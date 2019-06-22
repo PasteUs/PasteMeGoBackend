@@ -12,9 +12,11 @@ package data
 import (
 	"fmt"
 	"github.com/LucienShui/PasteMe/GoBackend/data/permanent"
+	"github.com/LucienShui/PasteMe/GoBackend/data/temporary"
 	"github.com/LucienShui/PasteMe/GoBackend/util"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
+	"os"
 )
 
 const (
@@ -51,12 +53,23 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-	// db = db.Debug() // DEBUG
+	if os.Getenv("GIN_MODE") == "debug" {
+		db = db.Debug()
+	}
 	if !db.HasTable(&permanent.Permanent{}) {
 		if err := db.Set(
 			"gorm:table_options",
 			"ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=100",
-			).CreateTable(&permanent.Permanent{}).Error; err != nil {
+		).CreateTable(&permanent.Permanent{}).Error; err != nil {
+			panic(err)
+		}
+	}
+
+	if !db.HasTable(&temporary.Temporary{}) {
+		if err := db.Set(
+			"gorm:table_options",
+			"ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
+		).CreateTable(&temporary.Temporary{}).Error; err != nil {
 			panic(err)
 		}
 	}
@@ -77,7 +90,15 @@ func Insert(paste Paste) (string, error) {
 			return "", err
 		}
 	} else { // temporary
-		// TODO
+		if paste.Key, err = func() (string, error) {
+			key, err := temporary.Insert(db, paste.Key, paste.Lang, paste.Content, paste.Password)
+			if err != nil {
+				return "", err
+			}
+			return key, nil
+		}(); err != nil {
+			return "", err
+		}
 	}
 	return paste.Key, err
 }
@@ -94,14 +115,26 @@ func Query(key string) (Paste, error) {
 			return paste, err
 		}
 		return Paste{
-			Key: util.Uint2string(object.Key),
-			Lang: object.Lang,
-			Content: object.Content,
-			Password: object.Password}, err
+			Key:      util.Uint2string(object.Key),
+			Lang:     object.Lang,
+			Content:  object.Content,
+			Password: object.Password,
+		}, err
 	} else { // temporary
-		// TODO
+		object, err := temporary.Query(db, key)
+		if err != nil {
+			return paste, err
+		}
+		if err := Delete(key); err != nil {
+			return paste, err
+		}
+		return Paste{
+			Key:      object.Key,
+			Lang:     object.Lang,
+			Content:  object.Content,
+			Password: object.Password,
+		}, err
 	}
-	return paste, err
 }
 
 func Delete(key string) error {
@@ -112,7 +145,6 @@ func Delete(key string) error {
 	if table == "permanent" {
 		return permanent.Delete(db, util.String2uint(key))
 	} else { // temporary
-		// TODO
+		return temporary.Delete(db, key)
 	}
-	return err
 }

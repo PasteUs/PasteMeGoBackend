@@ -25,9 +25,9 @@ type Permanent struct {
 
 func Insert(db *gorm.DB, lang string, content string, password string) (uint64, error) {
 	permanent := &Permanent{
-		Content:   content,
-		Lang:      lang,
-		Password:  password}
+		Content:  content,
+		Lang:     lang,
+		Password: password}
 	if err := db.Create(&permanent).Error; err != nil {
 		return 0, err
 	}

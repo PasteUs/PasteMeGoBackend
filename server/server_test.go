@@ -11,20 +11,14 @@ package server
 
 import (
 	"encoding/json"
-	"github.com/LucienShui/PasteMe/GoBackend/server/request"
+	"github.com/LucienShui/PasteMe/GoBackend/tests/request"
 	"testing"
 )
 
 var key string
 
-func TestPost(t *testing.T) {
-	body := request.Set(
-		t,
-		router,
-		"",
-		"plain",
-		"HelloWorld!",
-		"")
+func TestPermanentPost(t *testing.T) {
+	body := request.Set(t, router, "", "plain", "<h1>Hello!</h1>", "")
 
 	type JsonResponse struct {
 		Key string `json:"key"`
@@ -37,14 +31,10 @@ func TestPost(t *testing.T) {
 
 	key = response.Key
 
-	content, err := json.Marshal(response)
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Log(string(content))
+	t.Log(key)
 }
 
-func TestGet(t *testing.T) {
+func TestPermanentGet(t *testing.T) {
 	body := request.Get(t, router, key, "")
 
 	type JsonResponse struct {
@@ -61,5 +51,44 @@ func TestGet(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	t.Log(string(content))
+}
+
+func TestTemporaryPost(t *testing.T) {
+	body := request.Set(t, router, "asdf", "plain", "<h1>Hello!</h1>", "")
+
+	type JsonResponse struct {
+		Key string `json:"key"`
+	}
+
+	response := JsonResponse{}
+	if err := json.Unmarshal(body, &response); err != nil {
+		t.Fatal(err)
+	}
+
+	key = response.Key
+
+	t.Log(key)
+}
+
+func TestTemporaryGet(t *testing.T) {
+	body := request.Get(t, router, key, "")
+
+	type JsonResponse struct {
+		Content string `json:"content"`
+		Lang string `json:"lang"`
+	}
+
+	response := &JsonResponse{}
+	if err := json.Unmarshal(body, &response); err != nil {
+		t.Fatal(err)
+	}
+
+	content, err := json.Marshal(response)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	t.Log(string(content))
 }

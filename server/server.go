@@ -59,7 +59,7 @@ func insert(requests *gin.Context) {
 		panic(err)
 		// TODO
 	}
-	requests.JSON(http.StatusOK, gin.H {
+	requests.JSON(http.StatusCreated, gin.H {
 		"key": key,
 	})
 }
@@ -73,6 +73,7 @@ func query(requests *gin.Context) {
 	} else {
 		key, password := util.Parse(token)
 		object, err := data.Query(key)
+
 		if err != nil {
 			if err.Error() == "record not found" {
 				requests.JSON(http.StatusNotFound, gin.H {
@@ -84,6 +85,7 @@ func query(requests *gin.Context) {
 			panic(err)
 			// TODO
 		}
+
 		if object.Password == password { // key and password (if exist) is right
 			browser := requests.DefaultQuery("browser", "empty")
 			if browser == "empty" { // API request
@@ -94,7 +96,7 @@ func query(requests *gin.Context) {
 					"lang": 	object.Lang,
 				})
 			}
-		} else { // key not found or password wrong
+		} else { // password wrong
 			// TODO
 		}
 	}

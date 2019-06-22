@@ -6,7 +6,7 @@ import (
 
 func TestValidChecker(t *testing.T) {
 	var TestCases = []struct {
-		input string
+		input    string
 		expected string
 	}{
 		{"01234567", ""},
