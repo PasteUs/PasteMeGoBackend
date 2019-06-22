@@ -1,0 +1,40 @@
+kind: pipeline
+name: GoBackend latest test
+workspace:
+    base: /go
+    path: src/github.com/LucienShui/PasteMeBackend
+
+services:
+- name: mysql
+  image: mysql:latest
+  ports:
+  - 3306
+  environment:
+    MYSQL_USER: username
+    MYSQL_PASSWORD: password
+    MYSQL_ROOT_PASSWORD: password
+    MYSQL_DATABASE: pasteme
+
+steps:
+- name: test
+  image: golang:latest
+  commands:
+  - sleep 15
+  - bash script/dep.sh
+  - bash script/test.sh
+
+---
+
+kind: pipeline
+name: gobackend_latest build
+workspace:
+    base: /go
+    path: src/github.com/LucienShui/PasteMeBackend
+
+steps:
+- name: build
+  image: golang:latest
+  commands:
+  - bash script/dep.sh
+  - go build -o backend
+
