@@ -1,47 +1,40 @@
----
 kind: pipeline
-name: frontend_latest_lint
+name: GoBackend latest test
+workspace:
+    base: /go
+    path: src/github.com/LucienShui/PasteMeBackend
+
+services:
+- name: mysql
+  image: mysql:latest
+  ports:
+  - 3306
+  environment:
+    MYSQL_USER: username
+    MYSQL_PASSWORD: password
+    MYSQL_ROOT_PASSWORD: password
+    MYSQL_DATABASE: pasteme
 
 steps:
-- name: lint
-  image: node:latest
+- name: test
+  image: golang:latest
   commands:
-  - cd Frontend
-  - npm install
-  - npm run lint
+  - sleep 15
+  - bash script/dep.sh
+  - bash script/test.sh
 
 ---
+
 kind: pipeline
-name: frontend_version_lint
-
-steps:
-- name: lint
-  image: node:11
-  commands:
-  - cd Frontend
-  - npm install
-  - npm run lint
-
----
-kind: pipeline
-name: frontend_latest_build
-
-steps:
-- name: build
-  image: node:latest
-  commands:
-  - cd Frontend
-  - npm install
-  - npm run build
-
----
-kind: pipeline
-name: frontend_version_build
+name: gobackend_latest build
+workspace:
+    base: /go
+    path: src/github.com/LucienShui/PasteMeBackend
 
 steps:
 - name: build
-  image: node:11
+  image: golang:latest
   commands:
-  - cd Frontend
-  - npm install
-  - npm run build
+  - bash script/dep.sh
+  - go build -o backend
+

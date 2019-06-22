@@ -1,32 +1,12 @@
-requests.http
-config.php
-config.json
-usr.js
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
 
-.DS_Store
-node_modules
+# Test binary, build with `go test -c`
+*.test
 
-# local env files
-.env.local
-.env.*.local
-
-# Log files
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Editor directories and files
-.idea
-.vscode
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-.well-known
-.file
-.idea
-test.html
-test.php
-config.php
-tmp
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
