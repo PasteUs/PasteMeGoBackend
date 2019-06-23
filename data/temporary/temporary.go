@@ -47,3 +47,11 @@ func Delete(db *gorm.DB, key string) error {
 	}
 	return nil
 }
+
+func Exist(db *gorm.DB, key string) bool {
+	count := uint8(0)
+	if err := db.Model(&Temporary{}).Where("`key` = ?", key).Count(&count).Error; err != nil {
+		return false
+	}
+	return count > 0
+}

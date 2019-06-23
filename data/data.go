@@ -53,7 +53,7 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-	if os.Getenv("GIN_MODE") == "debug" {
+	if os.Getenv("GIN_MODE") != "release" {
 		db = db.Debug()
 	}
 	if !db.HasTable(&permanent.Permanent{}) {
@@ -147,4 +147,8 @@ func Delete(key string) error {
 	} else { // temporary
 		return temporary.Delete(db, key)
 	}
+}
+
+func Exist(key string) bool {
+	return temporary.Exist(db, key)
 }

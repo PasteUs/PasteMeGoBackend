@@ -39,7 +39,7 @@ func TestPermanentGet(t *testing.T) {
 
 	type JsonResponse struct {
 		Content string `json:"content"`
-		Lang string `json:"lang"`
+		Lang    string `json:"lang"`
 	}
 
 	response := &JsonResponse{}
@@ -77,7 +77,7 @@ func TestTemporaryGet(t *testing.T) {
 
 	type JsonResponse struct {
 		Content string `json:"content"`
-		Lang string `json:"lang"`
+		Lang    string `json:"lang"`
 	}
 
 	response := &JsonResponse{}

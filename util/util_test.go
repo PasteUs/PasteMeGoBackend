@@ -23,10 +23,20 @@ func TestValidChecker(t *testing.T) {
 	for i, TestCase := range TestCases {
 		output, err := ValidChecker(TestCase.input)
 		if output != TestCase.expected {
-			t.Errorf("Test %d | input: %s, expected: %s, output: %s\n", i, TestCase.input, TestCase.expected, output)
+			t.Fatalf("Test %d | input: %s, expected: %s, output: %s\n", i, TestCase.input, TestCase.expected, output)
 		}
 		if err != nil {
 			t.Logf("[%s]\n", err)
 		}
+	}
+}
+
+func Test_generator(t *testing.T) {
+	for i := 0; i < 8; i++ {
+		str, err := generator(8)
+		if err != nil {
+			t.Fatal(err)
+		}
+		t.Log(str)
 	}
 }

@@ -59,7 +59,7 @@ func insert(requests *gin.Context) {
 		panic(err)
 		// TODO
 	}
-	requests.JSON(http.StatusCreated, gin.H {
+	requests.JSON(http.StatusCreated, gin.H{
 		"key": key,
 	})
 }
@@ -67,7 +67,7 @@ func insert(requests *gin.Context) {
 func query(requests *gin.Context) {
 	token := requests.DefaultQuery("token", "")
 	if token == "" { // empty request
-		requests.JSON(http.StatusForbidden, gin.H {
+		requests.JSON(http.StatusForbidden, gin.H{
 			"message": "Wrong params",
 		})
 	} else {
@@ -76,8 +76,8 @@ func query(requests *gin.Context) {
 
 		if err != nil {
 			if err.Error() == "record not found" {
-				requests.JSON(http.StatusNotFound, gin.H {
-					"key": key,
+				requests.JSON(http.StatusNotFound, gin.H{
+					"key":     key,
 					"message": "404 Not Found",
 				})
 				return
@@ -91,9 +91,9 @@ func query(requests *gin.Context) {
 			if browser == "empty" { // API request
 				requests.String(http.StatusOK, object.Content)
 			} else { // Browser request
-				requests.JSON(http.StatusOK, gin.H {
-					"content": 	object.Content,
-					"lang": 	object.Lang,
+				requests.JSON(http.StatusOK, gin.H{
+					"content": object.Content,
+					"lang":    object.Lang,
 				})
 			}
 		} else { // password wrong

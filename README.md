@@ -11,6 +11,8 @@ $ go build -o pasteme_backend
 
 ## Test
 
+This script will test all packages if there is no param.
+
 ```bash
-bash test.sh
+./gotest [package name]
 ```

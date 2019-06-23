@@ -39,7 +39,7 @@ func get(t *testing.T, uri string, router *gin.Engine) []byte {
 	result := w.Result()                        // 提取响应
 	body, err := ioutil.ReadAll(result.Body)    // 读取响应body
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 	return body
 }
