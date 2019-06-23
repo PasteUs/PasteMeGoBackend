@@ -3,7 +3,6 @@
 BASE=github.com/LucienShui/PasteMeBackend/
 
 PACKAGE_LISTS="
-data
 server
 util
 "

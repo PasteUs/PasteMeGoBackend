@@ -35,17 +35,14 @@ func Parse(token string) (string, string) {
 
 func ValidChecker(key string) (string, error) {
 	if len(key) > 8 || len(key) < 3 {
-		return "", errors.New("length wrong") // "key's length show greater or equal than 3 and less or equal than 8: " + key)
-	}
-	if key[0] == '0' {
-		return "", errors.New("leading zero") // "permanent key should not have leading zero: " + key)
+		return "", errors.New("length wrong") // key's length should at least 3 and at most 8
 	}
 	flag, err := regexp.MatchString("^[0-9a-z]{3,8}$", key)
 	if err != nil {
 		return "", err
 	}
 	if !flag {
-		return "", errors.New("reg failed") // "key's format checking failed, should only contains digital or lowercase letters: " + key)
+		return "", errors.New("reg failed") // key's format checking failed, should only contains digital or lowercase letters
 	}
 	flag, err = regexp.MatchString("[a-z]", key)
 	if err != nil {
@@ -68,6 +65,9 @@ func generator(length uint8) (string, error) {
 
 // Check str is able to insert or not
 func check(str string) bool {
+	if str[0] == '0' {
+		return false
+	}
 	flag, err := regexp.MatchString("[a-z]", str)
 	if err != nil {
 		return false
@@ -76,18 +76,18 @@ func check(str string) bool {
 }
 
 // Generate a string that contains at least one alphabet and not occur in temporary database on field key
-func Generator() (string, error) {
+func Generator() string {
 	str, err := generator(8)
 	if err != nil {
-		return "", err
+		panic(err) // TODO
 	}
 	for !check(str) { // do {...} while (...)
 		str, err = generator(8)
 		if err != nil {
-			return "", err
+			panic(err) // TODO
 		}
 	}
-	return str, err
+	return str
 }
 
 func Uint2string(value uint64) string {

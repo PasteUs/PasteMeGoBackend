@@ -12,7 +12,7 @@ func TestValidChecker(t *testing.T) {
 		{"01234567", ""},
 		{"12345678", "permanent"},
 		{"asdfqwer", "temporary"},
-		{"0asdf123", "temporary"},
+		{"0asdf123", ""},
 		{"0", ""},
 		{"a", ""},
 		{"asdf", "temporary"},

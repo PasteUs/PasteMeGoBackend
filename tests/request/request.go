@@ -13,7 +13,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/LucienShui/PasteMeBackend/data"
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
 	"net/http/httptest"
@@ -60,22 +59,6 @@ func postForm(t *testing.T, uri string, param map[string]string, router *gin.Eng
 
 // postJson 根据特定请求uri和参数param，以Json形式传递参数，发起post请求返回响应
 func postJson(t *testing.T, uri string, param map[string]interface{}, router *gin.Engine) []byte {
-	jsonByte, err := json.Marshal(param) // 将参数转化为json比特流
-	if err != nil {
-		t.Fatal(err)
-	}
-	req := httptest.NewRequest("POST", uri, bytes.NewReader(jsonByte)) // 构造post请求，json数据以请求body的形式传递
-	w := httptest.NewRecorder()                                        // 初始化响应
-	router.ServeHTTP(w, req)                                           // 调用相应的handler接口
-	result := w.Result()                                               // 提取响应
-	body, err := ioutil.ReadAll(result.Body)                           // 读取响应body
-	if err != nil {
-		t.Fatal(err)
-	}
-	return body
-}
-
-func postPaste(t *testing.T, uri string, param data.Paste, router *gin.Engine) []byte {
 	jsonByte, err := json.Marshal(param) // 将参数转化为json比特流
 	if err != nil {
 		t.Fatal(err)
