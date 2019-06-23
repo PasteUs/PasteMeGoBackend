@@ -20,9 +20,9 @@ var router *gin.Engine
 func init() {
 	router = gin.Default()
 	router.Use(cors.Default())
-	router.GET("/:token/", get)
+	router.GET("/:token", get)
 	router.POST("/", setPermanent)
-	router.POST("/:key/", setTemporary)
+	router.POST("/:key", setTemporary)
 }
 
 func Run(address string, port uint16) {
