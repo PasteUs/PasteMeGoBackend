@@ -48,6 +48,13 @@ func cors(c *gin.Context) {
 	c.Next()
 }
 
+func post(requests *gin.Context) {
+	table, err := util.ValidChecker(requests.DefaultQuery("key", ""))
+	if err != nil {
+
+	}
+}
+
 func insert(requests *gin.Context) {
 	paste := data.Paste{}
 	if err := requests.Bind(&paste); err != nil {

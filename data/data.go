@@ -45,19 +45,19 @@ type Paste struct {
 	Password string `json:"password"`
 }
 
-var db *gorm.DB
+var DB *gorm.DB
 
 func init() {
 	var err error
-	db, err = gorm.Open("mysql", format(username, password, network, server, port, database))
+	DB, err = gorm.Open("mysql", format(username, password, network, server, port, database))
 	if err != nil {
 		panic(err)
 	}
 	if os.Getenv("GIN_MODE") != "release" {
-		db = db.Debug()
+		DB = DB.Debug()
 	}
-	if !db.HasTable(&permanent.Permanent{}) {
-		if err := db.Set(
+	if !DB.HasTable(&permanent.Permanent{}) {
+		if err := DB.Set(
 			"gorm:table_options",
 			"ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=100",
 		).CreateTable(&permanent.Permanent{}).Error; err != nil {
@@ -65,8 +65,8 @@ func init() {
 		}
 	}
 
-	if !db.HasTable(&temporary.Temporary{}) {
-		if err := db.Set(
+	if !DB.HasTable(&temporary.Temporary{}) {
+		if err := DB.Set(
 			"gorm:table_options",
 			"ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
 		).CreateTable(&temporary.Temporary{}).Error; err != nil {
@@ -81,7 +81,7 @@ func Insert(paste Paste) (string, error) {
 		// TODO
 	} else if paste.Key == "" { // permanent
 		if paste.Key, err = func() (string, error) {
-			key, err := permanent.Insert(db, paste.Lang, paste.Content, paste.Password)
+			key, err := permanent.Insert(DB, paste.Lang, paste.Content, paste.Password)
 			if err != nil {
 				return "", err
 			}
@@ -91,7 +91,7 @@ func Insert(paste Paste) (string, error) {
 		}
 	} else { // temporary
 		if paste.Key, err = func() (string, error) {
-			key, err := temporary.Insert(db, paste.Key, paste.Lang, paste.Content, paste.Password)
+			key, err := temporary.Insert(DB, paste.Key, paste.Lang, paste.Content, paste.Password)
 			if err != nil {
 				return "", err
 			}
@@ -110,7 +110,7 @@ func Query(key string) (Paste, error) {
 		return paste, err
 	}
 	if table == "permanent" {
-		object, err := permanent.Query(db, util.String2uint(key))
+		object, err := permanent.Query(DB, util.String2uint(key))
 		if err != nil {
 			return paste, err
 		}
@@ -121,7 +121,7 @@ func Query(key string) (Paste, error) {
 			Password: object.Password,
 		}, err
 	} else { // temporary
-		object, err := temporary.Query(db, key)
+		object, err := temporary.Query(DB, key)
 		if err != nil {
 			return paste, err
 		}
@@ -143,12 +143,12 @@ func Delete(key string) error {
 		return err
 	}
 	if table == "permanent" {
-		return permanent.Delete(db, util.String2uint(key))
+		return permanent.Delete(DB, util.String2uint(key))
 	} else { // temporary
-		return temporary.Delete(db, key)
+		return temporary.Delete(DB, key)
 	}
 }
 
 func Exist(key string) bool {
-	return temporary.Exist(db, key)
+	return temporary.Exist(DB, key)
 }

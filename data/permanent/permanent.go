@@ -10,6 +10,7 @@
 package permanent
 
 import (
+	"github.com/LucienShui/PasteMeBackend/data"
 	"github.com/jinzhu/gorm"
 	"time"
 )
@@ -21,6 +22,10 @@ type Permanent struct {
 	Password  string `gorm:"type:varchar(17)"`
 	CreatedAt time.Time
 	DeletedAt *time.Time
+}
+
+func (permanent *Permanent) save() error {
+	return data.DB.Create(&permanent).Error
 }
 
 func Insert(db *gorm.DB, lang string, content string, password string) (uint64, error) {

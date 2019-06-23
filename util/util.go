@@ -35,23 +35,23 @@ func Parse(token string) (string, string) {
 
 func ValidChecker(key string) (string, error) {
 	if len(key) > 8 || len(key) < 3 {
-		return "", errors.New("key's length show greater or equal than 3 and less or equal than 8: " + key)
+		return "", errors.New("length wrong") // "key's length show greater or equal than 3 and less or equal than 8: " + key)
+	}
+	if key[0] == '0' {
+		return "", errors.New("leading zero") // "permanent key should not have leading zero: " + key)
 	}
 	flag, err := regexp.MatchString("^[0-9a-z]{3,8}$", key)
 	if err != nil {
 		return "", err
 	}
 	if !flag {
-		return "", errors.New("key's format checking failed, should only contains digital or lowercase letters: " + key)
+		return "", errors.New("reg failed") // "key's format checking failed, should only contains digital or lowercase letters: " + key)
 	}
 	flag, err = regexp.MatchString("[a-z]", key)
 	if err != nil {
 		return "", err
 	}
 	if !flag { // only digit
-		if key[0] == '0' {
-			return "", errors.New("permanent key should not have leading zero: " + key)
-		}
 		return "permanent", nil
 	}
 	return "temporary", nil
