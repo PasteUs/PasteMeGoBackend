@@ -11,7 +11,7 @@ package server
 
 import (
 	"encoding/json"
-	"github.com/LucienShui/PasteMe/GoBackend/tests/request"
+	"github.com/LucienShui/PasteMeBackend/tests/request"
 	"testing"
 )
 

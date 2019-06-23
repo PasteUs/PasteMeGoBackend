@@ -11,8 +11,8 @@ package server
 
 import (
 	"fmt"
-	"github.com/LucienShui/PasteMe/GoBackend/data"
-	"github.com/LucienShui/PasteMe/GoBackend/util"
+	"github.com/LucienShui/PasteMeBackend/data"
+	"github.com/LucienShui/PasteMeBackend/util"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )

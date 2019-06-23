@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-BASE=github.com/LucienShui/PasteMe/GoBackend/
+BASE=github.com/LucienShui/PasteMeBackend/
 
 TEST_CASE="
 data

@@ -13,7 +13,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/LucienShui/PasteMe/GoBackend/data"
+	"github.com/LucienShui/PasteMeBackend/data"
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
 	"net/http/httptest"

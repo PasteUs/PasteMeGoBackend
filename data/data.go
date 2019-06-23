@@ -11,9 +11,9 @@ package data
 
 import (
 	"fmt"
-	"github.com/LucienShui/PasteMe/GoBackend/data/permanent"
-	"github.com/LucienShui/PasteMe/GoBackend/data/temporary"
-	"github.com/LucienShui/PasteMe/GoBackend/util"
+	"github.com/LucienShui/PasteMeBackend/data/permanent"
+	"github.com/LucienShui/PasteMeBackend/data/temporary"
+	"github.com/LucienShui/PasteMeBackend/util"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
 	"os"
