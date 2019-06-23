@@ -3,7 +3,7 @@
 @Contact: lucien@lucien.ink
 @Licence: (C)Copyright 2019 Lucien Shui
 
-@Modify Time      @Author    @Version    @Desciption
+@Modify Time      @Author    @Version    @Description
 ------------      -------    --------    -----------
 2019-06-11 02:07  Lucien     1.0         Init
 */
@@ -11,6 +11,7 @@ package util
 
 import (
 	"errors"
+	"github.com/LucienShui/PasteMeBackend/model"
 	"math/rand"
 	"regexp"
 	"strconv"
@@ -64,15 +65,15 @@ func generator(length uint8) (string, error) {
 }
 
 // Check str is able to insert or not
-func check(str string) bool {
-	if str[0] == '0' {
+func check(key string) bool {
+	if key[0] == '0' {
 		return false
 	}
-	flag, err := regexp.MatchString("[a-z]", str)
+	flag, err := regexp.MatchString("[a-z]", key)
 	if err != nil {
 		return false
 	}
-	return flag
+	return flag && !model.Exist(key)
 }
 
 // Generate a string that contains at least one alphabet and not occur in temporary database on field key

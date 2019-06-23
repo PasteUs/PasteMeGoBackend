@@ -75,9 +75,8 @@ func postJson(t *testing.T, uri string, param map[string]interface{}, router *gi
 }
 
 func Set(t *testing.T, router *gin.Engine, Key string, Lang string, Content string, Password string) []byte {
-	uri := "/"
+	uri := "/" + Key
 	params := make(map[string]string)
-	params["Key"] = Key
 	params["Lang"] = Lang
 	params["Content"] = Content
 	params["Password"] = Password
@@ -85,6 +84,6 @@ func Set(t *testing.T, router *gin.Engine, Key string, Lang string, Content stri
 }
 
 func Get(t *testing.T, router *gin.Engine, Key string, Password string) []byte {
-	uri := fmt.Sprintf("/?token=%s,%s&browser=", Key, Password)
+	uri := fmt.Sprintf("/%s,%s?browser", Key, Password)
 	return get(t, uri, router)
 }

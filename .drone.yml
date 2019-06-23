@@ -36,5 +36,4 @@ steps:
   image: golang:latest
   commands:
   - bash dep.sh
-  - go build -o backend
-
+  - go build -o api

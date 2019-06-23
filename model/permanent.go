@@ -3,7 +3,7 @@
 @Contact: lucien@lucien.ink
 @Licence: (C)Copyright 2019 Lucien Shui
 
-@Modify Time      @Author    @Version    @Desciption
+@Modify Time      @Author    @Version    @Description
 ------------      -------    --------    -----------
 2019-06-23 14:03  Lucien     1.0         None
 */

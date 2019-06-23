@@ -9,16 +9,18 @@ func TestValidChecker(t *testing.T) {
 		input    string
 		expected string
 	}{
-		{"01234567", ""},
+		{"01234567", "permanent"},
 		{"12345678", "permanent"},
 		{"asdfqwer", "temporary"},
-		{"0asdf123", ""},
+		{"0asdf123", "temporary"},
 		{"0", ""},
 		{"a", ""},
 		{"asdf", "temporary"},
 		{"asd", "temporary"},
 		{"asdfqwerasdf", ""},
 		{"1000000000", ""},
+		{"dafsdf?", ""},
+		{"read_once", ""},
 	}
 	for i, TestCase := range TestCases {
 		output, err := ValidChecker(TestCase.input)

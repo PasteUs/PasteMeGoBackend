@@ -11,19 +11,20 @@ package server
 
 import (
 	"encoding/json"
+	"github.com/LucienShui/PasteMeBackend/model"
 	"github.com/LucienShui/PasteMeBackend/tests/request"
 	"github.com/LucienShui/PasteMeBackend/util"
 	"testing"
 )
 
-var keyD int
-var keyS string
+var keyP uint64
+var keyT, keyR string
 
 func TestPermanentPost(t *testing.T) {
 	body := request.Set(t, router, "", "plain", "<h1>Hello!</h1>", "")
 
 	type JsonResponse struct {
-		Key int `json:"key"`
+		Key uint64 `json:"key"`
 	}
 
 	response := JsonResponse{}
@@ -31,13 +32,13 @@ func TestPermanentPost(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	keyD = response.Key
+	keyP = response.Key
 
-	t.Log(keyD)
+	t.Logf("permanent key: %d", keyP)
 }
 
 func TestPermanentGet(t *testing.T) {
-	body := request.Get(t, router, util.Uint2string(uint64(keyD)), "")
+	body := request.Get(t, router, util.Uint2string(uint64(keyP)), "")
 
 	type JsonResponse struct {
 		Content string `json:"content"`
@@ -69,13 +70,13 @@ func TestTemporaryPost(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	keyS = response.Key
+	keyT = response.Key
 
-	t.Log(keyS)
+	t.Logf("template key: %s", keyT)
 }
 
 func TestTemporaryGet(t *testing.T) {
-	body := request.Get(t, router, keyS, "")
+	body := request.Get(t, router, keyT, "")
 
 	type JsonResponse struct {
 		Content string `json:"content"`
@@ -107,13 +108,13 @@ func TestReadOncePost(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	keyS = response.Key
+	keyR = response.Key
 
-	t.Log(keyS)
+	t.Logf("read_once key: %s", keyR)
 }
 
 func TestReadOnceGet(t *testing.T) {
-	body := request.Get(t, router, keyS, "")
+	body := request.Get(t, router, keyR, "")
 
 	type JsonResponse struct {
 		Content string `json:"content"`
@@ -131,4 +132,31 @@ func TestReadOnceGet(t *testing.T) {
 	}
 
 	t.Log(string(content))
+}
+
+func TestExist(t *testing.T) {
+	if model.Exist(keyT) {
+		t.Fatalf("test temporary key: %s failed.", keyT)
+	}
+	if model.Exist(keyR) {
+		t.Fatalf("test read_once key: %s failed.", keyR)
+	}
+
+	TestTemporaryPost(t)
+	if !model.Exist(keyT) {
+		t.Fatalf("test temporary key: %s failed.", keyT)
+	}
+	TestTemporaryGet(t)
+	if model.Exist(keyT) {
+		t.Fatalf("test temporary key: %s failed.", keyT)
+	}
+
+	TestReadOncePost(t)
+	if !model.Exist(keyR) {
+		t.Fatalf("test read_once key: %s failed.", keyR)
+	}
+	TestReadOnceGet(t)
+	if model.Exist(keyR) {
+		t.Fatalf("test read_once key: %s failed.", keyR)
+	}
 }
