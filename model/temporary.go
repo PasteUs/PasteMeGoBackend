@@ -10,6 +10,8 @@
 package model
 
 import (
+	"errors"
+	"strings"
 	"time"
 )
 
@@ -22,6 +24,15 @@ type Temporary struct {
 }
 
 func (paste *Temporary) Save() error {
+	if paste.Content == "" {
+		return errors.New("empty content")
+	}
+	if paste.Lang == "" {
+		return errors.New("empty lang")
+	}
+	if strings.Contains(paste.Content, "#include") && paste.Lang == "plain" {
+		paste.Lang = "cpp"
+	}
 	return db.Create(&paste).Error
 }
 

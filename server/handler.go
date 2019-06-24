@@ -24,7 +24,9 @@ func setPermanent(requests *gin.Context) {
 		panic(err) // TODO
 	} else {
 		if err := paste.Save(); err != nil {
-			panic(err) // TODO
+			requests.JSON(http.StatusInternalServerError, gin.H{
+				"message": err.Error(),
+			})
 		} else {
 			requests.JSON(http.StatusCreated, gin.H{
 				"status": http.StatusCreated,
@@ -39,10 +41,14 @@ func setTemporary(requests *gin.Context) {
 	if key == "read_once" {
 		paste := model.Temporary{Key: util.Generator()}
 		if err := requests.Bind(&paste); err != nil {
-			panic(err) // TODO
+			requests.JSON(http.StatusInternalServerError, gin.H{
+				"message": err.Error(),
+			})
 		} else {
 			if err := paste.Save(); err != nil {
-				panic(err) // TODO
+				requests.JSON(http.StatusInternalServerError, gin.H{
+					"message": err.Error(),
+				})
 			} else {
 				requests.JSON(http.StatusCreated, gin.H{
 					"status": http.StatusCreated,
@@ -54,17 +60,31 @@ func setTemporary(requests *gin.Context) {
 		key = strings.ToLower(key)
 		table, err := util.ValidChecker(key)
 		if err != nil {
-			panic(err) // TODO
+			if err.Error() == "wrong length" {
+				requests.JSON(http.StatusBadRequest, gin.H{
+					"message": "key's length should at least 3 and at most 8",
+				})
+			} else {
+				requests.JSON(http.StatusBadRequest, gin.H{
+					"message": "key should only contains digital or lowercase letters",
+				})
+			}
 		} else {
 			if table != "temporary" {
-				// TODO
+				requests.JSON(http.StatusBadRequest, gin.H{
+					"message": "only temporary key can be specified",
+				})
 			} else {
 				paste := model.Temporary{Key: key}
 				if err := requests.Bind(&paste); err != nil {
-					panic(err) // TODO
+					requests.JSON(http.StatusInternalServerError, gin.H{
+						"message": err.Error(),
+					})
 				} else {
 					if err := paste.Save(); err != nil {
-						panic(err) // TODO
+						requests.JSON(http.StatusInternalServerError, gin.H{
+							"message": err.Error(),
+						})
 					} else {
 						requests.JSON(http.StatusCreated, gin.H{
 							"status": http.StatusCreated,
@@ -130,7 +150,9 @@ func get(requests *gin.Context) {
 							"message": fmt.Sprintf("key: %d not found", paste.Key),
 						})
 					} else {
-						panic(err) // TODO
+						requests.JSON(http.StatusInternalServerError, gin.H{
+							"message": err.Error(),
+						})
 					}
 				} else {
 					if paste.Password == password {

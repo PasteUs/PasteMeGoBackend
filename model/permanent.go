@@ -10,6 +10,8 @@
 package model
 
 import (
+	"errors"
+	"strings"
 	"time"
 )
 
@@ -23,6 +25,15 @@ type Permanent struct {
 }
 
 func (paste *Permanent) Save() error {
+	if paste.Content == "" {
+		return errors.New("empty content")
+	}
+	if paste.Lang == "" {
+		return errors.New("empty lang")
+	}
+	if strings.Contains(paste.Content, "#include") && paste.Lang == "plain" {
+		paste.Lang = "cpp"
+	}
 	return db.Create(&paste).Error
 }
 
@@ -32,11 +43,4 @@ func (paste *Permanent) Delete() error {
 
 func (paste *Permanent) Get() error {
 	return db.Find(&paste, "`key` = ?", paste.Key).Error
-}
-
-func (paste *Permanent) Load(temporary Temporary) {
-	paste.Key = 0
-	paste.Lang = temporary.Lang
-	paste.Content = temporary.Content
-	paste.Password = temporary.Password
 }
