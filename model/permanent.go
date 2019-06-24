@@ -17,9 +17,10 @@ import (
 
 type Permanent struct {
 	Key       uint64 `gorm:"primary_key;index:idx"`
-	Lang      string `gorm:"type:varchar(17)"`
+	Lang      string `gorm:"type:varchar(16)"`
 	Content   string `gorm:"type:mediumtext"`
-	Password  string `gorm:"type:varchar(17)"`
+	Password  string `gorm:"type:varchar(16)"`
+	ClientIP  string `gorm:"type:varchar(64)"`
 	CreatedAt time.Time
 	DeletedAt *time.Time
 }

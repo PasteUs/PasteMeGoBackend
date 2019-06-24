@@ -16,10 +16,11 @@ import (
 )
 
 type Temporary struct {
-	Key       string `gorm:"type:varchar(17);primary_key;index:idx"`
-	Lang      string `gorm:"type:varchar(17)"`
+	Key       string `gorm:"type:varchar(16);primary_key;index:idx"`
+	Lang      string `gorm:"type:varchar(16)"`
 	Content   string `gorm:"type:mediumtext"`
-	Password  string `gorm:"type:varchar(17)"`
+	Password  string `gorm:"type:varchar(16)"`
+	ClientIP  string `gorm:"type:varchar(64)"`
 	CreatedAt time.Time
 }
 

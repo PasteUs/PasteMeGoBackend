@@ -19,7 +19,7 @@ import (
 )
 
 func setPermanent(requests *gin.Context) {
-	paste := model.Permanent{}
+	paste := model.Permanent{ClientIP: requests.ClientIP()}
 	if err := requests.Bind(&paste); err != nil {
 		panic(err) // TODO
 	} else {
@@ -39,7 +39,7 @@ func setPermanent(requests *gin.Context) {
 func setTemporary(requests *gin.Context) {
 	key := requests.Param("key")
 	if key == "read_once" {
-		paste := model.Temporary{Key: util.Generator()}
+		paste := model.Temporary{Key: util.Generator(), ClientIP: requests.ClientIP()}
 		if err := requests.Bind(&paste); err != nil {
 			requests.JSON(http.StatusInternalServerError, gin.H{
 				"message": err.Error(),
@@ -75,7 +75,7 @@ func setTemporary(requests *gin.Context) {
 					"message": "only temporary key can be specified",
 				})
 			} else {
-				paste := model.Temporary{Key: key}
+				paste := model.Temporary{Key: key, ClientIP: requests.ClientIP()}
 				if err := requests.Bind(&paste); err != nil {
 					requests.JSON(http.StatusInternalServerError, gin.H{
 						"message": err.Error(),
