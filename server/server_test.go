@@ -13,7 +13,7 @@ import (
 	"encoding/json"
 	"github.com/LucienShui/PasteMeBackend/model"
 	"github.com/LucienShui/PasteMeBackend/tests/request"
-	"github.com/LucienShui/PasteMeBackend/util"
+	"github.com/LucienShui/PasteMeBackend/util/convert"
 	"testing"
 )
 
@@ -21,7 +21,7 @@ var keyP uint64
 var keyT, keyR string
 
 func TestPermanentPost(t *testing.T) {
-	body := request.Set(t, router, "", "plain", "<h1>Hello!</h1>", "")
+	body := request.Set(t, router, "", "plain", "Hello", "")
 
 	type JsonResponse struct {
 		Key uint64 `json:"key"`
@@ -38,7 +38,7 @@ func TestPermanentPost(t *testing.T) {
 }
 
 func TestPermanentGet(t *testing.T) {
-	body := request.Get(t, router, util.Uint2string(uint64(keyP)), "")
+	body := request.Get(t, router, convert.Uint2string(uint64(keyP)), "")
 
 	type JsonResponse struct {
 		Content string `json:"content"`
@@ -50,16 +50,13 @@ func TestPermanentGet(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	content, err := json.Marshal(response)
-	if err != nil {
-		t.Fatal(err)
+	if response.Content != "Hello" {
+		t.Fatalf("content not equal: %s", response.Content)
 	}
-
-	t.Log(string(content))
 }
 
 func TestTemporaryPost(t *testing.T) {
-	body := request.Set(t, router, "asdf", "plain", "<h1>Hello!</h1>", "")
+	body := request.Set(t, router, "asdf", "plain", "Hello", "")
 
 	type JsonResponse struct {
 		Key string `json:"key"`
@@ -88,16 +85,13 @@ func TestTemporaryGet(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	content, err := json.Marshal(response)
-	if err != nil {
-		t.Fatal(err)
+	if response.Content != "Hello" {
+		t.Fatalf("content not equal: %s", response.Content)
 	}
-
-	t.Log(string(content))
 }
 
 func TestReadOncePost(t *testing.T) {
-	body := request.Set(t, router, "read_once", "plain", "<h1>Hello!</h1>", "")
+	body := request.Set(t, router, "read_once", "plain", "Hello", "")
 
 	type JsonResponse struct {
 		Key string `json:"key"`
@@ -126,18 +120,121 @@ func TestReadOnceGet(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	content, err := json.Marshal(response)
-	if err != nil {
+	if response.Content != "Hello" {
+		t.Fatalf("content not equal: %s", response.Content)
+	}
+}
+
+func TestPermanentPasswordPost(t *testing.T) {
+	body := request.Set(t, router, "", "plain", "Hello", "password")
+
+	type JsonResponse struct {
+		Key uint64 `json:"key"`
+	}
+
+	response := JsonResponse{}
+	if err := json.Unmarshal(body, &response); err != nil {
 		t.Fatal(err)
 	}
 
-	t.Log(string(content))
+	keyP = response.Key
+
+	t.Logf("permanent key: %d", keyP)
+}
+
+func TestPermanentPasswordGet(t *testing.T) {
+	body := request.Get(t, router, convert.Uint2string(uint64(keyP)), "password")
+
+	type JsonResponse struct {
+		Content string `json:"content"`
+		Lang    string `json:"lang"`
+	}
+
+	response := JsonResponse{}
+	if err := json.Unmarshal(body, &response); err != nil {
+		t.Fatal(err)
+	}
+
+	if response.Content != "Hello" {
+		t.Fatalf("content not equal: %s", response.Content)
+	}
+}
+
+func TestTemporaryPasswordPost(t *testing.T) {
+	body := request.Set(t, router, "asdf", "plain", "Hello", "password")
+
+	type JsonResponse struct {
+		Key string `json:"key"`
+	}
+
+	response := JsonResponse{}
+	if err := json.Unmarshal(body, &response); err != nil {
+		t.Fatal(err)
+	}
+
+	keyT = response.Key
+
+	t.Logf("template key: %s", keyT)
+}
+
+func TestTemporaryPasswordGet(t *testing.T) {
+	body := request.Get(t, router, keyT, "password")
+
+	type JsonResponse struct {
+		Content string `json:"content"`
+		Lang    string `json:"lang"`
+	}
+
+	response := JsonResponse{}
+	if err := json.Unmarshal(body, &response); err != nil {
+		t.Fatal(err)
+	}
+
+	if response.Content != "Hello" {
+		t.Fatalf("content not equal: %s", response.Content)
+	}
+}
+
+func TestReadOncePasswordPost(t *testing.T) {
+	body := request.Set(t, router, "read_once", "plain", "Hello", "password")
+
+	type JsonResponse struct {
+		Key string `json:"key"`
+	}
+
+	response := JsonResponse{}
+	if err := json.Unmarshal(body, &response); err != nil {
+		t.Fatal(err)
+	}
+
+	keyR = response.Key
+
+	t.Logf("read_once key: %s", keyR)
+}
+
+func TestReadOncePasswordGet(t *testing.T) {
+	body := request.Get(t, router, keyR, "password")
+
+	type JsonResponse struct {
+		Content string `json:"content"`
+		Lang    string `json:"lang"`
+	}
+
+	response := JsonResponse{}
+	if err := json.Unmarshal(body, &response); err != nil {
+		t.Fatal(err)
+	}
+
+	if response.Content != "Hello" {
+		t.Fatalf("content not equal: %s", response.Content)
+	}
 }
 
 func TestExist(t *testing.T) {
 	if model.Exist(keyT) {
 		t.Fatalf("test temporary key: %s failed.", keyT)
 	}
+
 	if model.Exist(keyR) {
 		t.Fatalf("test read_once key: %s failed.", keyR)
 	}
@@ -146,6 +243,7 @@ func TestExist(t *testing.T) {
 	if !model.Exist(keyT) {
 		t.Fatalf("test temporary key: %s failed.", keyT)
 	}
+
 	TestTemporaryGet(t)
 	if model.Exist(keyT) {
 		t.Fatalf("test temporary key: %s failed.", keyT)
@@ -155,7 +253,28 @@ func TestExist(t *testing.T) {
 	if !model.Exist(keyR) {
 		t.Fatalf("test read_once key: %s failed.", keyR)
 	}
+
 	TestReadOnceGet(t)
+	if model.Exist(keyR) {
+		t.Fatalf("test read_once key: %s failed.", keyR)
+	}
+
+	TestTemporaryPasswordPost(t)
+	if !model.Exist(keyT) {
+		t.Fatalf("test temporary key: %s failed.", keyT)
+	}
+
+	TestTemporaryPasswordGet(t)
+	if model.Exist(keyT) {
+		t.Fatalf("test temporary key: %s failed.", keyT)
+	}
+
+	TestReadOncePasswordPost(t)
+	if !model.Exist(keyR) {
+		t.Fatalf("test read_once key: %s failed.", keyR)
+	}
+
+	TestReadOncePasswordGet(t)
 	if model.Exist(keyR) {
 		t.Fatalf("test read_once key: %s failed.", keyR)
 	}

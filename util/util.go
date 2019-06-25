@@ -14,7 +14,6 @@ import (
 	"github.com/LucienShui/PasteMeBackend/model"
 	"math/rand"
 	"regexp"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -56,12 +55,12 @@ func ValidChecker(key string) (string, error) {
 }
 
 // Generate a string using lowercase and digits with fixed length
-func generator(length uint8) (string, error) {
+func generator(length uint8) string {
 	ret := make([]rune, length)
 	for i := uint8(0); i < length; i++ {
 		ret[i] = table[rand.Intn(len(table))]
 	}
-	return string(ret), nil
+	return string(ret)
 }
 
 // Check str is able to insert or not
@@ -78,28 +77,9 @@ func check(key string) bool {
 
 // Generate a string that contains at least one alphabet and not occur in temporary database on field key
 func Generator() string {
-	str, err := generator(8)
-	if err != nil {
-		panic(err) // TODO
-	}
+	str := generator(8)
 	for !check(str) { // do {...} while (...)
-		str, err = generator(8)
-		if err != nil {
-			panic(err) // TODO
-		}
+		str = generator(8)
 	}
 	return str
-}
-
-func Uint2string(value uint64) string {
-	return strconv.FormatUint(value, 10)
-}
-
-func String2uint(value string) uint64 {
-	ret, err := strconv.ParseUint(value, 10, 64)
-	if err != nil {
-		// TODO
-		return 0
-	}
-	return ret
 }

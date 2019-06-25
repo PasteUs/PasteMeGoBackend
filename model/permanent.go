@@ -11,15 +11,16 @@ package model
 
 import (
 	"errors"
+	"github.com/LucienShui/PasteMeBackend/util/convert"
 	"strings"
 	"time"
 )
 
 type Permanent struct {
 	Key       uint64 `gorm:"primary_key;index:idx"`
-	Lang      string `gorm:"type:varchar(16)"`
-	Content   string `gorm:"type:mediumtext"`
-	Password  string `gorm:"type:varchar(16)"`
+	Lang      string `json:"lang" gorm:"type:varchar(16)"`
+	Content   string `json:"content" gorm:"type:mediumtext"`
+	Password  string `json:"password" gorm:"type:varchar(32)"`
 	ClientIP  string `gorm:"type:varchar(64)"`
 	CreatedAt time.Time
 	DeletedAt *time.Time
@@ -34,6 +35,9 @@ func (paste *Permanent) Save() error {
 	}
 	if strings.Contains(paste.Content, "#include") && paste.Lang == "plain" {
 		paste.Lang = "cpp"
+	}
+	if paste.Password != "" {
+		paste.Password = convert.String2md5(paste.Password)
 	}
 	return db.Create(&paste).Error
 }

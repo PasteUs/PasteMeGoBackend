@@ -76,11 +76,11 @@ func postJson(t *testing.T, uri string, param map[string]interface{}, router *gi
 
 func Set(t *testing.T, router *gin.Engine, Key string, Lang string, Content string, Password string) []byte {
 	uri := "/" + Key
-	params := make(map[string]string)
-	params["Lang"] = Lang
-	params["Content"] = Content
-	params["Password"] = Password
-	return postForm(t, uri, params, router)
+	params := make(map[string]interface{})
+	params["lang"] = Lang
+	params["content"] = Content
+	params["password"] = Password
+	return postJson(t, uri, params, router)
 }
 
 func Get(t *testing.T, router *gin.Engine, Key string, Password string) []byte {

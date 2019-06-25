@@ -11,15 +11,16 @@ package model
 
 import (
 	"errors"
+	"github.com/LucienShui/PasteMeBackend/util/convert"
 	"strings"
 	"time"
 )
 
 type Temporary struct {
-	Key       string `gorm:"type:varchar(16);primary_key;index:idx"`
-	Lang      string `gorm:"type:varchar(16)"`
-	Content   string `gorm:"type:mediumtext"`
-	Password  string `gorm:"type:varchar(16)"`
+	Key       string `json:"key" gorm:"type:varchar(16);primary_key;index:idx"`
+	Lang      string `json:"lang" gorm:"type:varchar(16)"`
+	Content   string `json:"content" gorm:"type:mediumtext"`
+	Password  string `json:"password" gorm:"type:varchar(32)"`
 	ClientIP  string `gorm:"type:varchar(64)"`
 	CreatedAt time.Time
 }
@@ -34,6 +35,9 @@ func (paste *Temporary) Save() error {
 	if strings.Contains(paste.Content, "#include") && paste.Lang == "plain" {
 		paste.Lang = "cpp"
 	}
+	if paste.Password != "" {
+		paste.Password = convert.String2md5(paste.Password)
+	}
 	return db.Create(&paste).Error
 }
 
@@ -42,10 +46,7 @@ func (paste *Temporary) Delete() error {
 }
 
 func (paste *Temporary) Get() error {
-	if err := db.Find(&paste, "`key` = ?", paste.Key).Error; err != nil {
-		return err
-	}
-	return paste.Delete()
+	return db.Find(&paste, "`key` = ?", paste.Key).Error
 }
 
 func Exist(key string) bool {
