@@ -12,9 +12,9 @@ script:
 after_success:
   - rm -rf .git
   - git clone https://${GH_REF} -b ${P_BRANCH} tmpdir
-  - cp DEPLOY.md LICENSE pastemed pastemed.service tmpdir
+  - cp API.md LICENSE pastemed pastemed.service tmpdir
   - cd tmpdir
-  - mv DEPLOY.md README.md
+  - mv API.md README.md
   - git config user.name "${U_NAME}"
   - git config user.email "${U_EMAIL}"
   - git add --all
