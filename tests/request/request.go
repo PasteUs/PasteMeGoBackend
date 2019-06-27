@@ -43,27 +43,13 @@ func get(t *testing.T, uri string, router *gin.Engine) []byte {
 	return body
 }
 
-// postForm 根据特定请求uri和参数param，以表单形式传递参数，发起post请求返回响应
-func postForm(t *testing.T, uri string, param map[string]string, router *gin.Engine) []byte {
-	//t.Fatal(uri + parseToStr(param))
-	req := httptest.NewRequest("POST", uri+parseToStr(param), nil) // 构造post请求，表单数据以querystring的形式加在uri之后
-	w := httptest.NewRecorder()                                    // 初始化响应
-	router.ServeHTTP(w, req)                                       // 调用相应handler接口
-	result := w.Result()                                           // 提取响应
-	body, err := ioutil.ReadAll(result.Body)                       // 读取响应body
-	if err != nil {
-		t.Fatal(err)
-	}
-	return body
-}
-
-// postJson 根据特定请求uri和参数param，以Json形式传递参数，发起post请求返回响应
-func postJson(t *testing.T, uri string, param map[string]interface{}, router *gin.Engine) []byte {
+// requestJson 根据特定请求uri和参数param，以Json形式传递参数，发起post请求返回响应
+func requestJson(t *testing.T, method string, uri string, param map[string]interface{}, router *gin.Engine) []byte {
 	jsonByte, err := json.Marshal(param) // 将参数转化为json比特流
 	if err != nil {
 		t.Fatal(err)
 	}
-	req := httptest.NewRequest("POST", uri, bytes.NewReader(jsonByte)) // 构造post请求，json数据以请求body的形式传递
+	req := httptest.NewRequest(method, uri, bytes.NewReader(jsonByte)) // 构造post请求，json数据以请求body的形式传递
 	w := httptest.NewRecorder()                                        // 初始化响应
 	router.ServeHTTP(w, req)                                           // 调用相应的handler接口
 	result := w.Result()                                               // 提取响应
@@ -76,11 +62,19 @@ func postJson(t *testing.T, uri string, param map[string]interface{}, router *gi
 
 func Set(t *testing.T, router *gin.Engine, Key string, Lang string, Content string, Password string) []byte {
 	uri := "/" + Key
-	params := make(map[string]interface{})
-	params["lang"] = Lang
-	params["content"] = Content
-	params["password"] = Password
-	return postJson(t, uri, params, router)
+	if Key == "" || Key == "once" {
+		params := make(map[string]interface{})
+		params["lang"] = Lang
+		params["content"] = Content
+		params["password"] = Password
+		return requestJson(t, "POST", uri, params, router)
+	} else {
+		params := make(map[string]interface{})
+		params["lang"] = Lang
+		params["content"] = Content
+		params["password"] = Password
+		return requestJson(t, "PUT", uri, params, router)
+	}
 }
 
 func Get(t *testing.T, router *gin.Engine, Key string, Password string) []byte {

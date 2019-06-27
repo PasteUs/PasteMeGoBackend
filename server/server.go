@@ -21,8 +21,9 @@ func init() {
 	router = gin.Default()
 	router.Use(cors.Default())
 	router.GET("/:token", get)
-	router.POST("/", setPermanent)
-	router.POST("/:key", setTemporary)
+	router.POST("/", permanent)
+	router.POST("/once", readOnce)
+	router.PUT("/:key", temporary)
 }
 
 func Run(address string, port uint16) {

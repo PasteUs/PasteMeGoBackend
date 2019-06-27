@@ -19,7 +19,7 @@ import (
 	"strings"
 )
 
-func setPermanent(requests *gin.Context) {
+func permanent(requests *gin.Context) {
 	paste := model.Permanent{
 		ClientIP: requests.ClientIP(),
 	}
@@ -45,83 +45,83 @@ func setPermanent(requests *gin.Context) {
 	}
 }
 
-func setTemporary(requests *gin.Context) {
+func temporary(requests *gin.Context) {
 	key := requests.Param("key")
-	if key == "read_once" {
-		paste := model.Temporary{
-			Key:      util.Generator(),
-			ClientIP: requests.ClientIP(),
-		}
-		if err := requests.ShouldBindJSON(&paste); err != nil {
-			requests.JSON(http.StatusInternalServerError, gin.H{
-				"status":  http.StatusInternalServerError,
+	key = strings.ToLower(key)
+	table, err := util.ValidChecker(key)
+	if err != nil {
+		if err.Error() == "wrong length" {
+			requests.JSON(http.StatusOK, gin.H{
+				"status":  http.StatusBadRequest,
 				"error":   err.Error(),
-				"message": "bind failed",
+				"message": "key's length should at least 3 and at most 8",
 			})
 		} else {
-			if err := paste.Save(); err != nil {
+			requests.JSON(http.StatusOK, gin.H{
+				"status":  http.StatusBadRequest,
+				"error":   err.Error(),
+				"message": "key should only contains digital or lowercase letters",
+			})
+		}
+	} else {
+		if table != "temporary" {
+			requests.JSON(http.StatusOK, gin.H{
+				"status":  http.StatusBadRequest,
+				"error":   "wrong key type",
+				"message": "only temporary key can be specified",
+			})
+		} else {
+			paste := model.Temporary{
+				Key:      key,
+				ClientIP: requests.ClientIP(),
+			}
+			if err := requests.ShouldBindJSON(&paste); err != nil {
 				requests.JSON(http.StatusInternalServerError, gin.H{
 					"status":  http.StatusInternalServerError,
 					"error":   err.Error(),
-					"message": "save failed",
+					"message": "bind failed",
 				})
 			} else {
-				requests.JSON(http.StatusCreated, gin.H{
-					"status": http.StatusCreated,
-					"key":    paste.Key,
-				})
-			}
-		}
-	} else {
-		key = strings.ToLower(key)
-		table, err := util.ValidChecker(key)
-		if err != nil {
-			if err.Error() == "wrong length" {
-				requests.JSON(http.StatusOK, gin.H{
-					"status":  http.StatusBadRequest,
-					"error":   err.Error(),
-					"message": "key's length should at least 3 and at most 8",
-				})
-			} else {
-				requests.JSON(http.StatusOK, gin.H{
-					"status":  http.StatusBadRequest,
-					"error":   err.Error(),
-					"message": "key should only contains digital or lowercase letters",
-				})
-			}
-		} else {
-			if table != "temporary" {
-				requests.JSON(http.StatusOK, gin.H{
-					"status":  http.StatusBadRequest,
-					"error":   "wrong key type",
-					"message": "only temporary key can be specified",
-				})
-			} else {
-				paste := model.Temporary{
-					Key:      key,
-					ClientIP: requests.ClientIP(),
-				}
-				if err := requests.ShouldBindJSON(&paste); err != nil {
+				if err := paste.Save(); err != nil {
 					requests.JSON(http.StatusInternalServerError, gin.H{
 						"status":  http.StatusInternalServerError,
 						"error":   err.Error(),
-						"message": "bind failed",
+						"message": "save failed",
 					})
 				} else {
-					if err := paste.Save(); err != nil {
-						requests.JSON(http.StatusInternalServerError, gin.H{
-							"status":  http.StatusInternalServerError,
-							"error":   err.Error(),
-							"message": "save failed",
-						})
-					} else {
-						requests.JSON(http.StatusCreated, gin.H{
-							"status": http.StatusCreated,
-							"key":    paste.Key,
-						})
-					}
+					requests.JSON(http.StatusCreated, gin.H{
+						"status": http.StatusCreated,
+						"key":    paste.Key,
+					})
 				}
 			}
+		}
+	}
+}
+
+func readOnce(requests *gin.Context) {
+	paste := model.Temporary{
+		Key:      util.Generator(),
+		ClientIP: requests.ClientIP(),
+	}
+	if err := requests.ShouldBindJSON(&paste); err != nil {
+		requests.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"error":   err.Error(),
+			"message": "bind failed",
+		})
+	} else {
+		if err := paste.Save(); err != nil {
+			requests.JSON(http.StatusInternalServerError, gin.H{
+				"status":  http.StatusInternalServerError,
+				"error":   err.Error(),
+				"message": "save failed",
+			})
+		} else {
+			requests.JSON(http.StatusCreated, gin.H{
+				"status": http.StatusCreated,
+				"key":    paste.Key,
+			})
 		}
 	}
 }
@@ -132,7 +132,7 @@ func get(requests *gin.Context) {
 		requests.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusBadRequest,
 			"error":   "empty token",
-			"message": "Wrong params",
+			"message": "wrong params",
 		})
 	} else {
 		key, password := util.Parse(token)
@@ -179,7 +179,7 @@ func get(requests *gin.Context) {
 						requests.JSON(http.StatusOK, gin.H{
 							"status":  http.StatusUnauthorized,
 							"error":   "wrong password",
-							"message": "Wrong password",
+							"message": "wrong password",
 						})
 					}
 				}
@@ -215,7 +215,7 @@ func get(requests *gin.Context) {
 						requests.JSON(http.StatusOK, gin.H{
 							"status":  http.StatusUnauthorized,
 							"error":   "wrong password",
-							"message": "Wrong password",
+							"message": "wrong password",
 						})
 					}
 				}

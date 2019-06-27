@@ -20,7 +20,7 @@ func TestValidChecker(t *testing.T) {
 		{"asdfqwerasdf", ""},
 		{"1000000000", ""},
 		{"dafsdf?", ""},
-		{"read_once", ""},
+		{"once", ""},
 	}
 	for i, TestCase := range TestCases {
 		output, err := ValidChecker(TestCase.input)

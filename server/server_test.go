@@ -91,7 +91,7 @@ func TestTemporaryGet(t *testing.T) {
 }
 
 func TestReadOncePost(t *testing.T) {
-	body := request.Set(t, router, "read_once", "plain", "Hello", "")
+	body := request.Set(t, router, "once", "plain", "Hello", "")
 
 	type JsonResponse struct {
 		Key string `json:"key"`
@@ -104,7 +104,7 @@ func TestReadOncePost(t *testing.T) {
 
 	keyR = response.Key
 
-	t.Logf("read_once key: %s", keyR)
+	t.Logf("once key: %s", keyR)
 }
 
 func TestReadOnceGet(t *testing.T) {
@@ -196,7 +196,7 @@ func TestTemporaryPasswordGet(t *testing.T) {
 }
 
 func TestReadOncePasswordPost(t *testing.T) {
-	body := request.Set(t, router, "read_once", "plain", "Hello", "password")
+	body := request.Set(t, router, "once", "plain", "Hello", "password")
 
 	type JsonResponse struct {
 		Key string `json:"key"`
@@ -209,7 +209,7 @@ func TestReadOncePasswordPost(t *testing.T) {
 
 	keyR = response.Key
 
-	t.Logf("read_once key: %s", keyR)
+	t.Logf("once key: %s", keyR)
 }
 
 func TestReadOncePasswordGet(t *testing.T) {
@@ -236,7 +236,7 @@ func TestExist(t *testing.T) {
 	}
 
 	if model.Exist(keyR) {
-		t.Fatalf("test read_once key: %s failed.", keyR)
+		t.Fatalf("test once key: %s failed.", keyR)
 	}
 
 	TestTemporaryPost(t)
@@ -251,12 +251,12 @@ func TestExist(t *testing.T) {
 
 	TestReadOncePost(t)
 	if !model.Exist(keyR) {
-		t.Fatalf("test read_once key: %s failed.", keyR)
+		t.Fatalf("test once key: %s failed.", keyR)
 	}
 
 	TestReadOnceGet(t)
 	if model.Exist(keyR) {
-		t.Fatalf("test read_once key: %s failed.", keyR)
+		t.Fatalf("test once key: %s failed.", keyR)
 	}
 
 	TestTemporaryPasswordPost(t)
@@ -271,11 +271,11 @@ func TestExist(t *testing.T) {
 
 	TestReadOncePasswordPost(t)
 	if !model.Exist(keyR) {
-		t.Fatalf("test read_once key: %s failed.", keyR)
+		t.Fatalf("test once key: %s failed.", keyR)
 	}
 
 	TestReadOncePasswordGet(t)
 	if model.Exist(keyR) {
-		t.Fatalf("test read_once key: %s failed.", keyR)
+		t.Fatalf("test once key: %s failed.", keyR)
 	}
 }

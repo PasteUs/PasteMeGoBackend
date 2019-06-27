@@ -36,4 +36,4 @@ steps:
   image: golang:latest
   commands:
   - bash dep.sh
-  - go build -o api
+  - go build -o pastemed
