@@ -3,7 +3,7 @@ language: go
 go:
   - master
 
-before_script:
+install:
   - bash dep.sh
 
 script:
@@ -33,7 +33,7 @@ notifications:
 env:
   global:
     - GH_REF: github.com/LucienShui/PasteMeBackend.git
-    - p_BRANCH: build
+    - P_BRANCH: build
 
 addons:
   hosts:
