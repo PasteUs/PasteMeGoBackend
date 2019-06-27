@@ -20,7 +20,7 @@ func TestValidChecker(t *testing.T) {
 		{"asdfqwerasdf", ""},
 		{"1000000000", ""},
 		{"dafsdf?", ""},
-		{"once", ""},
+		{"once", "temporary"},
 	}
 	for i, TestCase := range TestCases {
 		output, err := ValidChecker(TestCase.input)
@@ -28,17 +28,14 @@ func TestValidChecker(t *testing.T) {
 			t.Fatalf("Test %d | input: %s, expected: %s, output: %s\n", i, TestCase.input, TestCase.expected, output)
 		}
 		if err != nil {
-			t.Logf("[%s]\n", err)
+			t.Logf("[%s: %s]\n", err, TestCase.input)
 		}
 	}
 }
 
 func Test_generator(t *testing.T) {
 	for i := 0; i < 8; i++ {
-		str, err := generator(8)
-		if err != nil {
-			t.Fatal(err)
-		}
+		str := generator(8)
 		t.Log(str)
 	}
 }
