@@ -223,3 +223,11 @@ func get(requests *gin.Context) {
 		}
 	}
 }
+
+func notFound(requests *gin.Context) {
+	requests.JSON(http.StatusNotFound, gin.H{
+		"status": http.StatusNotFound,
+		"error": "not found",
+		"message": "no router founded",
+	})
+}

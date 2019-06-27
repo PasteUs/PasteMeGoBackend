@@ -16,7 +16,7 @@ import (
 	"os"
 )
 
-const (
+var (
 	username = "username"
 	password = "password"
 	network  = "tcp"

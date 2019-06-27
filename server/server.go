@@ -24,6 +24,7 @@ func init() {
 	router.POST("/", permanent)
 	router.POST("/once", readOnce)
 	router.PUT("/:key", temporary)
+	router.NoRoute(notFound)
 }
 
 func Run(address string, port uint16) {
