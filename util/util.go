@@ -3,7 +3,7 @@
 @Contact: lucien@lucien.ink
 @Licence: (C)Copyright 2019 Lucien Shui
 
-@Modify Time      @Author    @Version    @Desciption
+@Modify Time      @Author    @Version    @Description
 ------------      -------    --------    -----------
 2019-06-11 02:07  Lucien     1.0         Init
 */
@@ -11,13 +11,18 @@ package util
 
 import (
 	"errors"
+	"github.com/LucienShui/PasteMeBackend/model"
 	"math/rand"
 	"regexp"
-	"strconv"
 	"strings"
+	"time"
 )
 
-var table = "qwertyuiopasdfghjklzxcvbnm0123456789"
+var table = []rune("qwertyuiopasdfghjklzxcvbnm0123456789")
+
+func init() {
+	rand.Seed(time.Now().UnixNano())
+}
 
 func Parse(token string) (string, string) {
 	buf := strings.Split(token, ",")
@@ -30,50 +35,51 @@ func Parse(token string) (string, string) {
 
 func ValidChecker(key string) (string, error) {
 	if len(key) > 8 || len(key) < 3 {
-		return "", errors.New("key's length show greater or equal than 3 and less or equal than 8: " + key)
+		return "", errors.New("wrong length") // key's length should at least 3 and at most 8
 	}
 	flag, err := regexp.MatchString("^[0-9a-z]{3,8}$", key)
 	if err != nil {
 		return "", err
 	}
 	if !flag {
-		return "", errors.New("key's format checking failed, should only contains digital or lowercase letters: " + key)
+		return "", errors.New("wrong format") // key's format checking failed, should only contains digital or lowercase letters
 	}
 	flag, err = regexp.MatchString("[a-z]", key)
 	if err != nil {
 		return "", err
 	}
 	if !flag { // only digit
-		if key[0] == '0' {
-			return "", errors.New("permanent key should not have leading zero: " + key)
-		}
 		return "permanent", nil
 	}
 	return "temporary", nil
 }
 
-func generator() (string, error) {
-	for i := 0; i < 8; i++ {
-		rand.Int()
-		// TODO
+// Generate a string using lowercase and digits with fixed length
+func generator(length uint8) string {
+	ret := make([]rune, length)
+	for i := uint8(0); i < length; i++ {
+		ret[i] = table[rand.Intn(len(table))]
 	}
-	return "", nil
+	return string(ret)
 }
 
-func Generator() (string, error) {
-	// TODO
-	return "", nil
-}
-
-func Uint2string(value uint64) string {
-	return strconv.FormatUint(value, 10)
-}
-
-func String2uint(value string) uint64 {
-	ret, err := strconv.ParseUint(value, 10, 64)
+// Check str is able to insert or not
+func check(key string) bool {
+	if key[0] == '0' {
+		return false
+	}
+	flag, err := regexp.MatchString("[a-z]", key)
 	if err != nil {
-		// TODO
-		return 0
+		return false
 	}
-	return ret
+	return flag && !model.Exist(key)
+}
+
+// Generate a string that contains at least one alphabet and not occur in temporary database on field key
+func Generator() string {
+	str := generator(8)
+	for !check(str) { // do {...} while (...)
+		str = generator(8)
+	}
+	return str
 }

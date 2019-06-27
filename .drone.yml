@@ -20,8 +20,8 @@ steps:
   image: golang:latest
   commands:
   - sleep 15
-  - bash script/dep.sh
-  - bash script/test.sh
+  - bash dep.sh
+  - bash gotest.sh
 
 ---
 
@@ -35,6 +35,5 @@ steps:
 - name: build
   image: golang:latest
   commands:
-  - bash script/dep.sh
-  - go build -o backend
-
+  - bash dep.sh
+  - go build -o pastemed

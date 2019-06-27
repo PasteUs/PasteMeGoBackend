@@ -3,7 +3,7 @@
 @Contact: lucien@lucien.ink
 @Licence: (C)Copyright 2019 Lucien Shui
 
-@Modify Time      @Author    @Version    @Desciption
+@Modify Time      @Author    @Version    @Description
 ------------      -------    --------    -----------
 2019-06-11 01:27  Lucien     1.0         Init
 2019-06-13 01:59  Lucien     1.1         Split function, add mysql.Init()
@@ -13,9 +13,9 @@
 package main
 
 import (
-	"github.com/LucienShui/PasteMe/GoBackend/server"
+	"github.com/LucienShui/PasteMeBackend/server"
 )
 
 func main() {
-	server.Run("0.0.0.0", 8000)
+	server.Run("", 8000)
 }

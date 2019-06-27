@@ -1,0 +1,40 @@
+language: go
+
+go:
+  - master
+
+before_script:
+  - bash dep.sh
+
+script:
+  - go build -o pastemed
+
+after_success:
+  - rm -rf .git
+  - git clone https://${GH_REF} -b ${P_BRANCH} tmpdir
+  - cp API.md LICENSE pastemed pastemed.service tmpdir
+  - cd tmpdir
+  - mv API.md README.md
+  - git config user.name "${U_NAME}"
+  - git config user.email "${U_EMAIL}"
+  - git add --all
+  - git commit -m "build from travis-ci `TZ=UTC-8 date +'%Y-%m-%d %H:%M:%S'`"
+  - git push https://${GH_TOKEN}@${GH_REF} ${P_BRANCH}
+
+branches:
+  only:
+    - master
+
+notifications:
+  email:
+    - lucien@lucien.ink
+  on_failure: always
+
+env:
+  global:
+    - GH_REF: github.com/LucienShui/PasteMeBackend.git
+    - p_BRANCH: build
+
+addons:
+  hosts:
+    - ${WEBHOOK}
