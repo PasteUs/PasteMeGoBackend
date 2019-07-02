@@ -12,6 +12,7 @@ package convert
 import (
 	"crypto/md5"
 	"fmt"
+	"github.com/wonderivan/logger"
 	"strconv"
 )
 
@@ -22,7 +23,7 @@ func Uint2string(value uint64) string {
 func String2uint(value string) uint64 {
 	ret, err := strconv.ParseUint(value, 10, 64)
 	if err != nil {
-		// TODO
+		logger.Fatal("Convert String to Uint failed: " + value)
 		return 0
 	}
 	return ret

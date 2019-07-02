@@ -19,17 +19,6 @@ import (
 	"testing"
 )
 
-// parseToStr 将map中的键值对输出成querystring形式
-func parseToStr(mp map[string]string) string {
-	values := ""
-	for key, val := range mp {
-		values += "&" + key + "=" + val
-	}
-	temp := values[1:]
-	values = "?" + temp
-	return values
-}
-
 // Get 根据特定请求uri，发起get请求返回响应
 func get(t *testing.T, uri string, router *gin.Engine) []byte {
 	req := httptest.NewRequest("GET", uri, nil) // 构造get请求
@@ -78,6 +67,6 @@ func Set(t *testing.T, router *gin.Engine, Key string, Lang string, Content stri
 }
 
 func Get(t *testing.T, router *gin.Engine, Key string, Password string) []byte {
-	uri := fmt.Sprintf("/%s,%s?browser", Key, Password)
+	uri := fmt.Sprintf("/%s,%s?json", Key, Password)
 	return get(t, uri, router)
 }

@@ -11,6 +11,7 @@ package util
 
 import (
 	"errors"
+	"fmt"
 	"github.com/LucienShui/PasteMeBackend/model"
 	"math/rand"
 	"regexp"
@@ -82,4 +83,8 @@ func Generator() string {
 		str = generator(8)
 	}
 	return str
+}
+
+func LoggerInfo(IP string, content string) string {
+	return fmt.Sprintf("[%s] %s", IP, content)
 }

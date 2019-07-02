@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/wonderivan/logger"
 )
 
 var router *gin.Engine
@@ -29,6 +30,6 @@ func init() {
 
 func Run(address string, port uint16) {
 	if err := router.Run(fmt.Sprintf("%s:%d", address, port)); err != nil {
-		panic(err)
+		logger.Fatal("Run server failed: " + err.Error())
 	}
 }
