@@ -190,13 +190,11 @@ func get(requests *gin.Context) {
 							})
 						} else {
 							jsonRequest := requests.DefaultQuery("json", "false")
-							if jsonRequest != "false" {
-								jsonRequest = "true"
-							}
-							logger.Info(util.LoggerInfo(IP, "jsonRequest: "+jsonRequest))
 							if jsonRequest == "false" { // API request
+								logger.Info(util.LoggerInfo(IP, "jsonRequest: false"))
 								requests.String(http.StatusOK, paste.Content)
 							} else { // json request
+								logger.Info(util.LoggerInfo(IP, "jsonRequest: true"))
 								requests.JSON(http.StatusOK, gin.H{
 									"status":  http.StatusOK,
 									"lang":    paste.Lang,
@@ -236,13 +234,11 @@ func get(requests *gin.Context) {
 					if paste.Password == "" || paste.Password == convert.String2md5(password) {
 						logger.Info(util.LoggerInfo(IP, "Password accept"))
 						jsonRequest := requests.DefaultQuery("json", "false")
-						if jsonRequest != "false" {
-							jsonRequest = "true"
-						}
-						logger.Info(util.LoggerInfo(IP, "jsonRequest: "+jsonRequest))
 						if jsonRequest == "false" {
+							logger.Info(util.LoggerInfo(IP, "jsonRequest: false"))
 							requests.String(http.StatusOK, paste.Content)
 						} else {
+							logger.Info(util.LoggerInfo(IP, "jsonRequest: true"))
 							requests.JSON(http.StatusOK, gin.H{
 								"status":  http.StatusOK,
 								"lang":    paste.Lang,

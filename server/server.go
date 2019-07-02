@@ -14,11 +14,15 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/wonderivan/logger"
+	"os"
 )
 
 var router *gin.Engine
 
 func init() {
+	if os.Getenv("PASTEMED_RUNTIME") != "debug" {
+		gin.SetMode(gin.ReleaseMode)
+	}
 	router = gin.Default()
 	router.Use(cors.Default())
 	router.GET("/:token", get)

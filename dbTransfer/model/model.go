@@ -70,3 +70,7 @@ func init() {
 		}
 	}
 }
+
+func FixAutoIncrement(autoIncrement uint64) error {
+	return db.Exec(fmt.Sprintf("ALTER TABLE `permanents` AUTO_INCREMENT=%d", autoIncrement)).Error
+}
