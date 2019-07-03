@@ -32,10 +32,3 @@ func TestValidChecker(t *testing.T) {
 		}
 	}
 }
-
-func Test_generator(t *testing.T) {
-	for i := 0; i < 8; i++ {
-		str := generator(8)
-		t.Log(str)
-	}
-}
