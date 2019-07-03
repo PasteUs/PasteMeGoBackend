@@ -5,17 +5,19 @@ if [[ ${#} != 1 ]]; then
 else
     if [[ ${1} == "install" ]]; then
         set -x
-        mkdir -p /usr/local/pastemed && \
-        cp pastemed pastemed.service pastemectl.sh installer.sh /usr/local/pastemed/ && \
+        mkdir -p /usr/local/pastemed /etc/pastemed && \
+        cp pastemed db_transfer pastemectl.sh installer.sh /usr/local/pastemed/ && \
+        cp pastemed.service config /etc/pastemed/ && \
         chmod +x /usr/local/pastemed/pastemed && \
         cd /usr/local/pastemed/ && \
         ln -s /usr/local/pastemed/pastemectl.sh /usr/local/bin/pastemectl && \
         chmod +x /usr/local/bin/pastemectl && \
-        ln -s /usr/local/pastemed/pastemed.service /lib/systemd/system/ && \
+        ln -s /etc/pastemed/pastemed.service /lib/systemd/system/ && \
         systemctl daemon-reload
         set +x
         if [[ ${?} != 0 ]]; then
             echo "Installation finished"
+            echo "Config file: /etc/pastemed/config"
         else
             echo "Installation failed"
         fi

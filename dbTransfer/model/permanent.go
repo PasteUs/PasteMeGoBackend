@@ -11,6 +11,7 @@ package model
 
 import (
 	"errors"
+	"github.com/jinzhu/gorm"
 	"strings"
 	"time"
 )
@@ -25,7 +26,7 @@ type Permanent struct {
 	DeletedAt *time.Time
 }
 
-func (paste *Permanent) Save() error {
+func (paste *Permanent) Save(db *gorm.DB) error {
 	if paste.Content == "" {
 		return errors.New("empty content")
 	}

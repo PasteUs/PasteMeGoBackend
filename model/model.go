@@ -11,6 +11,8 @@ package model
 
 import (
 	"fmt"
+	"github.com/LucienShui/PasteMeBackend/util"
+	"github.com/LucienShui/PasteMeBackend/util/convert"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
 	"github.com/wonderivan/logger"
@@ -18,12 +20,12 @@ import (
 )
 
 var (
-	username = "username"
-	password = "password"
+	username = util.GetEnvOrFatal("PASTEMED_DB_USERNAME")
+	password = util.GetEnvOrFatal("PASTEMED_DB_PASSWORD")
 	network  = "tcp"
-	server   = "mysql"
-	port     = 3306
-	database = "pasteme"
+	server   = util.GetEnvOrFatal("PASTEMED_DB_SERVER")
+	port     = convert.String2uint(util.GetEnvOrFatal("PASTEMED_DB_PORT"))
+	database = util.GetEnvOrFatal("PASTEMED_DB_DATABASE")
 )
 
 func format(
@@ -31,7 +33,7 @@ func format(
 	password string,
 	network string,
 	server string,
-	port int,
+	port uint64,
 	database string) string {
 	return fmt.Sprintf("%s:%s@%s(%s:%d)/%s?parseTime=True&loc=Local", username, password, network, server, port, database)
 }

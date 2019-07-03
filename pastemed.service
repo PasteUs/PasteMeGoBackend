@@ -3,6 +3,7 @@ Description=PasteMe API Server Service
 After=network.target
 
 [Service]
+EnvironmentFile=/etc/pastemed/config
 Type=simple
 User=nobody
 Restart=on-failure

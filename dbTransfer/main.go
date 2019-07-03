@@ -15,19 +15,22 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/LucienShui/PasteMeBackend/dbTransfer/model"
+	"github.com/LucienShui/PasteMeBackend/util"
+	"github.com/LucienShui/PasteMeBackend/util/convert"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/jinzhu/gorm"
 	"github.com/wonderivan/logger"
 	"html"
 	"time"
 )
 
 var (
-	username = "pasteme_cn"
-	password = "password"
+	username = util.GetEnvOrFatal("PASTEMED_OLD_DB_USERNAME")
+	password = util.GetEnvOrFatal("PASTEMED_OLD_DB_PASSWORD")
 	network  = "tcp"
-	server   = "web"
-	port     = 3306
-	database = "pasteme_cn"
+	server   = util.GetEnvOrFatal("PASTEMED_OLD_DB_SERVER")
+	port     = convert.String2uint(util.GetEnvOrFatal("PASTEMED_OLD_DB_PORT"))
+	database = util.GetEnvOrFatal("PASTEMED_OLD_DB_DATABASE")
 )
 
 func format(
@@ -35,7 +38,7 @@ func format(
 	password string,
 	network string,
 	server string,
-	port int,
+	port uint64,
 	database string) string {
 	return fmt.Sprintf("%s:%s@%s(%s:%d)/%s?parseTime=True&loc=Local", username, password, network, server, port, database)
 }
@@ -49,12 +52,12 @@ func main() {
 		fixAutoIncrement(db)
 
 		start := time.Now()
-		permanent(db)
+		permanent(db, model.Begin())
 		timePerm := time.Since(start)
 		logger.Info("Permanent finished: ", timePerm)
 
 		start = time.Now()
-		temporary(db)
+		temporary(db, model.Begin())
 		timeTemp := time.Since(start)
 		logger.Info("Temporary finished: ", timeTemp)
 
@@ -65,7 +68,7 @@ func main() {
 	}
 }
 
-func temporary(db *sql.DB) {
+func temporary(db *sql.DB, event *gorm.DB) {
 	if rows, err := db.Query("SELECT `key`, `type`, `text`, `passwd` FROM `temp`"); err != nil {
 		logger.Fatal("MySQL query failed: " + err.Error())
 	} else {
@@ -92,7 +95,7 @@ func temporary(db *sql.DB) {
 
 				object.Content = html.UnescapeString(object.Content)
 
-				if err := object.Save(); err != nil {
+				if err := object.Save(event); err != nil {
 					logger.Fatal(fmt.Sprintf("Paste %s save failed: %s", object.Key, err.Error()))
 				} else {
 					logger.Debug(fmt.Sprintf("Paste %s save successful", object.Key))
@@ -100,10 +103,11 @@ func temporary(db *sql.DB) {
 				}
 			}
 		}
+		event.Commit()
 	}
 }
 
-func permanent(db *sql.DB) {
+func permanent(db *sql.DB, event *gorm.DB) {
 	for i := 0; i < 10; i++ {
 		if rows, err := db.Query(fmt.Sprintf("SELECT `key`, `type`, `text`, `passwd` FROM `perm%d`", i)); err != nil {
 			logger.Fatal("MySQL query failed: " + err.Error())
@@ -131,7 +135,7 @@ func permanent(db *sql.DB) {
 
 					object.Content = html.UnescapeString(object.Content)
 
-					if err := object.Save(); err != nil {
+					if err := object.Save(event); err != nil {
 						logger.Fatal(fmt.Sprintf("Paste %d save failed: %s", object.Key, err.Error()))
 					} else {
 						logger.Debug(fmt.Sprintf("Paste %d save successful", object.Key))
@@ -141,6 +145,7 @@ func permanent(db *sql.DB) {
 			}
 		}
 	}
+	event.Commit()
 }
 
 func fixAutoIncrement(db *sql.DB) {

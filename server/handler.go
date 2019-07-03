@@ -14,6 +14,7 @@ import (
 	"github.com/LucienShui/PasteMeBackend/model"
 	"github.com/LucienShui/PasteMeBackend/util"
 	"github.com/LucienShui/PasteMeBackend/util/convert"
+	"github.com/LucienShui/PasteMeBackend/util/generator"
 	"github.com/gin-gonic/gin"
 	"github.com/wonderivan/logger"
 	"net/http"
@@ -113,7 +114,7 @@ func temporary(requests *gin.Context) {
 func readOnce(requests *gin.Context) {
 	IP := requests.ClientIP()
 	paste := model.Temporary{
-		Key:      util.Generator(),
+		Key:      generator.Generator(),
 		ClientIP: IP,
 	}
 	if err := requests.ShouldBindJSON(&paste); err != nil {

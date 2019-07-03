@@ -11,6 +11,7 @@ package model
 
 import (
 	"errors"
+	"github.com/jinzhu/gorm"
 	"strings"
 	"time"
 )
@@ -24,7 +25,7 @@ type Temporary struct {
 	CreatedAt time.Time
 }
 
-func (paste *Temporary) Save() error {
+func (paste *Temporary) Save(db *gorm.DB) error {
 	if paste.Content == "" {
 		return errors.New("empty content")
 	}
