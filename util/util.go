@@ -11,14 +11,14 @@ package util
 
 import (
 	"errors"
-	"github.com/LucienShui/PasteMeBackend/model"
+	"fmt"
+	"github.com/wonderivan/logger"
 	"math/rand"
+	"os"
 	"regexp"
 	"strings"
 	"time"
 )
-
-var table = []rune("qwertyuiopasdfghjklzxcvbnm0123456789")
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
@@ -54,32 +54,14 @@ func ValidChecker(key string) (string, error) {
 	return "temporary", nil
 }
 
-// Generate a string using lowercase and digits with fixed length
-func generator(length uint8) string {
-	ret := make([]rune, length)
-	for i := uint8(0); i < length; i++ {
-		ret[i] = table[rand.Intn(len(table))]
-	}
-	return string(ret)
+func LoggerInfo(IP string, content string) string {
+	return fmt.Sprintf("[%s] %s", IP, content)
 }
 
-// Check str is able to insert or not
-func check(key string) bool {
-	if key[0] == '0' {
-		return false
+func GetEnvOrFatal(key string) string {
+	value, exist := os.LookupEnv(key)
+	if !exist {
+		logger.Fatal(fmt.Sprintf("Enviromental variable %s is not set", key))
 	}
-	flag, err := regexp.MatchString("[a-z]", key)
-	if err != nil {
-		return false
-	}
-	return flag && !model.Exist(key)
-}
-
-// Generate a string that contains at least one alphabet and not occur in temporary database on field key
-func Generator() string {
-	str := generator(8)
-	for !check(str) { // do {...} while (...)
-		str = generator(8)
-	}
-	return str
+	return value
 }

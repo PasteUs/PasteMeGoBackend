@@ -1,14 +1,16 @@
 #!/usr/bin/env bash
 
 if [[ ${#} != 1 ]]; then
-    echo "Usage: pastemectl.sh <install|uninstall|upgrade|restart>"
+    echo "Usage: ${0} <start|stop|restart|status|log>"
 else
-    if [[ ${1} == "install" ]]; then
-        echo "install" # TODO
-    elif [[ ${1} == "uninstall" ]]; then
-        echo "uninstall" # TODO
+    if [[ ${1} == "start" || ${1} == "stop" || ${1} == "restart" ]]; then
+        systemctl ${1} pastemed
+    elif [[ ${1} == "status" ]]; then
+        systemctl status pastemed | grep Active
+    elif [[ ${1} == "log" ]]; then
+        journalctl -xe -u pastemed | cat
     else
-        # TODO
         echo "[ERROR] unsupported operation: ${1}"
+        exit 1
     fi
 fi

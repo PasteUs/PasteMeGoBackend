@@ -3,13 +3,12 @@ Description=PasteMe API Server Service
 After=network.target
 
 [Service]
-# TODO
-EnvironmentFile=/etc/pastemed
+EnvironmentFile=/etc/pastemed/config
 Type=simple
 User=nobody
 Restart=on-failure
 RestartSec=5s
-ExecStart=GIN_MOD=release /usr/local/pastemed/pastemed
+ExecStart=/usr/local/pastemed/pastemed
 
 [Install]
 WantedBy=multi-user.target

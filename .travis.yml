@@ -8,11 +8,12 @@ install:
 
 script:
   - go build -o pastemed
+  - go build dbTransfer/main.go && mv main db_transfer
 
 after_success:
   - rm -rf .git
   - git clone https://${GH_REF} -b ${P_BRANCH} tmpdir
-  - cp API.md LICENSE pastemed pastemed.service tmpdir
+  - cp API.md LICENSE pastemed db_transfer pastemed.service tmpdir
   - cd tmpdir
   - mv API.md README.md
   - git config user.name "${U_NAME}"
