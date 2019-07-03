@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 DEP="
-github.com/gin-contrib/cors
 github.com/gin-gonic/gin
 github.com/jinzhu/gorm
 github.com/go-sql-driver/mysql
