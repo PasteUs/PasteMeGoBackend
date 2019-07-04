@@ -13,7 +13,7 @@ script:
 after_success:
   - rm -rf .git
   - git clone https://${GH_REF} -b ${P_BRANCH} tmpdir
-  - cp API.md LICENSE pastemed db_transfer pastemed.service tmpdir
+  - cp API.md LICENSE pastemed db_transfer pastemedctl.sh config.sh pastemed.service tmpdir
   - cd tmpdir
   - mv API.md README.md
   - git config user.name "${U_NAME}"
