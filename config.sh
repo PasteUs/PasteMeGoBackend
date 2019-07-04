@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 PASTEMED_RUNTIME=release
 
 # PASTEMED_DB_USERNAME=

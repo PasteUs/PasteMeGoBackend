@@ -13,4 +13,13 @@ services:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: pasteme
     volumes:
-      - ./data:/var/lib/mysql
+      - data:/var/lib/mysql
+
+  nginx:
+    image: nginx:1.17.1
+    container_name: nginx
+    restart: always
+    ports:
+      - 80:80
+    volumes:
+      - conf.d:/etc/nginx/conf.d
