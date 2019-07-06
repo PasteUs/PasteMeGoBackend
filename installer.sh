@@ -12,7 +12,8 @@ else
         mv pastemed.service config.sh /etc/pastemed/ && \
         ln -s ${PWD}/pastemectl.sh /usr/local/bin/pastemectl && \
         ln -s /etc/pastemed/pastemed.service /lib/systemd/system/ && \
-        systemctl daemon-reload
+        systemctl daemon-reload && \
+        systemctl enable pastemed
         if [[ ${?} == 0 ]]; then
             echo "Installation finished"
             echo "Config file: /etc/pastemed/config.sh"
@@ -20,7 +21,10 @@ else
             echo "Installation failed"
         fi
     elif [[ ${1} == "uninstall" ]]; then
+        systemctl stop pastemed && \
+        systemctl disable pastemed && \
         rm -f /lib/systemd/system/pastemed.service && \
+        systemctl daemon-reload && \
         rm -f /usr/local/bin/pastemectl && \
         rm -rf /usr/local/pastemed && \
         rm -rf /etc/pastemed
