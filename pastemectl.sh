@@ -8,7 +8,7 @@ else
     elif [[ ${1} == "status" ]]; then
         systemctl status pastemed | grep Active
     elif [[ ${1} == "log" ]]; then
-        journalctl -xe -u pastemed | cat
+        journalctl -e -u pastemed -o cat | cat
     else
         echo "[ERROR] unsupported operation: ${1}"
         exit 1
