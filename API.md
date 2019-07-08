@@ -95,11 +95,11 @@ Table of Contents Created by [gh-md-toc](https://github.com/ekalinin/github-mark
 
 ##### Params
 
-| Name | Type | Description |
-| :---: | :---: | --- |
-| lang | string | Paste content's language |
-| content | text | Paste's content |
-| password | string | Paste's password |
+| Name | Type | Description | Required |
+| :---: | :---: | --- | :---: |
+| lang | string | Paste content's language | Yes |
+| content | text | Paste's content | Yes |
+| password | string | Paste's password | No |
 
 ##### Example
 
@@ -164,11 +164,11 @@ or
 
 ##### Params
 
-| Name | Type | Description |
-| :---: | :---: | --- |
-| lang | string | Paste content's language |
-| content | text | Paste's content |
-| password | string | Paste's password |
+| Name | Type | Description | Required |
+| :---: | :---: | --- | :---: |
+| lang | string | Paste content's language | Yes |
+| content | text | Paste's content | Yes |
+| password | string | Paste's password | No |
 
 ##### Example
 
