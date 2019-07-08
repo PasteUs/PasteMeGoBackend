@@ -21,6 +21,15 @@ after_success:
   - git add --all
   - git commit -m "build from travis-ci `TZ=UTC-8 date +'%Y-%m-%d %H:%M:%S'`"
   - git push https://${GH_TOKEN}@${GH_REF} ${P_BRANCH}
+  - echo 'Start updating PasteMe dev'
+  - git clone https://github.com/LucienShui/PasteMe.git -b dev PasteMeDev
+  - cd PasteMeDev
+  - git submodule foreach git pull origin master
+  - git config user.name "${U_NAME}"
+  - git config user.email "${U_EMAIL}"
+  - git add --all
+  - git commit -m "push from travis-ci `TZ=UTC-8 date +'%Y-%m-%d %H:%M:%S'`"
+  - git push origin https://${GH_TOKEN}@github.com/LucienShui/PasteMe.git dev
 
 branches:
   only:
