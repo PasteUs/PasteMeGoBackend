@@ -7,11 +7,11 @@ else
     if [[ ${1} == "install" ]]; then
         /usr/bin/env bash ${0} uninstall && \
         git clone --depth=1 https://github.com/LucienShui/PasteMeBackend.git -b build /usr/local/pastemed && \
-        mkdir -p /etc/pastemed && \
         cd /usr/local/pastemed && \
-        mv pastemed.service config.sh /etc/pastemed/ && \
-        ln -s ${PWD}/pastemectl.sh /usr/local/bin/pastemectl && \
-        ln -s /etc/pastemed/pastemed.service /lib/systemd/system/ && \
+        mkdir -p /etc/pastemed && \
+        ln -s ${PWD}/config.sh /etc/pastemed/ && \
+        ln -s ${PWD}/pastemectl.sh /usr/local/bin/pastemectl/ && \
+        ln -s ${PWD}/pastemed.service /lib/systemd/system/ && \
         systemctl daemon-reload && \
         systemctl enable pastemed
         if [[ ${?} == 0 ]]; then
