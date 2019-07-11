@@ -6,6 +6,16 @@ Using `Gin` and `Gorm`.
 
 [API Documentation](./API.md)
 
+## Deploy
+
+[Deploy guidance](./DEPLOY.md)
+
+## pastemectl
+
+[pastemectl](./pastemectl.sh) is backend's controllor, written by shell script, when using [auto deploy script](./installer.sh), `pastemectl` would be installed by default
+
+Get more: [pastemectl Document](./PASTEMECTL_DOCUMENT.md)
+
 ## Build
 
 ```bash
