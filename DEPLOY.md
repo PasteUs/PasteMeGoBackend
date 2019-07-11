@@ -1,5 +1,7 @@
 # Deployment
 
+> Version 3
+
 1. Download binary file `pastemed` in build branch
 2. Execute the following command:
 
@@ -21,3 +23,7 @@ PASTEMED_DB_DATABASE= \ # Database name
 | PASTEMED_DB_SERVER | MySQL server address | `localhost` |
 | PASTEMED_DB_PORT | MySQL server port | `3306` |
 | PASTEMED_DB_DATABASE | Database name | `pasteme` |
+
+## Upgrade from 2.x
+
+See [Migrate Documentation](./MIGRATE.md)
