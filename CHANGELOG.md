@@ -2,6 +2,10 @@
 
 ## 1.0.1
 
+### 2019-07-11
+
+1. Add [Dockerfile](./Dockerfile)
+
 ### 2019-07-09
 
 1. Add [MIGRATE.md](./MIGRATE.md)

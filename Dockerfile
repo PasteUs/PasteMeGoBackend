@@ -7,7 +7,8 @@ RUN bash dep.sh
 RUN CGO_ENABLED=0 GOOS=linux go build main.go
 
 FROM alpine:latest
-MAINTAINER lucien@lucien.ink
+LABEL maintainer="Lucien Shui" \
+      email="lucien@lucien.ink"
 WORKDIR /root/
 COPY --from=builder /go/src/github.com/LucienShui/PasteMeBackend/main ./app
 ENV PASTEMED_DB_USERNAME=username \
