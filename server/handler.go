@@ -267,3 +267,9 @@ func notFound(requests *gin.Context) {
 		"message": "no router founded",
 	})
 }
+
+func beat(requests *gin.Context) {
+	requests.JSON(http.StatusOK, gin.H{
+		"status": 200,
+	})
+}

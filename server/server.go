@@ -23,6 +23,7 @@ func init() {
 		gin.SetMode(gin.ReleaseMode)
 	}
 	router = gin.Default()
+	router.GET("/", beat)
 	router.GET("/:token", get)
 	router.POST("/", permanent)
 	router.POST("/once", readOnce)
