@@ -25,7 +25,7 @@ func init() {
 	}
 	router = gin.Default()
 	router.Use(cors.Default())
-	router.HEAD("/")
+	router.GET("/", beat)
 	router.GET("/:token", get)
 	router.POST("/", permanent)
 	router.POST("/once", readOnce)

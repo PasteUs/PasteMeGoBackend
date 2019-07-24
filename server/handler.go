@@ -267,3 +267,14 @@ func notFound(requests *gin.Context) {
 		"message": "no router founded",
 	})
 }
+
+func beat(requests *gin.Context) {
+	method := requests.DefaultQuery("method", "beat")
+	if method == "beat" {
+		requests.JSON(http.StatusOK, gin.H{
+			"status": http.StatusOK,
+		})
+	} else {
+		notFound(requests)
+	}
+}
