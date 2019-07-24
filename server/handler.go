@@ -269,12 +269,12 @@ func notFound(requests *gin.Context) {
 }
 
 func beat(requests *gin.Context) {
-	method := requests.DefaultQuery("beat", "none")
-	if method == "none" {
-		notFound(requests)
-	} else {
+	method := requests.DefaultQuery("method", "beat")
+	if method == "beat" {
 		requests.JSON(http.StatusOK, gin.H{
 			"status": http.StatusOK,
 		})
+	} else {
+		notFound(requests)
 	}
 }
