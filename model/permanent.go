@@ -12,7 +12,6 @@ package model
 import (
 	"errors"
 	"github.com/LucienShui/PasteMeBackend/util/convert"
-	"strings"
 	"time"
 )
 
@@ -32,9 +31,6 @@ func (paste *Permanent) Save() error {
 	}
 	if paste.Lang == "" {
 		return errors.New("empty lang")
-	}
-	if strings.Contains(paste.Content, "#include") && paste.Lang == "plain" {
-		paste.Lang = "cpp"
 	}
 	if paste.Password != "" {
 		paste.Password = convert.String2md5(paste.Password)
