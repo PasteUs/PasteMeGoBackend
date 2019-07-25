@@ -21,6 +21,7 @@ after_success:
   - git add --all
   - git commit -m "build from travis-ci `TZ=UTC-8 date +'%Y-%m-%d %H:%M:%S'`"
   - git push https://${GH_TOKEN}@${GH_REF} ${P_BRANCH}
+  - curl ${WEBHOOK}${WEBHOOK_PATH}
   - echo 'Start updating PasteMe dev'
   - git clone https://github.com/LucienShui/PasteMe.git -b dev PasteMeDev --recursive
   - cd PasteMeDev
