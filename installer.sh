@@ -15,10 +15,10 @@ else
         systemctl daemon-reload && \
         systemctl enable pastemed
         if [[ ${?} == 0 ]]; then
-            echo "Installation finished"
+            echo -e "\033[32mInstall finished\033[0m"
             echo "Config file: /etc/pastemed/config.sh"
         else
-            echo "Installation failed"
+            echo -e '\033[31mInstallation failed\033[0m'
         fi
     elif [[ ${1} == "uninstall" ]]; then
         systemctl stop pastemed
@@ -28,7 +28,7 @@ else
         rm -f /usr/local/bin/pastemectl
         rm -rf /usr/local/pastemed
         rm -rf /etc/pastemed
-        echo "uninstall finished"
+        echo -e "\033[32mUninstall finished\033[0m"
     elif [[ ${1} == "upgrade" ]]; then
         cd /usr/local/pastemed
         git pull

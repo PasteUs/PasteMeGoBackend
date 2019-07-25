@@ -269,7 +269,7 @@ func notFound(requests *gin.Context) {
 }
 
 func beat(requests *gin.Context) {
-	method := requests.DefaultQuery("method", "beat")
+	method := requests.DefaultQuery("method", "none")
 	if method == "beat" {
 		requests.JSON(http.StatusOK, gin.H{
 			"status": http.StatusOK,
