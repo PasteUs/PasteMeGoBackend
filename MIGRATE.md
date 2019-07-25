@@ -6,11 +6,11 @@
 2. Execute the following command:
 
 ```bash
-PASTEMED_DB_USERNAME= \ # Database username
-PASTEMED_DB_PASSWORD= \ # Database password
-PASTEMED_DB_SERVER= \ # MySQL server address
-PASTEMED_DB_PORT= \ # MySQL server port
-PASTEMED_DB_DATABASE= \ # Database name
+PASTEMED_DB_USERNAME= \
+PASTEMED_DB_PASSWORD= \
+PASTEMED_DB_SERVER= \
+PASTEMED_DB_PORT= \
+PASTEMED_DB_DATABASE= \
 ./db_transfer
 ```
 

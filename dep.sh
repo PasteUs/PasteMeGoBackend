@@ -2,7 +2,6 @@
 
 DEP="
 github.com/gin-gonic/gin
-github.com/gin-contrib/cors
 github.com/jinzhu/gorm
 github.com/go-sql-driver/mysql
 github.com/wonderivan/logger

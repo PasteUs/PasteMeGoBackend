@@ -11,7 +11,6 @@ package server
 
 import (
 	"fmt"
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/wonderivan/logger"
 	"os"
@@ -24,7 +23,6 @@ func init() {
 		gin.SetMode(gin.ReleaseMode)
 	}
 	router = gin.Default()
-	router.Use(cors.Default())
 	router.GET("/", beat)
 	router.GET("/:token", get)
 	router.POST("/", permanent)
