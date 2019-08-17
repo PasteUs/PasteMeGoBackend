@@ -20,12 +20,13 @@ import (
 	"net/http"
 	"strings"
 )
-
-func permanent(requests *gin.Context) {
-	IP := requests.ClientIP()
+// 创建一个永久的 Paste，key 是自增键
+func permanentCreator(requests *gin.Context) {
+	IP := requests.ClientIP() // 用户IP
 	paste := model.Permanent{
 		ClientIP: IP,
 	}
+	// 绑定请求参数
 	if err := requests.ShouldBindJSON(&paste); err != nil {
 		logger.Error(util.LoggerInfo(IP, "Bind failed: "+err.Error()))
 		requests.JSON(http.StatusInternalServerError, gin.H{
@@ -50,10 +51,10 @@ func permanent(requests *gin.Context) {
 		}
 	}
 }
-
-func temporary(requests *gin.Context) {
+// 创建一个阅后即焚的 Paste，key 是指定的
+func temporaryCreator(requests *gin.Context) {
 	IP, key := requests.ClientIP(), requests.Param("key")
-	key = strings.ToLower(key)
+	key = strings.ToLower(key) // 进行大写到小写的转换
 	table, err := util.ValidChecker(key)
 	if err != nil {
 		if err.Error() == "wrong length" {
@@ -110,8 +111,8 @@ func temporary(requests *gin.Context) {
 		}
 	}
 }
-
-func readOnce(requests *gin.Context) {
+// 创建一个阅后即焚的 Paste，key 是随机的
+func readOnceCreator(requests *gin.Context) {
 	IP := requests.ClientIP()
 	paste := model.Temporary{
 		Key:      generator.Generator(),
@@ -141,19 +142,20 @@ func readOnce(requests *gin.Context) {
 		}
 	}
 }
-
-func get(requests *gin.Context) {
+// 访问未加密的 Paste，token 为 <Paste ID>
+// 访问加密的 Paste，token 为 <Paste ID>,<Password>
+func query(requests *gin.Context) {
 	IP, token := requests.ClientIP(), requests.Param("token")
-	if token == "" { // empty token
+	if token == "" { // 空的token
 		requests.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusBadRequest,
 			"error":   "empty token",
 			"message": "wrong params",
 		})
 	} else {
-		key, password := util.Parse(token)
-		key = strings.ToLower(key)
-		table, err := util.ValidChecker(key)
+		key, password := util.Parse(token) // 分离出key和password
+		key = strings.ToLower(key) // 进行大写到小写的转换
+		table, err := util.ValidChecker(key) // 正则匹配
 
 		if err != nil {
 			requests.JSON(http.StatusOK, gin.H{
@@ -181,7 +183,7 @@ func get(requests *gin.Context) {
 						})
 					}
 				} else {
-					if paste.Password == "" || paste.Password == convert.String2md5(password) {
+					if paste.Password == "" || paste.Password == convert.String2md5(password) { // 密码为空或者密码正确
 						logger.Info(util.LoggerInfo(IP, "Password accept"))
 						if err := paste.Delete(); err != nil {
 							requests.JSON(http.StatusInternalServerError, gin.H{
@@ -205,7 +207,7 @@ func get(requests *gin.Context) {
 						}
 
 					} else {
-						logger.Info(util.LoggerInfo(IP, "Password wrong"))
+						logger.Info(util.LoggerInfo(IP, "Password wrong")) // 密码错误
 						requests.JSON(http.StatusOK, gin.H{
 							"status":  http.StatusUnauthorized,
 							"error":   "wrong password",
@@ -232,7 +234,7 @@ func get(requests *gin.Context) {
 						})
 					}
 				} else {
-					if paste.Password == "" || paste.Password == convert.String2md5(password) {
+					if paste.Password == "" || paste.Password == convert.String2md5(password) { // 密码为空或者密码正确
 						logger.Info(util.LoggerInfo(IP, "Password accept"))
 						jsonRequest := requests.DefaultQuery("json", "false")
 						if jsonRequest == "false" {
@@ -247,7 +249,7 @@ func get(requests *gin.Context) {
 							})
 						}
 					} else {
-						logger.Info(util.LoggerInfo(IP, "Password wrong"))
+						logger.Info(util.LoggerInfo(IP, "Password wrong")) // 密码错误
 						requests.JSON(http.StatusOK, gin.H{
 							"status":  http.StatusUnauthorized,
 							"error":   "wrong password",
@@ -260,7 +262,7 @@ func get(requests *gin.Context) {
 	}
 }
 
-func notFound(requests *gin.Context) {
+func notFoundHandler(requests *gin.Context) {
 	requests.JSON(http.StatusNotFound, gin.H{
 		"status":  http.StatusNotFound,
 		"error":   "not found",
@@ -275,6 +277,6 @@ func beat(requests *gin.Context) {
 			"status": http.StatusOK,
 		})
 	} else {
-		notFound(requests)
+		notFoundHandler(requests)
 	}
 }
