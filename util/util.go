@@ -24,14 +24,14 @@ func init() {
 	rand.Seed(time.Now().UnixNano()) // 连续生成随机数，以当前纳秒数作为随机数种子
 }
 
-// token有两种情况
-// 情况1：只有key；情况2：有key和password
+// token 有两种情况
+// 情况 1: 只有 key; 情况 2: 有 key 和 password
 func Parse(token string) (string, string) {
 	buf := strings.Split(token, ",")
-	if len(buf) == 1 { // 只有key
+	if len(buf) == 1 { // 只有 key
 		return buf[0], ""
 	} else {
-		return buf[0], buf[1] // 有key和password
+		return buf[0], buf[1] // 有 key 和 password
 	}
 }
 
@@ -53,7 +53,7 @@ func ValidChecker(key string) (string, error) {
 	if !flag { // only digit
 		return "permanent", nil // key 中只包括数字的是永久的
 	}
-	return "temporary", nil // key中至少包括字母的是阅后即焚的
+	return "temporary", nil // key 中至少包括字母的是阅后即焚的
 }
 
 func LoggerInfo(IP string, content string) string {
