@@ -11,8 +11,8 @@ package model
 
 import (
 	"fmt"
-	"github.com/LucienShui/PasteMeBackend/util"
-	"github.com/LucienShui/PasteMeBackend/util/convert"
+	"github.com/PasteUs/PasteMeGoBackend/util"
+	"github.com/PasteUs/PasteMeGoBackend/util/convert"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
 	"github.com/wonderivan/logger"

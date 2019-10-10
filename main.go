@@ -13,7 +13,7 @@
 package main
 
 import (
-	"github.com/LucienShui/PasteMeBackend/server"
+	"github.com/PasteUs/PasteMeGoBackend/server"
 )
 
 func main() {

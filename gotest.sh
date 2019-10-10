@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-BASE=github.com/LucienShui/PasteMeBackend/
+BASE=github.com/PasteUs/PasteMeGoBackend/
 
 PACKAGE_LISTS="
 server

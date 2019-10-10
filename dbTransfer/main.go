@@ -13,7 +13,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/LucienShui/PasteMeBackend/dbTransfer/database"
+	"github.com/PasteUs/PasteMeGoBackend/dbTransfer/database"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/wonderivan/logger"
 	"time"
