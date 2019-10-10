@@ -10,7 +10,7 @@
 package generator
 
 import (
-	"github.com/LucienShui/PasteMeBackend/model"
+	"github.com/PasteUs/PasteMeGoBackend/model"
 	"math/rand"
 	"regexp"
 )

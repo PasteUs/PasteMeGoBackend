@@ -6,7 +6,7 @@ else
     set -x
     if [[ ${1} == "install" ]]; then
         /usr/bin/env bash ${0} uninstall && \
-        git clone --depth=1 https://github.com/LucienShui/PasteMeBackend.git -b build /usr/local/pastemed && \
+        git clone --depth=1 https://github.com/PasteUs/PasteMeGoBackend.git -b build /usr/local/pastemed && \
         cd /usr/local/pastemed && \
         mkdir -p /etc/pastemed && \
         ln -s ${PWD}/config.sh /etc/pastemed/ && \

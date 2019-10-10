@@ -11,10 +11,10 @@ package server
 
 import (
 	"fmt"
-	"github.com/LucienShui/PasteMeBackend/model"
-	"github.com/LucienShui/PasteMeBackend/util"
-	"github.com/LucienShui/PasteMeBackend/util/convert"
-	"github.com/LucienShui/PasteMeBackend/util/generator"
+	"github.com/PasteUs/PasteMeGoBackend/model"
+	"github.com/PasteUs/PasteMeGoBackend/util"
+	"github.com/PasteUs/PasteMeGoBackend/util/convert"
+	"github.com/PasteUs/PasteMeGoBackend/util/generator"
 	"github.com/gin-gonic/gin"
 	"github.com/wonderivan/logger"
 	"net/http"

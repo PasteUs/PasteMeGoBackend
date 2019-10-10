@@ -2,7 +2,7 @@ kind: pipeline
 name: Test mysql:latest
 workspace:
     base: /go
-    path: src/github.com/LucienShui/PasteMeBackend
+    path: src/github.com/PasteUs/PasteMeGoBackend
 
 services:
 - name: mysql
@@ -29,7 +29,7 @@ kind: pipeline
 name: Test mysql:5
 workspace:
   base: /go
-  path: src/github.com/LucienShui/PasteMeBackend
+  path: src/github.com/PasteUs/PasteMeGoBackend
 
 services:
   - name: mysql
@@ -56,7 +56,7 @@ kind: pipeline
 name: Build
 workspace:
     base: /go
-    path: src/github.com/LucienShui/PasteMeBackend
+    path: src/github.com/PasteUs/PasteMeGoBackend
 
 steps:
 - name: build

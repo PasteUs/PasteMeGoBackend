@@ -1,5 +1,7 @@
 # Change Log
 
+## Version 3.1.0
+
 ### 2019-07-24
 
 1. Add `github.com/gin-contrib/cors`
@@ -8,7 +10,7 @@
 
 1. Add beat
 
-## 3.0.1
+## Version 3.0.1
 
 ### 2019-07-11
 

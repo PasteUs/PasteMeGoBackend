@@ -11,7 +11,7 @@ package model
 
 import (
 	"errors"
-	"github.com/LucienShui/PasteMeBackend/util/convert"
+	"github.com/PasteUs/PasteMeGoBackend/util/convert"
 	"time"
 )
 

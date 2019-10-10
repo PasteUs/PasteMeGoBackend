@@ -11,9 +11,9 @@ package server
 
 import (
 	"encoding/json"
-	"github.com/LucienShui/PasteMeBackend/model"
-	"github.com/LucienShui/PasteMeBackend/tests/request"
-	"github.com/LucienShui/PasteMeBackend/util/convert"
+	"github.com/PasteUs/PasteMeGoBackend/model"
+	"github.com/PasteUs/PasteMeGoBackend/tests/request"
+	"github.com/PasteUs/PasteMeGoBackend/util/convert"
 	"testing"
 )
 
