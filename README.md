@@ -1,5 +1,7 @@
 # PasetMe Backend
 
+[![Build Status](https://travis-ci.com/PasteUs/PasteMeGoBackend.svg?branch=master)](https://travis-ci.com/PasteUs/PasteMeGoBackend) [![Build Status](https://cloud.drone.io/api/badges/PasteUs/PasteMeGoBackend/status.svg)](https://cloud.drone.io/PasteUs/PasteMeGoBackend)
+
 Using `Gin` and `Gorm`.
 
 ## API

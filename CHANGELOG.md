@@ -2,6 +2,10 @@
 
 ## Version 3.1.0
 
+### 2019-10-10
+
+1. Add badge in `README.md`
+
 ### 2019-07-24
 
 1. Add `github.com/gin-contrib/cors`
