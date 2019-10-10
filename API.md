@@ -44,13 +44,16 @@ Table of Contents Created by [gh-md-toc](https://github.com/ekalinin/github-mark
 
 ### Request
 
-`GET` `api.pasteme.cn/:key`
+`GET` `api.pasteme.cn/:token`
+
++ `token` is `100` with Paste ID **100**
++ `token` is `101,123456` with Paste ID **101** and Password **123456**
 
 #### Params
 
 | Name | Type | Description |
 | :---: | :---: | --- |
-| key | string | Paste key |
+| token | string | <Paste key>,[Password] |
 
 ### Response 
 
