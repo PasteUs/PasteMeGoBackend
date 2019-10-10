@@ -43,7 +43,7 @@ notifications:
 
 env:
   global:
-    - GH_REF: github.com/LucienShui/PasteMeBackend.git
+    - GH_REF: github.com/PasteUs/PasteMeGoBackend.git
     - GH_PASTEME: github.com/LucienShui/PasteMe.git
     - P_BRANCH: build
 
