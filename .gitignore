@@ -1,3 +1,9 @@
+# sqlite3
+pasteme.db
+
+# config
+config.json
+
 # GoLand
 .idea
 
