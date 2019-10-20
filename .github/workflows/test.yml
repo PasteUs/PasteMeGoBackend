@@ -3,7 +3,7 @@ on: [push, pull_request]
 jobs:
 
   test:
-    name: Test on ${{ matrix.os }} with go ${{ matrix.go_version }}
+    name: Test with go ${{ matrix.go_version }} using ${{ matrix.datasource }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
 
     services:
@@ -43,7 +43,7 @@ jobs:
               dep ensure
           fi
 
-      - name: Build
+      - name: Test
         run: |
           rm -f pasteme.db server/pasteme.db
           cp .github/config/config.${{ matrix.datasource }}.json config.json
