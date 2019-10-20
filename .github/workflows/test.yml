@@ -3,7 +3,7 @@ on: [push, pull_request]
 jobs:
 
   test:
-    name: Test one ${{ matrix.go_version }} and ${{ matrix.os }}
+    name: Test on ${{ matrix.os }} with go ${{ matrix.go_version }}
     runs-on: ${{ matrix.os }}
 
     services:
@@ -22,7 +22,7 @@ jobs:
       matrix:
         go_version: [1.12, 1.13]
         datasource: [mysql, sqlite3]
-        os: [ubuntu-latest, windows-latest, macOS-latest]
+        os: [ubuntu-latest]
 
     steps:
 
