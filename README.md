@@ -1,29 +1,16 @@
-# PasetMe Backend
+# PasteMe Backend
 
-[![Build Status](https://travis-ci.com/PasteUs/PasteMeGoBackend.svg?branch=master)](https://travis-ci.com/PasteUs/PasteMeGoBackend) [![Build Status](https://cloud.drone.io/api/badges/PasteUs/PasteMeGoBackend/status.svg)](https://cloud.drone.io/PasteUs/PasteMeGoBackend)
+[![CodeFactor](https://www.codefactor.io/repository/github/pasteus/pastemegobackend/badge)](https://www.codefactor.io/repository/github/pasteus/pastemegobackend) ![version](https://img.shields.io/badge/version-3.2.0-brightgreen.svg)
 
 Using `Gin` and `Gorm`.
 
 ## API
 
-[API Documentation](./API.md)
+[API Documentation](doc/API.md)
 
 ## Deploy
 
-[Deploy guidance](./DEPLOY.md)
-
-## pastemectl
-
-[pastemectl](./pastemectl.sh) is backend's controllor, written by shell script, when using [auto deploy script](./installer.sh), `pastemectl` would be installed by default
-
-Get more: [pastemectl Document](./PASTEMECTL_DOCUMENT.md)
-
-## Build
-
-```bash
-$ bash dep.sh
-$ go build -o pastemed
-```
+[Deploy guidance](doc/DEPLOY.md)
 
 ## Test
 
@@ -32,3 +19,7 @@ This script will test all packages if there is no param.
 ```bash
 bash gotest.sh [package name]
 ```
+
+## Change Log
+
+[Change Log](doc/CHANGELOG.md)
