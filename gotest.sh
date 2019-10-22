@@ -18,7 +18,7 @@ fi
 
 for PACKAGE in ${PACKAGE_LISTS}; do
     go test -v -count=1 ${BASE}${PACKAGE}
-    if [[ ${?} != 0 ]]; then
+    if [[ $? != 0 ]]; then
         exit 1
     fi
 done
