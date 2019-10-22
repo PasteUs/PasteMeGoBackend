@@ -3,7 +3,7 @@ COPY ./ /go/src/github.com/PasteUs/PasteMeGoBackend
 ENV GOPROXY=https://goproxy.io \
     GO111MODULE=on
 WORKDIR /go/src/github.com/PasteUs/PasteMeGoBackend
-RUN bash dep.sh
+RUN go mod download
 RUN CGO_ENABLED=0 GOOS=linux go build main.go
 
 FROM alpine:3
