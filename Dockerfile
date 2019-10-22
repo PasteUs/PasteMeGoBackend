@@ -1,4 +1,4 @@
-FROM golang:latest as builder
+FROM golang:1.13-alpine as builder
 COPY ./ /go/src/github.com/PasteUs/PasteMeGoBackend
 ENV GOPROXY=https://goproxy.io \
     GO111MODULE=on
@@ -6,14 +6,10 @@ WORKDIR /go/src/github.com/PasteUs/PasteMeGoBackend
 RUN bash dep.sh
 RUN CGO_ENABLED=0 GOOS=linux go build main.go
 
-FROM alpine:latest
+FROM alpine:3
 LABEL maintainer="Lucien Shui" \
       email="lucien@lucien.ink"
 WORKDIR /root/
 COPY --from=builder /go/src/github.com/PasteUs/PasteMeGoBackend/main ./app
-ENV PASTEMED_DB_USERNAME=username \
-    PASTEMED_DB_PASSWORD=password \
-    PASTEMED_DB_SERVER=pasteme-mysql \
-    PASTEMED_DB_PORT=3306 \
-    PASTEMED_DB_DATABASE=pasteme
-CMD ["./app"]
+RUN echo '{"address":"0.0.0.0","port":8000,"debug":false,"database":{"type":"mysql","username":"username","password":"password","server":"pasteme-mysql","port":3306,"database":"pasteme"}}' > /config.json
+CMD ["./app -c /config.json"]
