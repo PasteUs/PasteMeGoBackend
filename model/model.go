@@ -37,15 +37,15 @@ func formatWithConfig(config config.Config) string {
 
 var db *gorm.DB
 
-func Init(config config.Config) {
+func init() {
 	var err error
-	if config.Database.Type != "mysql" {
+	if config.Data.Database.Type != "mysql" {
 		db, err = gorm.Open("sqlite3", "pasteme.db")
 		if err != nil {
 			logger.Fatal("Connect to SQLite failed: " + err.Error())
 		} else {
 			logger.Info("SQLite connected")
-			if config.Debug {
+			if config.Data.Debug {
 				logger.Warn("Running in debug mode, database execute will be displayed")
 				db = db.Debug()
 			}
@@ -65,12 +65,12 @@ func Init(config config.Config) {
 			}
 		}
 	} else {
-		db, err = gorm.Open("mysql", formatWithConfig(config))
+		db, err = gorm.Open("mysql", formatWithConfig(config.Data))
 		if err != nil {
 			logger.Fatal("Connect to MySQL failed: " + err.Error())
 		} else {
 			logger.Info("MySQL connected")
-			if config.Debug {
+			if config.Data.Debug {
 				logger.Warn("Running in debug mode, database execute will be displayed")
 				db = db.Debug()
 			}

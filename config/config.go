@@ -31,6 +31,8 @@ type Config struct {
 	Database database `json:"database"`
 }
 
+var Data Config
+
 func (config *Config) Load(filename string) {
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
