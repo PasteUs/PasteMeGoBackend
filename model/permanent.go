@@ -17,7 +17,7 @@ import (
 
 // 永久
 type Permanent struct {
-	Key       uint64 `gorm:"primary_key;index:idx"` // 主键:索引
+	Key       uint64 `gorm:"primary_key"` // 主键:索引
 	Lang      string `json:"lang" gorm:"type:varchar(16)"` // 语言类型
 	Content   string `json:"content" gorm:"type:mediumtext"` // 内容，最大长度为 16777215(2^24-1) 个字符
 	Password  string `json:"password" gorm:"type:varchar(32)"` // 密码

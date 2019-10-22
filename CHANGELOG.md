@@ -1,5 +1,11 @@
 # Change Log
 
+### 2019-10-20
+
+1. Add flag support
+2. Add SQLite3 support
+3. Add config.json support
+
 ## Version 3.1.0
 
 ### 2019-10-10
