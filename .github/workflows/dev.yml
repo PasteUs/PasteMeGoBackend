@@ -1,8 +1,9 @@
-name: Go Release
+name: Publish for dev
 
 on:
-  release:
-    types: [published]
+  push:
+    branches:
+      - dev
 
 jobs:
 
@@ -39,25 +40,11 @@ jobs:
         run: |
           go build -v -o pastemed .
 
-      - name: Gzip
-        run: |
-          mkdir pastemed-linux-amd64
-          cp pastemed pastemed-linux-amd64
-          tar -czvf pastemed-linux-amd64.tar.gz pastemed-linux-amd64
-
-      - name: Upload to release
-        uses: JasonEtco/upload-to-release@master
-        with:
-          args: pastemed-linux-amd64.tar.gz application/octet-stream
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_PASSWORD }}
-
       - name: Publish Docker
         uses: LucienShui/Publish-Docker-Github-Action@2.7.1
         with:
-          name: registry.cn-hangzhou.aliyuncs.com/pasteus/pasteme-go-backend
+          name: registry.cn-hangzhou.aliyuncs.com/pasteus/pasteme-go-backend:beta
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           registry: registry.cn-hangzhou.aliyuncs.com
           dockerfile: Dockerfile
-          tag_names: true
