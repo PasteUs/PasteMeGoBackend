@@ -33,8 +33,6 @@ func TestPermanentPost(t *testing.T) {
 	}
 
 	keyP = response.Key
-
-	t.Logf("permanent key: %d", keyP)
 }
 
 func TestPermanentGet(t *testing.T) {
@@ -68,8 +66,6 @@ func TestTemporaryPost(t *testing.T) {
 	}
 
 	keyT = response.Key
-
-	t.Logf("template key: %s", keyT)
 }
 
 func TestTemporaryGet(t *testing.T) {
@@ -103,8 +99,6 @@ func TestReadOncePost(t *testing.T) {
 	}
 
 	keyR = response.Key
-
-	t.Logf("once key: %s", keyR)
 }
 
 func TestReadOnceGet(t *testing.T) {
@@ -138,8 +132,6 @@ func TestPermanentPasswordPost(t *testing.T) {
 	}
 
 	keyP = response.Key
-
-	t.Logf("permanent key: %d", keyP)
 }
 
 func TestPermanentPasswordGet(t *testing.T) {
@@ -173,8 +165,6 @@ func TestTemporaryPasswordPost(t *testing.T) {
 	}
 
 	keyT = response.Key
-
-	t.Logf("template key: %s", keyT)
 }
 
 func TestTemporaryPasswordGet(t *testing.T) {
@@ -208,8 +198,6 @@ func TestReadOncePasswordPost(t *testing.T) {
 	}
 
 	keyR = response.Key
-
-	t.Logf("once key: %s", keyR)
 }
 
 func TestReadOncePasswordGet(t *testing.T) {

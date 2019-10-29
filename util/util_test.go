@@ -23,12 +23,9 @@ func TestValidChecker(t *testing.T) {
 		{"once", "temporary"},
 	}
 	for i, TestCase := range TestCases {
-		output, err := ValidChecker(TestCase.input)
+		output, _ := ValidChecker(TestCase.input)
 		if output != TestCase.expected {
 			t.Fatalf("Test %d | input: %s, expected: %s, output: %s\n", i, TestCase.input, TestCase.expected, output)
-		}
-		if err != nil {
-			t.Logf("[%s: %s]\n", err, TestCase.input)
 		}
 	}
 }
