@@ -43,6 +43,8 @@ jobs:
         run: |
           mkdir pastemed-linux-amd64
           cp pastemed pastemed-linux-amd64
+          cp config.example.json pastemed-linux-amd64
+          cp -r systemd pastemed-linux-amd64
           tar -czvf pastemed-linux-amd64.tar.gz pastemed-linux-amd64
 
       - name: Upload to release
