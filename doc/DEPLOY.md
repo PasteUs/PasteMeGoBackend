@@ -16,15 +16,15 @@
 
 | Name | Description | Example |
 | :---: | --- | --- |
-| address | Listen address | `0.0.0.0` |
-| port | Listen port | `8000` |
-| debug | Whether use debug mod | `false` |
-| database.type | Data Source, `mysql` for using MySQL, another for using SQLite3 | `mysql` |
-| database.username | Database username | `username` |
-| database.password | Database password | `password` |
-| database.server | MySQL server address | `localhost` |
-| database.port | MySQL server port | `3306` |
-| database.database | Database name | `pasteme` |
+| `address` | Listen address | `0.0.0.0` |
+| `port` | Listen port | `8000` |
+| `debug` | Whether use debug mod | `false` |
+| `database.type` | Data Source, `mysql` for using MySQL, another for using SQLite3 | `mysql` |
+| `database.username` | Database username | `username` |
+| `database.password` | Database password | `password` |
+| `database.server` | MySQL server address | `localhost` |
+| `database.port` | MySQL server port | `3306` |
+| `database.database` | Database name | `pasteme` |
 
 ## Upgrade from 2.x
 
