@@ -1,6 +1,6 @@
 # PasteMe Backend
 
-[![CodeFactor](https://www.codefactor.io/repository/github/pasteus/pastemegobackend/badge)](https://www.codefactor.io/repository/github/pasteus/pastemegobackend) ![version](https://img.shields.io/badge/version-3.2.0-brightgreen.svg)
+[![CodeFactor](https://www.codefactor.io/repository/github/pasteus/pastemegobackend/badge)](https://www.codefactor.io/repository/github/pasteus/pastemegobackend) ![version](https://img.shields.io/badge/version-3.2.1-brightgreen.svg)
 
 Using `Gin` and `Gorm`.
 
