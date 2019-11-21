@@ -38,7 +38,7 @@ jobs:
 
       - name: Build
         run: |
-          CGO_ENABLED=0 GOOS=linux go build -v -o pastemed .
+          GOARCH=amd64 GOOS=linux go build -v -o pastemed .
 
       - name: Publish Docker
         uses: LucienShui/Publish-Docker-Github-Action@2.7.1
