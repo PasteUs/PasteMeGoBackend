@@ -6,12 +6,12 @@ jobs:
     strategy:
       matrix:
         go_version: [1.12, 1.13]
-        datasource: [mysql, sqlite3]
         os: [ubuntu-latest]
 
     name: Build with go ${{ matrix.go_version }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
 
+    steps:
     - name: Set up Go ${{ matrix.go_version }}
       uses: actions/setup-go@v1
       with:
@@ -31,7 +31,7 @@ jobs:
 
     - name: Build
       run: |
-        CGO_ENABLED=0 GOOS=linux go build -v -o pastemed .
+        GOARCH=amd64 GOOS=linux go build -v -o pastemed .
 
   test:
     strategy:
