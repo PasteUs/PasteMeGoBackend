@@ -1,8 +1,45 @@
 name: Go Test
-on: [push, pull_request]
+on: [pull_request]
 jobs:
 
+  build:
+    strategy:
+      matrix:
+        go_version: [1.12, 1.13]
+        datasource: [mysql, sqlite3]
+        os: [ubuntu-latest]
+
+    name: Build with go ${{ matrix.go_version }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    - name: Set up Go ${{ matrix.go_version }}
+      uses: actions/setup-go@v1
+      with:
+        go-version: ${{ matrix.go_version }}
+      id: go
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v1
+
+    - name: Get dependencies
+      run: |
+        go get -v -t -d ./...
+        if [ -f Gopkg.toml ]; then
+            curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+            dep ensure
+        fi
+
+    - name: Build
+      run: |
+        CGO_ENABLED=0 GOOS=linux go build -v -o pastemed .
+
   test:
+    strategy:
+      matrix:
+        go_version: [1.12, 1.13]
+        datasource: [mysql, sqlite3]
+        os: [ubuntu-latest]
+
     name: Test with go ${{ matrix.go_version }} using ${{ matrix.datasource }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
 
@@ -18,14 +55,7 @@ jobs:
           - 4399:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
-    strategy:
-      matrix:
-        go_version: [1.12, 1.13]
-        datasource: [mysql, sqlite3]
-        os: [ubuntu-latest]
-
     steps:
-
       - name: Set up Go ${{ matrix.go_version }}
         uses: actions/setup-go@v1
         with:
