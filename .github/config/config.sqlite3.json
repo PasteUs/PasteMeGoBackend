@@ -1,13 +1,12 @@
 {
   "address": "0.0.0.0",
   "port": 8000,
-  "debug": true,
   "database": {
     "type": "sqlite3",
     "username": "username",
     "password": "password",
     "server": "localhost",
-    "port": 3306,
+    "port": 4399,
     "database": "pasteme"
   }
 }

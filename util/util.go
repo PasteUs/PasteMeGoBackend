@@ -63,7 +63,7 @@ func LoggerInfo(IP string, content string) string {
 func GetEnvOrFatal(key string) string {
 	value, exist := os.LookupEnv(key)
 	if !exist {
-		logger.Fatal(fmt.Sprintf("Enviromental variable %s is not set", key))
+		logger.Painc(fmt.Sprintf("Enviromental variable %s is not set", key))
 	}
 	return value
 }

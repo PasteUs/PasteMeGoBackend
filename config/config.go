@@ -11,6 +11,7 @@ package config
 
 import (
 	"encoding/json"
+	"github.com/PasteUs/PasteMeGoBackend/flag"
 	"github.com/wonderivan/logger"
 	"io/ioutil"
 )
@@ -27,19 +28,35 @@ type database struct {
 type Config struct {
 	Address string `json:"address"`
 	Port uint16 `json:"port"`
-	Debug bool `json:"debug"`
 	Database database `json:"database"`
 }
 
-var Data Config
+var config Config
+var isInitialized bool
 
-func (config *Config) Load(filename string) {
+func init() {
+	load(flag.Config)
+}
+
+func load(filename string) {
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
-		logger.Fatal(err)
+		logger.Painc(err)
 	}
+
 	err = json.Unmarshal(data, &config)
 	if err != nil {
-		logger.Fatal(err)
+		logger.Painc(err)
 	}
+
+	logger.Info("Load from %s\nconfig = %s", filename, data)
+
+	isInitialized = true
+}
+
+func Get() Config {
+	if !isInitialized {
+		logger.Painc("Trying to use uninitialized config")
+	}
+	return config
 }

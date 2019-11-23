@@ -7,7 +7,6 @@ server
 util
 "
 
-cp config.example.json config.json
 rm -f server/pasteme.db
 
 if [[ ${#} == 1 ]]; then
