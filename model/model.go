@@ -42,11 +42,12 @@ var db *gorm.DB
 func Init() {
 	var err error
 	if config.Get().Database.Type != "mysql" {
-		db, err = gorm.Open("sqlite3", flag.DataDir + "pasteme.db")
+		sqlitePath := flag.DataDir + "pasteme.db"
+		db, err = gorm.Open("sqlite3", sqlitePath)
 		if err != nil {
-			logger.Fatal("Connect to SQLite failed: " + err.Error())
+			logger.Painc("SQLite connect to %s failed: ", sqlitePath, err.Error())
 		} else {
-			logger.Info("SQLite connected")
+			logger.Info("SQLite connect to %s success", sqlitePath)
 			if flag.Debug {
 				logger.Warn("Running in debug mode, database execute will be displayed")
 				db = db.Debug()
@@ -54,7 +55,7 @@ func Init() {
 			if !db.HasTable(&Permanent{}) {
 				logger.Warn("Table permanents not found, start creating")
 				if err := db.CreateTable(&Permanent{}).Error; err != nil {
-					logger.Fatal("Create table permanents failed: " + err.Error())
+					logger.Painc("Create table permanents failed: " + err.Error())
 				}
 				db.Exec("INSERT INTO `sqlite_sequence` (`name`, `seq`) VALUES ('permanents', 99)")
 			}
@@ -62,14 +63,14 @@ func Init() {
 			if !db.HasTable(&Temporary{}) {
 				logger.Warn("Table temporaries not found, start creating")
 				if err := db.CreateTable(&Temporary{}).Error; err != nil {
-					logger.Fatal("Create table temporaries failed: " + err.Error())
+					logger.Painc("Create table temporaries failed: " + err.Error())
 				}
 			}
 		}
 	} else {
 		db, err = gorm.Open("mysql", formatWithConfig(config.Get()))
 		if err != nil {
-			logger.Fatal("Connect to MySQL failed: " + err.Error())
+			logger.Painc("Connect to MySQL failed: " + err.Error())
 		} else {
 			logger.Info("MySQL connected")
 			if flag.Debug {
@@ -82,7 +83,7 @@ func Init() {
 					"gorm:table_options",
 					"ENGINE=Innodb DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=100",
 				).CreateTable(&Permanent{}).Error; err != nil {
-					logger.Fatal("Create table permanents failed: " + err.Error())
+					logger.Painc("Create table permanents failed: " + err.Error())
 				}
 			}
 
@@ -92,7 +93,7 @@ func Init() {
 					"gorm:table_options",
 					"ENGINE=Innodb DEFAULT CHARSET=utf8mb4",
 				).CreateTable(&Temporary{}).Error; err != nil {
-					logger.Fatal("Create table temporaries failed: " + err.Error())
+					logger.Painc("Create table temporaries failed: " + err.Error())
 				}
 			}
 		}

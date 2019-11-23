@@ -37,6 +37,6 @@ func init() {
 func Run(address string, port uint16) {
 	model.Init()
 	if err := router.Run(fmt.Sprintf("%s:%d", address, port)); err != nil {
-		logger.Fatal("Run server failed: " + err.Error())
+		logger.Painc("Run server failed: " + err.Error())
 	}
 }

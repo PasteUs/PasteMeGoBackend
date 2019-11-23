@@ -36,20 +36,22 @@ var isInitialized bool
 func Load(filename string) {
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
-		logger.Fatal(err)
+		logger.Painc(err)
 	}
 
 	err = json.Unmarshal(data, &config)
 	if err != nil {
-		logger.Fatal(err)
+		logger.Painc(err)
 	}
+
+	logger.Info("Load from %s\nconfig = %s", filename, data)
 
 	isInitialized = true
 }
 
 func Get() Config {
 	if !isInitialized {
-		logger.Fatal("Trying to use uninitialized config")
+		logger.Painc("Trying to use uninitialized config")
 	}
 	return config
 }

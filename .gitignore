@@ -1,3 +1,6 @@
+# data directory
+/data
+
 # sqlite3
 pasteme.db
 

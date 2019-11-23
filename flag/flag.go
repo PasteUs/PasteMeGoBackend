@@ -12,6 +12,8 @@ package flag
 import (
 	"flag"
 	"fmt"
+	"github.com/wonderivan/logger"
+	"os"
 	"strings"
 )
 
@@ -29,6 +31,13 @@ func init() {
 	flag.StringVar(&DataDir, "d", "./", "-d <data dir>")
 }
 
+func isDir(dataDir string) bool {
+	if dir, err := os.Stat(dataDir); err == nil && dir != nil {
+		return dir.IsDir()
+	}
+	return false
+}
+
 func Parse() bool { // return true for continue
 	flag.Parse()
 	if version {
@@ -36,8 +45,13 @@ func Parse() bool { // return true for continue
 		return false
 	}
 
+	if !isDir(DataDir) {
+		logger.Painc("%s is not a directory", DataDir)
+	}
+
 	if !strings.HasSuffix(DataDir, "/") {
 		DataDir = DataDir + "/"
 	}
+
 	return true
 }
