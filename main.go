@@ -13,18 +13,13 @@
 package main
 
 import (
-	conf "github.com/PasteUs/PasteMeGoBackend/config"
+	"github.com/PasteUs/PasteMeGoBackend/config"
 	"github.com/PasteUs/PasteMeGoBackend/flag"
-	"github.com/PasteUs/PasteMeGoBackend/model"
 	"github.com/PasteUs/PasteMeGoBackend/server"
 )
 
-var config conf.Config
-
 func main() {
 	if flag.Parse() {
-		config.Load(flag.Config)
-		model.Init(config)
-		server.Run(config.Address, config.Port)
+		server.Run(config.Get().Address, config.Get().Port)
 	}
 }

@@ -13,13 +13,13 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"github.com/PasteUs/PasteMeGoBackend/flag"
 	"github.com/PasteUs/PasteMeGoBackend/util"
 	"github.com/PasteUs/PasteMeGoBackend/util/convert"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
 	"github.com/wonderivan/logger"
 	"html"
-	"os"
 	"strings"
 	"time"
 )
@@ -94,15 +94,15 @@ var sqlDB *sql.DB
 func init() {
 	var err error
 	if sqlDB, err = sql.Open("mysql", format(username, password, network, server, port, database)); err != nil {
-		logger.Fatal("Connect to MySQL failed: " + err.Error())
+		logger.Painc("Connect to MySQL failed: " + err.Error())
 	}
 
 	gormDB, err = gorm.Open("mysql", format(username, password, network, server, port, database))
 	if err != nil {
-		logger.Fatal("Connect to MySQL failed: " + err.Error())
+		logger.Painc("Connect to MySQL failed: " + err.Error())
 	} else {
 		logger.Info("MySQL connected")
-		if os.Getenv("PASTEMED_RUNTIME") == "debug" {
+		if flag.Debug {
 			logger.Warn("Running in debug mode, database execute will be displayed")
 			gormDB = gormDB.Debug()
 		}
@@ -112,7 +112,7 @@ func init() {
 				"gorm:table_options",
 				"ENGINE=Innodb DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=100",
 			).CreateTable(&Permanent{}).Error; err != nil {
-				logger.Fatal("Create table permanents failed: " + err.Error())
+				logger.Painc("Create table permanents failed: " + err.Error())
 			}
 		}
 
@@ -122,7 +122,7 @@ func init() {
 				"gorm:table_options",
 				"ENGINE=Innodb DEFAULT CHARSET=utf8mb4",
 			).CreateTable(&Temporary{}).Error; err != nil {
-				logger.Fatal("Create table temporaries failed: " + err.Error())
+				logger.Painc("Create table temporaries failed: " + err.Error())
 			}
 		}
 	}
@@ -135,13 +135,13 @@ func fixAutoIncrement(autoIncrement uint64) error {
 func TransTemporary() uint64 {
 	var count uint64 = 0
 	if rows, err := sqlDB.Query("SELECT `key`, `type`, `text`, `passwd` FROM `temp`"); err != nil {
-		logger.Fatal("MySQL query failed: " + err.Error())
+		logger.Painc("MySQL query failed: " + err.Error())
 	} else {
 		event := gormDB.Begin()
 		for rows.Next() {
 			object, lang, passwd := Temporary{}, sql.NullString{}, sql.NullString{}
 			if err := rows.Scan(&object.Key, &lang, &object.Content, &passwd); err != nil {
-				logger.Fatal("Scan error: " + err.Error())
+				logger.Painc("Scan error: " + err.Error())
 			} else {
 				if passwd.Valid {
 					object.Password = passwd.String
@@ -162,7 +162,7 @@ func TransTemporary() uint64 {
 				object.Content = html.UnescapeString(object.Content)
 
 				if err := object.Save(event); err != nil {
-					logger.Fatal(fmt.Sprintf("Paste %s save failed: %s", object.Key, err.Error()))
+					logger.Painc(fmt.Sprintf("Paste %s save failed: %s", object.Key, err.Error()))
 				} else {
 					logger.Debug(fmt.Sprintf("Paste %s save successful", object.Key))
 					count++
@@ -179,12 +179,12 @@ func TransPermanent() uint64 {
 	var count uint64 = 0
 	for i := 0; i < 10; i++ {
 		if rows, err := sqlDB.Query(fmt.Sprintf("SELECT `key`, `type`, `text`, `passwd` FROM `perm%d`", i)); err != nil {
-			logger.Fatal("MySQL query failed: " + err.Error())
+			logger.Painc("MySQL query failed: " + err.Error())
 		} else {
 			for rows.Next() {
 				object, lang, passwd := Permanent{}, sql.NullString{}, sql.NullString{}
 				if err := rows.Scan(&object.Key, &lang, &object.Content, &passwd); err != nil {
-					logger.Fatal("Scan error: " + err.Error())
+					logger.Painc("Scan error: " + err.Error())
 				} else {
 					if passwd.Valid {
 						object.Password = passwd.String
@@ -205,7 +205,7 @@ func TransPermanent() uint64 {
 					object.Content = html.UnescapeString(object.Content)
 
 					if err := object.Save(event); err != nil {
-						logger.Fatal(fmt.Sprintf("Paste %d save failed: %s", object.Key, err.Error()))
+						logger.Painc(fmt.Sprintf("Paste %d save failed: %s", object.Key, err.Error()))
 					} else {
 						logger.Debug(fmt.Sprintf("Paste %d save successful", object.Key))
 						count++
@@ -221,9 +221,9 @@ func TransPermanent() uint64 {
 func FixAutoIncrement() {
 	var autoIncrement uint64
 	if err := sqlDB.QueryRow("SELECT `id` FROM `id`").Scan(&autoIncrement); err != nil {
-		logger.Fatal("MySQL query from old table: `id` failed: " + err.Error())
+		logger.Painc("MySQL query from old table: `id` failed: " + err.Error())
 	}
 	if err := fixAutoIncrement(autoIncrement); err != nil {
-		logger.Fatal("MySQL alter new table: `permanents`.`AUTO_INCREMENT` failed: " + err.Error())
+		logger.Painc("MySQL alter new table: `permanents`.`AUTO_INCREMENT` failed: " + err.Error())
 	}
 }

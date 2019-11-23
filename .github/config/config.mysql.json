@@ -5,8 +5,8 @@
     "type": "mysql",
     "username": "username",
     "password": "password",
-    "server": "pasteme-mysql",
-    "port": 3306,
+    "server": "localhost",
+    "port": 4399,
     "database": "pasteme"
   }
 }
