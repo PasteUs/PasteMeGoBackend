@@ -4,9 +4,11 @@ ENV GOPROXY=https://goproxy.io \
     GO111MODULE=on \
     GOOS=linux
 WORKDIR /go/src/github.com/PasteUs/PasteMeGoBackend
-RUN go mod download && go build main.go
+RUN apk add g++
+RUN go mod download
+RUN go build main.go
 
-FROM debian:stable-slim
+FROM alpine:3
 LABEL maintainer="Lucien Shui" \
       email="lucien@lucien.ink"
 COPY --from=builder /go/src/github.com/PasteUs/PasteMeGoBackend/main /usr/bin/pastemed
