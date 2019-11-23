@@ -4,7 +4,7 @@ ENV GOPROXY=https://goproxy.io \
     GO111MODULE=on \
     GOOS=linux
 WORKDIR /go/src/github.com/PasteUs/PasteMeGoBackend
-RUN apk add g++
+RUN apk --no-cache add g++
 RUN go mod download
 RUN go build main.go
 
