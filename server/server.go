@@ -11,16 +11,15 @@ package server
 
 import (
 	"fmt"
-	"github.com/PasteUs/PasteMeGoBackend/model"
+	"github.com/PasteUs/PasteMeGoBackend/flag"
 	"github.com/gin-gonic/gin"
 	"github.com/wonderivan/logger"
-	"os"
 )
 
 var router *gin.Engine
 
 func init() {
-	if os.Getenv("PASTEMED_RUNTIME") != "debug" {
+	if !flag.Debug {
 		gin.SetMode(gin.ReleaseMode)
 	}
 	router = gin.Default()
@@ -35,7 +34,6 @@ func init() {
 }
 
 func Run(address string, port uint16) {
-	model.Init()
 	if err := router.Run(fmt.Sprintf("%s:%d", address, port)); err != nil {
 		logger.Painc("Run server failed: " + err.Error())
 	}

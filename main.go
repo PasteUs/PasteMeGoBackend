@@ -20,7 +20,6 @@ import (
 
 func main() {
 	if flag.Parse() {
-		config.Load(flag.Config)
 		server.Run(config.Get().Address, config.Get().Port)
 	}
 }

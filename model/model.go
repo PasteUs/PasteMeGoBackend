@@ -38,8 +38,7 @@ func formatWithConfig(config config.Config) string {
 
 var db *gorm.DB
 
-// 如果使用 init() 交给程序自动初始化，model 会在 config 之前被初始化，使得这里读不到 config
-func Init() {
+func init() {
 	var err error
 	if config.Get().Database.Type != "mysql" {
 		sqlitePath := flag.DataDir + "pasteme.db"

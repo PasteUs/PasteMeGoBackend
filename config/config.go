@@ -11,6 +11,7 @@ package config
 
 import (
 	"encoding/json"
+	"github.com/PasteUs/PasteMeGoBackend/flag"
 	"github.com/wonderivan/logger"
 	"io/ioutil"
 )
@@ -33,7 +34,11 @@ type Config struct {
 var config Config
 var isInitialized bool
 
-func Load(filename string) {
+func init() {
+	load(flag.Config)
+}
+
+func load(filename string) {
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
 		logger.Painc(err)

@@ -11,6 +11,7 @@ package server
 
 import (
 	"fmt"
+	"github.com/PasteUs/PasteMeGoBackend/flag"
 	"github.com/gin-gonic/gin"
 	"github.com/wonderivan/logger"
 	"os"
@@ -19,7 +20,7 @@ import (
 var router *gin.Engine
 
 func init() {
-	if os.Getenv("PASTEMED_RUNTIME") != "debug" {
+	if !flag.Debug {
 		gin.SetMode(gin.ReleaseMode)
 	}
 	router = gin.Default()

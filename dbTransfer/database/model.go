@@ -13,13 +13,13 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"github.com/PasteUs/PasteMeGoBackend/flag"
 	"github.com/PasteUs/PasteMeGoBackend/util"
 	"github.com/PasteUs/PasteMeGoBackend/util/convert"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
 	"github.com/wonderivan/logger"
 	"html"
-	"os"
 	"strings"
 	"time"
 )
@@ -102,7 +102,7 @@ func init() {
 		logger.Painc("Connect to MySQL failed: " + err.Error())
 	} else {
 		logger.Info("MySQL connected")
-		if os.Getenv("PASTEMED_RUNTIME") == "debug" {
+		if flag.Debug {
 			logger.Warn("Running in debug mode, database execute will be displayed")
 			gormDB = gormDB.Debug()
 		}

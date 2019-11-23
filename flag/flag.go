@@ -29,6 +29,20 @@ func init() {
 	flag.StringVar(&Config, "c", "./config.json", "-c <config file>")
 	flag.BoolVar(&Debug, "debug", false, "--debug Using debug mode")
 	flag.StringVar(&DataDir, "d", "./", "-d <data dir>")
+
+	flag.Parse()
+
+	validationCheck()
+}
+
+func validationCheck() {
+	if !isDir(DataDir) {
+		logger.Painc("%s is not a directory", DataDir)
+	}
+
+	if !strings.HasSuffix(DataDir, "/") {
+		DataDir = DataDir + "/"
+	}
 }
 
 func isDir(dataDir string) bool {
@@ -39,19 +53,9 @@ func isDir(dataDir string) bool {
 }
 
 func Parse() bool { // return true for continue
-	flag.Parse()
 	if version {
-		fmt.Println("3.2.0")
+		fmt.Println("3.2.1")
 		return false
 	}
-
-	if !isDir(DataDir) {
-		logger.Painc("%s is not a directory", DataDir)
-	}
-
-	if !strings.HasSuffix(DataDir, "/") {
-		DataDir = DataDir + "/"
-	}
-
 	return true
 }
