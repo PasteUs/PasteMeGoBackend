@@ -27,19 +27,29 @@ type database struct {
 type Config struct {
 	Address string `json:"address"`
 	Port uint16 `json:"port"`
-	Debug bool `json:"debug"`
 	Database database `json:"database"`
 }
 
-var Data Config
+var config Config
+var isInitialized bool
 
-func (config *Config) Load(filename string) {
+func Load(filename string) {
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
 		logger.Fatal(err)
 	}
+
 	err = json.Unmarshal(data, &config)
 	if err != nil {
 		logger.Fatal(err)
 	}
+
+	isInitialized = true
+}
+
+func Get() Config {
+	if !isInitialized {
+		logger.Fatal("Trying to use uninitialized config")
+	}
+	return config
 }

@@ -11,6 +11,7 @@ package server
 
 import (
 	"fmt"
+	"github.com/PasteUs/PasteMeGoBackend/model"
 	"github.com/gin-gonic/gin"
 	"github.com/wonderivan/logger"
 	"os"
@@ -34,6 +35,7 @@ func init() {
 }
 
 func Run(address string, port uint16) {
+	model.Init()
 	if err := router.Run(fmt.Sprintf("%s:%d", address, port)); err != nil {
 		logger.Fatal("Run server failed: " + err.Error())
 	}

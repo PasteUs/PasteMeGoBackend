@@ -13,6 +13,7 @@ package model
 import (
 	"fmt"
 	"github.com/PasteUs/PasteMeGoBackend/config"
+	"github.com/PasteUs/PasteMeGoBackend/flag"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
 	_ "github.com/mattn/go-sqlite3"
@@ -37,15 +38,16 @@ func formatWithConfig(config config.Config) string {
 
 var db *gorm.DB
 
-func init() {
+// 如果使用 init() 交给程序自动初始化，model 会在 config 之前被初始化，使得这里读不到 config
+func Init() {
 	var err error
-	if config.Data.Database.Type != "mysql" {
-		db, err = gorm.Open("sqlite3", "pasteme.db")
+	if config.Get().Database.Type != "mysql" {
+		db, err = gorm.Open("sqlite3", flag.DataDir + "pasteme.db")
 		if err != nil {
 			logger.Fatal("Connect to SQLite failed: " + err.Error())
 		} else {
 			logger.Info("SQLite connected")
-			if config.Data.Debug {
+			if flag.Debug {
 				logger.Warn("Running in debug mode, database execute will be displayed")
 				db = db.Debug()
 			}
@@ -65,12 +67,12 @@ func init() {
 			}
 		}
 	} else {
-		db, err = gorm.Open("mysql", formatWithConfig(config.Data))
+		db, err = gorm.Open("mysql", formatWithConfig(config.Get()))
 		if err != nil {
 			logger.Fatal("Connect to MySQL failed: " + err.Error())
 		} else {
 			logger.Info("MySQL connected")
-			if config.Data.Debug {
+			if flag.Debug {
 				logger.Warn("Running in debug mode, database execute will be displayed")
 				db = db.Debug()
 			}
