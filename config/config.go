@@ -17,17 +17,17 @@ import (
 )
 
 type database struct {
-	Type string `json:"type"`
+	Type     string `json:"type"`
 	Username string `json:"username"`
 	Password string `json:"password"`
-	Server string `json:"server"`
-	Port uint16 `json:"port"`
+	Server   string `json:"server"`
+	Port     uint16 `json:"port"`
 	Database string `json:"database"`
 }
 
 type Config struct {
-	Address string `json:"address"`
-	Port uint16 `json:"port"`
+	Address  string   `json:"address"`
+	Port     uint16   `json:"port"`
 	Database database `json:"database"`
 }
 

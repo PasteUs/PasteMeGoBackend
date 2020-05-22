@@ -20,6 +20,7 @@ import (
 	"net/http"
 	"strings"
 )
+
 // 创建一个永久的 Paste, key 是自增键
 func permanentCreator(requests *gin.Context) {
 	IP := requests.ClientIP() // 用户 IP
@@ -51,6 +52,7 @@ func permanentCreator(requests *gin.Context) {
 		}
 	}
 }
+
 // 创建一个阅后即焚的 Paste, key 是指定的
 func temporaryCreator(requests *gin.Context) {
 	IP, key := requests.ClientIP(), requests.Param("key")
@@ -111,6 +113,7 @@ func temporaryCreator(requests *gin.Context) {
 		}
 	}
 }
+
 // 创建一个阅后即焚的 Paste, key 是随机的
 func readOnceCreator(requests *gin.Context) {
 	IP := requests.ClientIP()
@@ -142,6 +145,7 @@ func readOnceCreator(requests *gin.Context) {
 		}
 	}
 }
+
 // 访问未加密的 Paste, token 为 <Paste ID>
 // 访问加密的 Paste, token 为 <Paste ID>,<Password>
 func query(requests *gin.Context) {
@@ -153,8 +157,8 @@ func query(requests *gin.Context) {
 			"message": "wrong params",
 		})
 	} else {
-		key, password := util.Parse(token) // 分离出 key 和 password
-		key = strings.ToLower(key) // 进行大写到小写的转换
+		key, password := util.Parse(token)   // 分离出 key 和 password
+		key = strings.ToLower(key)           // 进行大写到小写的转换
 		table, err := util.ValidChecker(key) // 正则匹配
 
 		if err != nil {

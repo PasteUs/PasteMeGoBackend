@@ -17,11 +17,11 @@ import (
 
 // 永久
 type Permanent struct {
-	Key       uint64 `gorm:"primary_key"` // 主键:索引
-	Lang      string `json:"lang" gorm:"type:varchar(16)"` // 语言类型
-	Content   string `json:"content" gorm:"type:mediumtext"` // 内容，最大长度为 16777215(2^24-1) 个字符
-	Password  string `json:"password" gorm:"type:varchar(32)"` // 密码
-	ClientIP  string `gorm:"type:varchar(64)"` // 用户 IP
+	Key       uint64    `gorm:"primary_key"`                      // 主键:索引
+	Lang      string    `json:"lang" gorm:"type:varchar(16)"`     // 语言类型
+	Content   string    `json:"content" gorm:"type:mediumtext"`   // 内容，最大长度为 16777215(2^24-1) 个字符
+	Password  string    `json:"password" gorm:"type:varchar(32)"` // 密码
+	ClientIP  string    `gorm:"type:varchar(64)"`                 // 用户 IP
 	CreatedAt time.Time // 存储记录的创建时间
 	// 存储记录的删除时间
 	// 删除具有 DeletedAt 字段的记录，它不会从数据库中删除，但只将字段 DeletedAt 设置为当前时间，并在查询时无法找到记录
