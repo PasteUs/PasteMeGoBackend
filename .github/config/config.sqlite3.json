@@ -1,5 +1,6 @@
 {
   "address": "0.0.0.0",
+  "admin_url": "",
   "port": 8000,
   "database": {
     "type": "sqlite3",
