@@ -27,6 +27,7 @@ type database struct {
 
 type Config struct {
 	Address  string   `json:"address"`
+	AdminUrl string   `json:"admin_url"` // PasteMe Admin's hostname
 	Port     uint16   `json:"port"`
 	Database database `json:"database"`
 }

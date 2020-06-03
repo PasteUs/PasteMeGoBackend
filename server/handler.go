@@ -12,6 +12,7 @@ package server
 import (
 	"fmt"
 	"github.com/PasteUs/PasteMeGoBackend/model"
+	"github.com/PasteUs/PasteMeGoBackend/pasteme_admin"
 	"github.com/PasteUs/PasteMeGoBackend/util"
 	"github.com/PasteUs/PasteMeGoBackend/util/convert"
 	"github.com/PasteUs/PasteMeGoBackend/util/generator"
@@ -45,6 +46,11 @@ func permanentCreator(requests *gin.Context) {
 			})
 		} else {
 			logger.Info(util.LoggerInfo(IP, "Create an permanent paste with key: "+convert.Uint2string(paste.Key)))
+
+			if pasteme_admin.Url != "" { // 如果在 config 里配置了 adminUrl 的话，调用 PasteMe Admin 的接口
+				go pasteme_admin.Classify(IP, paste.Key) // 异步调用
+			}
+
 			requests.JSON(http.StatusCreated, gin.H{
 				"status": http.StatusCreated,
 				"key":    paste.Key,
