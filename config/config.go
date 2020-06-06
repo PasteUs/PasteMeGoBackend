@@ -11,6 +11,7 @@ package config
 
 import (
 	"encoding/json"
+	"github.com/PasteUs/PasteMeGoBackend/flag"
 	"github.com/wonderivan/logger"
 	"io/ioutil"
 )
@@ -29,10 +30,15 @@ type Config struct {
 	Port uint16 `json:"port"`
 	Debug bool `json:"debug"`
 	Database database `json:"database"`
+	LogFilePath string `json:"logfilepath"`
+	LogFileName string `json:"logfilename"`
 }
 
 var Data Config
 
+func init() {
+	Data.Load(flag.Config)
+}
 func (config *Config) Load(filename string) {
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {

@@ -11,6 +11,7 @@ package server
 
 import (
 	"fmt"
+	"github.com/PasteUs/PasteMeGoBackend/middleware"
 	"github.com/gin-gonic/gin"
 	"github.com/wonderivan/logger"
 	"os"
@@ -22,7 +23,7 @@ func init() {
 	if os.Getenv("PASTEMED_RUNTIME") != "debug" {
 		gin.SetMode(gin.ReleaseMode)
 	}
-	router = gin.Default()
+	middlewareInit()
 	router.GET("/", beat) // 心跳检测
 	// 访问未加密的 Paste，token 为 <Paste ID>
 	// 访问加密的 Paste，token 为 <Paste ID>,<Password>
@@ -37,4 +38,8 @@ func Run(address string, port uint16) {
 	if err := router.Run(fmt.Sprintf("%s:%d", address, port)); err != nil {
 		logger.Fatal("Run server failed: " + err.Error())
 	}
+}
+func middlewareInit(){
+	router = gin.Default()
+	router.Use(middleware.LoggerToFile())
 }
