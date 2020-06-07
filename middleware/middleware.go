@@ -12,8 +12,23 @@ import (
 	"time"
 )
 
+func init()  {
+
+	LogFilePath := config.Data.LogFilePath
+	LogFileName := config.Data.LogFileName
+	/*日志文件*/
+	fileName := path.Join(LogFilePath,LogFileName)
+
+	f,err := os.Create( fileName )
+	defer f.Close()
+
+	if err !=nil {
+		logger.Error("Can't create file,Please check for errors in config.json")
+	}
+}
 /*记录到文件*/
 func LoggerToFile() gin.HandlerFunc{
+
 	LogFilePath := config.Data.LogFilePath
 	LogFileName := config.Data.LogFileName
 	/*日志文件*/
