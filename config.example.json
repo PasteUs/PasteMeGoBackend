@@ -1,15 +1,15 @@
 {
-  "address": "127.0.0.1",
+  "address": "0.0.0.0",
   "port": 8000,
   "debug": false,
   "database": {
-    "type": "mysql",
-    "username": "root",
-    "password": "123",
-    "server": "127.0.0.1",
+    "type": "sqlite3",
+    "username": "username",
+    "password": "password",
+    "server": "localhost",
     "port": 3306,
     "database": "pasteme"
   },
-  "logfilepath": "./log",
-  "logfilename": "gin.log"
+  "logfilepath": "path",
+  "logfilename": "filename"
 }
