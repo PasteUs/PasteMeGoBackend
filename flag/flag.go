@@ -19,8 +19,8 @@ import (
 
 var (
 	version bool
-	Config string
-	Debug bool
+	Config  string
+	Debug   bool
 	DataDir string
 )
 
