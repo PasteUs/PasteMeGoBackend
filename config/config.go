@@ -12,6 +12,7 @@ package config
 import (
 	"encoding/json"
 	"github.com/PasteUs/PasteMeGoBackend/flag"
+	"github.com/PasteUs/PasteMeGoBackend/meta"
 	"github.com/wonderivan/logger"
 	"io/ioutil"
 )
@@ -26,6 +27,7 @@ type database struct {
 }
 
 type Config struct {
+	Version  string   `json:"version"`
 	Address  string   `json:"address"`
 	AdminUrl string   `json:"admin_url"` // PasteMe Admin's hostname
 	Port     uint16   `json:"port"`
@@ -37,6 +39,30 @@ var isInitialized bool
 
 func init() {
 	load(flag.Config)
+	checkVersion(config.Version)
+}
+
+func isInArray(item string, array []string) bool {
+	for _, each := range array {
+		if item == each {
+			return true
+		}
+	}
+	return false
+}
+
+func checkVersion(version string) {
+	if version != meta.Version {
+
+		if jsonBytes, err := json.Marshal(meta.ValidConfigVersion); err != nil {
+			logger.Painc(err)
+		} else {
+			if !isInArray(version, meta.ValidConfigVersion) {
+				logger.Painc("Valid config versions are %s, but \"%s\" was given", string(jsonBytes), version)
+			}
+		}
+	}
+
 }
 
 func load(filename string) {
