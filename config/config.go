@@ -26,10 +26,12 @@ type database struct {
 }
 
 type Config struct {
-	Address  string   `json:"address"`
-	AdminUrl string   `json:"admin_url"` // PasteMe Admin's hostname
-	Port     uint16   `json:"port"`
-	Database database `json:"database"`
+	Address     string   `json:"address"`
+	AdminUrl    string   `json:"admin_url"` // PasteMe Admin's hostname
+	Port        uint16   `json:"port"`
+	Database    database `json:"database"`
+	LogFilePath string   `json:"log_file_path"`
+	LogFileName string   `json:"log_file_name"`
 }
 
 var config Config

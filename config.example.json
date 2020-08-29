@@ -9,5 +9,7 @@
     "server": "pasteme-mysql",
     "port": 3306,
     "database": "pasteme"
-  }
+  },
+  "log_file_path": "./log",
+  "log_file_name": "gin.log"
 }
