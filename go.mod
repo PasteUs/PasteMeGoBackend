@@ -1,6 +1,6 @@
 module github.com/PasteUs/PasteMeGoBackend
 
-go 1.15
+go 1.12
 
 require (
 	github.com/gin-gonic/gin v1.6.3

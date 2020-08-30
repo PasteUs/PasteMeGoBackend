@@ -1,4 +1,4 @@
-FROM golang:1.15-alpine as builder
+FROM golang:1.12-alpine as builder
 COPY ./ /go/src/github.com/PasteUs/PasteMeGoBackend
 ENV GOPROXY=https://goproxy.io \
     GO111MODULE=on \
