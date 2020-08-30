@@ -1,4 +1,5 @@
 {
+  "version": "3.3.0",
   "address": "0.0.0.0",
   "admin_url": "",
   "port": 8000,

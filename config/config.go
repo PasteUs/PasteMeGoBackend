@@ -12,6 +12,7 @@ package config
 import (
 	"encoding/json"
 	"github.com/PasteUs/PasteMeGoBackend/flag"
+	"github.com/PasteUs/PasteMeGoBackend/meta"
 	"github.com/wonderivan/logger"
 	"io/ioutil"
 )
@@ -25,13 +26,18 @@ type database struct {
 	Database string `json:"database"`
 }
 
+type log struct {
+	Path  string `json:"path"`
+	Level string `json:"level"`
+}
+
 type Config struct {
-	Address     string   `json:"address"`
-	AdminUrl    string   `json:"admin_url"` // PasteMe Admin's hostname
-	Port        uint16   `json:"port"`
-	Database    database `json:"database"`
-	LogFilePath string   `json:"log_file_path"`
-	LogFileName string   `json:"log_file_name"`
+	Version  string   `json:"version"`
+	Address  string   `json:"address"`
+	AdminUrl string   `json:"admin_url"` // PasteMe Admin's hostname
+	Port     uint16   `json:"port"`
+	Database database `json:"database"`
+	Log      log      `json:"log"`
 }
 
 var config Config
@@ -39,6 +45,37 @@ var isInitialized bool
 
 func init() {
 	load(flag.Config)
+	checkVersion(config.Version)
+	setDefault()
+}
+
+func setDefault() {
+	if config.Log.Level == "" {
+		config.Log.Level = "info"
+	}
+}
+
+func isInArray(item string, array []string) bool {
+	for _, each := range array {
+		if item == each {
+			return true
+		}
+	}
+	return false
+}
+
+func checkVersion(version string) {
+	if version != meta.Version {
+
+		if jsonBytes, err := json.Marshal(meta.ValidConfigVersion); err != nil {
+			logger.Painc(err)
+		} else {
+			if !isInArray(version, meta.ValidConfigVersion) {
+				logger.Painc("Valid config versions are %s, but \"%s\" was given", string(jsonBytes), version)
+			}
+		}
+	}
+
 }
 
 func load(filename string) {

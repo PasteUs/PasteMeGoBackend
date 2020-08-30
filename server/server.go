@@ -12,7 +12,6 @@ package server
 import (
 	"fmt"
 	"github.com/PasteUs/PasteMeGoBackend/flag"
-	"github.com/PasteUs/PasteMeGoBackend/middleware"
 	"github.com/gin-gonic/gin"
 	"github.com/wonderivan/logger"
 )
@@ -24,7 +23,6 @@ func init() {
 		gin.SetMode(gin.ReleaseMode)
 	}
 	router = gin.Default()
-	router.Use(middleware.LoggerToFile()) // 使用中间件增强日志
 	router.GET("/", beat)                 // 心跳检测
 	// 访问未加密的 Paste，token 为 <Paste ID>
 	// 访问加密的 Paste，token 为 <Paste ID>,<Password>
@@ -35,7 +33,7 @@ func init() {
 	router.NoRoute(notFoundHandler)
 }
 
-func Run(address string, port uint16) {
+func Run(address string, port uint16, logToFile bool) {
 	if err := router.Run(fmt.Sprintf("%s:%d", address, port)); err != nil {
 		logger.Painc("Run server failed: " + err.Error())
 	}

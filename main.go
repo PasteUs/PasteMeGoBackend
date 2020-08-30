@@ -20,6 +20,6 @@ import (
 
 func main() {
 	if flag.Parse() {
-		server.Run(config.Get().Address, config.Get().Port)
+		server.Run(config.Get().Address, config.Get().Port, config.Get().Log.Path != "")
 	}
 }

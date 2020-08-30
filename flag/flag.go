@@ -12,6 +12,7 @@ package flag
 import (
 	"flag"
 	"fmt"
+	"github.com/PasteUs/PasteMeGoBackend/meta"
 	"github.com/wonderivan/logger"
 	"os"
 	"strings"
@@ -54,7 +55,7 @@ func isDir(dataDir string) bool {
 
 func Parse() bool { // return true for continue
 	if version {
-		fmt.Println("3.2.1")
+		fmt.Println(meta.Version)
 		return false
 	}
 	return true

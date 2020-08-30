@@ -44,7 +44,9 @@ Table of Contents Created by [gh-md-toc](https://github.com/ekalinin/github-mark
 
 ### Request
 
-`GET` `api.pasteme.cn/:token`
+`GET` `api.pasteme.cn/:token` or `api.pasteme.cn/:token?json=true`
+
+> `GET` with `json=true` will only get content field instead.
 
 + `token` is `100` with Paste ID **100**
 + `token` is `101,123456` with Paste ID **101** and Password **123456**
@@ -53,7 +55,7 @@ Table of Contents Created by [gh-md-toc](https://github.com/ekalinin/github-mark
 
 | Name | Type | Description |
 | :---: | :---: | --- |
-| token | string | <Paste key>,[Password] |
+| token | string | \<Paste key\>[,Password] |
 
 ### Response 
 
