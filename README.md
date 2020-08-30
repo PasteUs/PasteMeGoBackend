@@ -1,16 +1,16 @@
 # PasteMe Backend
 
-[![CodeFactor](https://www.codefactor.io/repository/github/pasteus/pastemegobackend/badge)](https://www.codefactor.io/repository/github/pasteus/pastemegobackend) ![version](https://img.shields.io/badge/version-3.2.1-brightgreen.svg)
+[![CodeFactor](https://www.codefactor.io/repository/github/pasteus/pastemegobackend/badge)](https://www.codefactor.io/repository/github/pasteus/pastemegobackend) ![version](https://img.shields.io/badge/version-3.3.0-brightgreen.svg)
 
 Using `Gin` and `Gorm`.
 
 ## API
 
-[API Documentation](doc/API.md)
+[API Documentation](https://docs.pasteme.cn/#/developer/api)
 
 ## Deploy
 
-[Deploy guidance](doc/DEPLOY.md)
+[Deploy guidance](https://docs.pasteme.cn/#/deploy/docker)
 
 ## Test
 
@@ -22,4 +22,4 @@ bash gotest.sh [package name]
 
 ## Change Log
 
-[Change Log](doc/CHANGELOG.md)
+[PasteMe Go Backend Releases](https://github.com/PasteUs/PasteMeGoBackend/releases)

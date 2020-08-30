@@ -23,7 +23,7 @@ func init() {
 		gin.SetMode(gin.ReleaseMode)
 	}
 	router = gin.Default()
-	router.GET("/", beat) // 心跳检测
+	router.GET("/", beat)                 // 心跳检测
 	// 访问未加密的 Paste，token 为 <Paste ID>
 	// 访问加密的 Paste，token 为 <Paste ID>,<Password>
 	router.GET("/:token", query)
@@ -33,7 +33,7 @@ func init() {
 	router.NoRoute(notFoundHandler)
 }
 
-func Run(address string, port uint16) {
+func Run(address string, port uint16, logToFile bool) {
 	if err := router.Run(fmt.Sprintf("%s:%d", address, port)); err != nil {
 		logger.Painc("Run server failed: " + err.Error())
 	}

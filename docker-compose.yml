@@ -8,15 +8,20 @@ services:
       - pasteme-mysql
     healthcheck:
       test: ["CMD", "wget", "localhost:8000/?method=beat", "--output=/dev/null"]
-      interval: 45s
+      interval: 30s
       timeout: 3s
       retries: 3
     restart: always
+    logging:
+      options:
+        max-size: "16m"
     volumes:
-      - ./backend/config/:/config/
+      - ./backend/config/:/etc/pastemed/
       - ./backend/data/:/data/
     ports:
       - 8000:8000
+    networks:
+      - pasteme-network
 
   pasteme-mysql:
     image: mysql:5.5
@@ -40,3 +45,9 @@ services:
       MYSQL_INNODB_LOG_FILE_SIZE: 64M
     volumes:
       - ./mysql:/var/lib/mysql
+    networks:
+      - pasteme-network
+
+networks:
+  pasteme-network:
+    external: true

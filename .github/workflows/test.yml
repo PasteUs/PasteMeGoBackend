@@ -5,7 +5,7 @@ jobs:
   build:
     strategy:
       matrix:
-        go_version: [1.12, 1.13]
+        go_version: [1.12]
         os: [ubuntu-latest]
 
     name: Build with go ${{ matrix.go_version }} on ${{ matrix.os }}
