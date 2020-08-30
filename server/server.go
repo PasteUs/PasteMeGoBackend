@@ -12,7 +12,6 @@ package server
 import (
 	"fmt"
 	"github.com/PasteUs/PasteMeGoBackend/flag"
-	"github.com/PasteUs/PasteMeGoBackend/middleware"
 	"github.com/gin-gonic/gin"
 	"github.com/wonderivan/logger"
 )
