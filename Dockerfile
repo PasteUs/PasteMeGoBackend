@@ -1,4 +1,4 @@
-FROM registry.cn-hangzhou.aliyuncs.com/pasteus/golang-alpine:latest as builder
+FROM registry.cn-hangzhou.aliyuncs.com/pasteus/golang-alpine:1.0.1 as builder
 COPY ./ /go/src/github.com/PasteUs/PasteMeGoBackend
 WORKDIR /go/src/github.com/PasteUs/PasteMeGoBackend
 RUN go mod download
