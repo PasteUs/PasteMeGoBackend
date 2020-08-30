@@ -26,12 +26,18 @@ type database struct {
 	Database string `json:"database"`
 }
 
+type log struct {
+	Path  string `json:"path"`
+	Level string `json:"level"`
+}
+
 type Config struct {
 	Version  string   `json:"version"`
 	Address  string   `json:"address"`
 	AdminUrl string   `json:"admin_url"` // PasteMe Admin's hostname
 	Port     uint16   `json:"port"`
 	Database database `json:"database"`
+	Log      log      `json:"log"`
 }
 
 var config Config
@@ -40,6 +46,13 @@ var isInitialized bool
 func init() {
 	load(flag.Config)
 	checkVersion(config.Version)
+	setDefault()
+}
+
+func setDefault() {
+	if config.Log.Level == "" {
+		config.Log.Level = "info"
+	}
 }
 
 func isInArray(item string, array []string) bool {

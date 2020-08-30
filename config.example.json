@@ -4,7 +4,7 @@
   "admin_url": "",
   "port": 8000,
   "database": {
-    "type": "sqlite",
+    "type": "mysql",
     "username": "username",
     "password": "password",
     "server": "pasteme-mysql",
