@@ -27,7 +27,10 @@ type Permanent struct {
 	// 存储记录的删除时间
 	// 删除具有 DeletedAt 字段的记录，它不会从数据库中删除，但只将字段 DeletedAt 设置为当前时间，并在查询时无法找到记录
 	DeletedAt *time.Time
-	DeadLine  *DeadLine `gorm:"type:datetime"`
+
+	// 过期时间,为Time结构体,标志的是消息删除的日期时间,为零值时不过期.利用自定义的类型进行自定义解析转换.
+	// 过期后查询时无法找到记录,在某个指定时间由定时任务 Clean() 统一回收
+	DeadLine *DeadLine `gorm:"type:datetime"`
 }
 
 //成员函数，创建
