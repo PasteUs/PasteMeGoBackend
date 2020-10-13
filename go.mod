@@ -12,6 +12,7 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.2
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect
+	github.com/robfig/cron/v3 v3.0.0
 	github.com/wonderivan/logger v1.0.0
 	golang.org/x/sys v0.0.0-20200828194041-157a740278f4 // indirect
 	google.golang.org/protobuf v1.25.0 // indirect

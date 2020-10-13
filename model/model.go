@@ -7,6 +7,7 @@
 ------------      -------    --------    -----------
 2019-06-23 14:03  Lucien     1.0.0       None
 2019-10-20 19:30  Lucien     1.1.0       Add SQLite support
+
 */
 package model
 
