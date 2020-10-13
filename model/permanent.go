@@ -12,6 +12,7 @@ package model
 
 import (
 	"errors"
+	"github.com/PasteUs/PasteMeGoBackend/config"
 	"github.com/PasteUs/PasteMeGoBackend/util/convert"
 	"time"
 )
@@ -54,10 +55,20 @@ func (paste *Permanent) Delete() error {
 
 // 成员函数，访问
 func (paste *Permanent) Get() error {
-	return db.Find(&paste, "`key` = ? and (dead_line > (select now()) or dead_line is NULL)", paste.Key).Error
+	if config.Get().Database.Type == "mysql" {
+		return db.Find(&paste, "`key` = ? and (dead_line > (select now()) or dead_line is NULL)", paste.Key).Error
+
+	} else {
+		return db.Find(&paste, "`key` = ? and (dead_line > DATETIME('now') or dead_line is NULL)", paste.Key).Error
+	}
 }
 
 //成员函数,自动删除
 func Clean() error {
-	return db.Exec("DELETE FROM Permanents WHERE dead_line < (SELECT now())").Error
+	if config.Get().Database.Type == "mysql" {
+		return db.Exec("DELETE FROM Permanents WHERE dead_line < (SELECT now())").Error
+	} else {
+		return db.Exec("DELETE FROM Permanents WHERE dead_line < DATETIME('now')").Error
+	}
+
 }
