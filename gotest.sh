@@ -5,7 +5,6 @@ BASE=github.com/PasteUs/PasteMeGoBackend/
 PACKAGE_LISTS="
 server
 util
-http_client
 "
 
 rm -f server/pasteme.db
