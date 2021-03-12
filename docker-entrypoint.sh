@@ -1,4 +1,5 @@
 #!/usr/bin/env sh
+
 CONFIG_PATH="/etc/pastemed/config.json"
 EXAMPLE_CONFIG_PATH="/usr/local/pastemed/config.example.json"
 DATA_PATH="/data"
