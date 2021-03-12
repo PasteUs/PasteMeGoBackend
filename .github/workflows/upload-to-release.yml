@@ -1,4 +1,4 @@
-name: Go Release
+name: Upload to release and publish
 
 on:
   release:
@@ -98,3 +98,7 @@ jobs:
 
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
+
+      - name: Trigger Webhook
+        run: |
+          curl -X POST "${{ secrets.RELEASE_WEBHOOK }}backend"

@@ -1,4 +1,4 @@
-FROM registry.cn-hangzhou.aliyuncs.com/pasteus/golang-alpine:1.0.1 as builder
+FROM pasteme/golang:1.12-alpine
 COPY ./ /go/src/github.com/PasteUs/PasteMeGoBackend
 WORKDIR /go/src/github.com/PasteUs/PasteMeGoBackend
 RUN go mod download
@@ -10,6 +10,7 @@ RUN mkdir /pastemed && \
 FROM alpine:3
 LABEL maintainer="Lucien Shui" \
       email="lucien@lucien.ink"
+ENV TZ=Asia/Shanghai
 COPY --from=builder /pastemed /usr/local/pastemed
 RUN chmod +x /usr/local/pastemed/pastemed && \
     mkdir /data && \
