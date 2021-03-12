@@ -1,4 +1,4 @@
-name: Publish for master
+name: Publish beta to docker registry
 
 on:
   push:
@@ -65,3 +65,7 @@ jobs:
 
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
+
+      - name: Trigger Webhook
+        run: |
+          curl -X POST "${{ secrets.BETA_WEBHOOK }}backend"
