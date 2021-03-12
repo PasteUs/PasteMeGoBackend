@@ -39,27 +39,62 @@ jobs:
         run: |
           GOARCH=amd64 GOOS=linux go build -v -o pastemed .
 
+      - name: Release Version
+        id: release_version
+        run: |
+          echo ::set-output name=tag::$(echo "${GITHUB_REF}" | sed -e "s/refs\/tags\///g" | sed -E "s/release-v?([0-9]+)\.([0-9]+)\.([0-9]+)(-[a-zA-Z]+(\.[0-9]+)?)?/\1.\2.\3\4/g")
+
       - name: Gzip
         run: |
           mkdir pastemed-linux-amd64
           cp pastemed pastemed-linux-amd64
           cp config.example.json pastemed-linux-amd64
           cp -r systemd pastemed-linux-amd64
-          tar -czvf pastemed-linux-amd64.tar.gz pastemed-linux-amd64
+          tar -czvf pastemed-${{ steps.release_version.outputs.tag }}-linux-amd64.tar.gz pastemed-linux-amd64
 
       - name: Upload to release
         uses: JasonEtco/upload-to-release@master
         with:
-          args: pastemed-linux-amd64.tar.gz application/octet-stream
+          args: pastemed-${{ steps.release_version.outputs.tag }}-linux-amd64.tar.gz application/octet-stream
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_PASSWORD }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Publish Docker
-        uses: LucienShui/Publish-Docker-Github-Action@2.7.1
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
         with:
-          name: registry.cn-hangzhou.aliyuncs.com/pasteus/pasteme-go-backend
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Login to Aliyun Docker Registry
+        uses: docker/login-action@v1
+        with:
           registry: registry.cn-hangzhou.aliyuncs.com
-          dockerfile: Dockerfile
-          tag_names: true
+          username: ${{ secrets.ALIYUN_DOCKER_REGISTRY_USERNAME }}
+          password: ${{ secrets.ALIYUN_DOCKER_REGISTRY_TOKEN }}
+
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          platforms: |
+            linux/amd64
+            linux/arm64
+            linux/arm/v7
+            linux/arm/v6
+            linux/386
+          push: true
+          tags: |
+            pasteme/frontend:latest
+            pasteme/frontend:${{ steps.release_version.outputs.tag }}
+            registry.cn-hangzhou.aliyuncs.com/pasteus/pasteme-frontend:latest
+            registry.cn-hangzhou.aliyuncs.com/pasteus/pasteme-frontend:${{ steps.release_version.outputs.tag }}
+
+      - name: Image digest
+        run: echo ${{ steps.docker_build.outputs.digest }}
