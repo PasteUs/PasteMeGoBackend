@@ -91,10 +91,10 @@ jobs:
             linux/386
           push: true
           tags: |
-            pasteme/frontend:latest
-            pasteme/frontend:${{ steps.release_version.outputs.tag }}
-            registry.cn-hangzhou.aliyuncs.com/pasteus/pasteme-frontend:latest
-            registry.cn-hangzhou.aliyuncs.com/pasteus/pasteme-frontend:${{ steps.release_version.outputs.tag }}
+            pasteme/go-backend:latest
+            pasteme/go-backend:${{ steps.release_version.outputs.tag }}
+            registry.cn-hangzhou.aliyuncs.com/pasteus/pasteme-go-backend:latest
+            registry.cn-hangzhou.aliyuncs.com/pasteus/pasteme-go-backend:${{ steps.release_version.outputs.tag }}
 
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
