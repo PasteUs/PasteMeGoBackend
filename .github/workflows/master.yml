@@ -1,9 +1,9 @@
-name: Publish for master
+name: Publish beta to docker registry
 
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
 
