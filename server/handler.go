@@ -1,12 +1,3 @@
-/*
-@File: handler.go
-@Contact: lucien@lucien.ink
-@Licence: (C)Copyright 2019 Lucien Shui
-
-@Modify Time      @Author    @Version    @Description
-------------      -------    --------    -----------
-2019-06-23 16:02  Lucien     1.0         None
-*/
 package server
 
 import (
@@ -196,21 +187,21 @@ func query(requests *gin.Context) {
 								"error":   err.Error(),
 								"message": fmt.Sprintf("key: %s delete failed", paste.Key),
 							})
-						} else {
-							jsonRequest := requests.DefaultQuery("json", "false")
-							if jsonRequest == "false" { // API request
-								logger.Info(util.LoggerInfo(IP, "jsonRequest: false"))
-								requests.String(http.StatusOK, paste.Content)
-							} else { // json request
-								logger.Info(util.LoggerInfo(IP, "jsonRequest: true"))
-								requests.JSON(http.StatusOK, gin.H{
-									"status":  http.StatusOK,
-									"lang":    paste.Lang,
-									"content": paste.Content,
-								})
-							}
+							return
 						}
 
+						jsonRequest := requests.DefaultQuery("json", "false")
+						if jsonRequest == "false" { // API request
+							logger.Info(util.LoggerInfo(IP, "jsonRequest: false"))
+							requests.String(http.StatusOK, paste.Content)
+						} else { // json request
+							logger.Info(util.LoggerInfo(IP, "jsonRequest: true"))
+							requests.JSON(http.StatusOK, gin.H{
+								"status":  http.StatusOK,
+								"lang":    paste.Lang,
+								"content": paste.Content,
+							})
+						}
 					} else {
 						logger.Info(util.LoggerInfo(IP, "Password wrong")) // 密码错误
 						requests.JSON(http.StatusOK, gin.H{

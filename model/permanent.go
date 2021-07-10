@@ -1,12 +1,3 @@
-/*
-@File: paste.go
-@Contact: lucien@lucien.ink
-@Licence: (C)Copyright 2019 Lucien Shui
-
-@Modify Time      @Author    @Version    @Description
-------------      -------    --------    -----------
-2019-06-23 14:03  Lucien     1.0         None
-*/
 package model
 
 import (
@@ -15,7 +6,7 @@ import (
 	"time"
 )
 
-// 永久
+// Permanent 永久
 type Permanent struct {
 	Key       uint64    `gorm:"primary_key"`                      // 主键:索引
 	Lang      string    `json:"lang" gorm:"type:varchar(16)"`     // 语言类型
@@ -28,7 +19,7 @@ type Permanent struct {
 	DeletedAt *time.Time
 }
 
-//成员函数，创建
+// Save 成员函数，创建
 func (paste *Permanent) Save() error {
 	if paste.Content == "" {
 		return errors.New("empty content") // 内容为空，返回错误信息 "empty content"
@@ -42,12 +33,12 @@ func (paste *Permanent) Save() error {
 	return db.Create(&paste).Error
 }
 
-// 成员函数，删除
+// Delete 成员函数，删除
 func (paste *Permanent) Delete() error {
 	return db.Delete(&paste, "`key` = ?", paste.Key).Error
 }
 
-// 成员函数，访问
+// Get 成员函数，访问
 func (paste *Permanent) Get() error {
 	return db.Find(&paste, "`key` = ?", paste.Key).Error
 }

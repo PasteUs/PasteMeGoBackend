@@ -10,7 +10,7 @@ jobs:
   release:
     strategy:
       matrix:
-        go_version: [1.12]
+        go_version: [1.12, 1.16]
         os: [ubuntu-latest]
 
     if: github.repository == 'PasteUs/PasteMeGoBackend'

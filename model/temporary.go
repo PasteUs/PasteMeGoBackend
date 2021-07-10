@@ -1,12 +1,3 @@
-/*
-@File: paste.go
-@Contact: lucien@lucien.ink
-@Licence: (C)Copyright 2019 Lucien Shui
-
-@Modify Time      @Author    @Version    @Description
-------------      -------    --------    -----------
-2019-06-23 14:03  Lucien     1.0         None
-*/
 package model
 
 import (
@@ -15,7 +6,7 @@ import (
 	"time"
 )
 
-// 临时
+// Temporary 临时
 type Temporary struct {
 	Key       string    `json:"key" gorm:"type:varchar(16);primary_key"` // 主键:索引
 	Lang      string    `json:"lang" gorm:"type:varchar(16)"`            // 语言类型
@@ -25,7 +16,7 @@ type Temporary struct {
 	CreatedAt time.Time // 存储记录的创建时间
 }
 
-// 成员函数，保存
+// Save 成员函数，保存
 func (paste *Temporary) Save() error {
 	if paste.Content == "" {
 		return errors.New("empty content") //内容为空，返回错误信息 "empty content"
@@ -39,12 +30,12 @@ func (paste *Temporary) Save() error {
 	return db.Create(&paste).Error
 }
 
-// 成员函数，删除
+// Delete 成员函数，删除
 func (paste *Temporary) Delete() error {
 	return db.Delete(&paste, "`key` = ?", paste.Key).Error
 }
 
-// 成员函数，查看
+// Get 成员函数，查看
 func (paste *Temporary) Get() error {
 	return db.Find(&paste, "`key` = ?", paste.Key).Error
 }
