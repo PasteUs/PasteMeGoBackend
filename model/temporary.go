@@ -8,6 +8,7 @@ import (
 
 // Temporary 临时
 type Temporary struct {
+	Paste
 	Key       string    `json:"key" gorm:"type:varchar(16);primary_key"` // 主键:索引
 	Lang      string    `json:"lang" gorm:"type:varchar(16)"`            // 语言类型
 	Content   string    `json:"content" gorm:"type:mediumtext"`          // 内容，最大长度为 16777215(2^24-1) 个字符

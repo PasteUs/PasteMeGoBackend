@@ -1,12 +1,3 @@
-/*
-@File: util.go
-@Contact: lucien@lucien.ink
-@Licence: (C)Copyright 2019 Lucien Shui
-
-@Modify Time      @Author    @Version    @Description
-------------      -------    --------    -----------
-2019-06-11 02:07  Lucien     1.0         Init
-*/
 package util
 
 import (
@@ -24,7 +15,7 @@ func init() {
 	rand.Seed(time.Now().UnixNano()) // 连续生成随机数，以当前纳秒数作为随机数种子
 }
 
-// token 有两种情况
+// Parse token 有两种情况
 // 情况 1: 只有 key; 情况 2: 有 key 和 password
 func Parse(token string) (string, string) {
 	buf := strings.Split(token, ",")

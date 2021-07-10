@@ -76,7 +76,7 @@ func temporaryCreator(requests *gin.Context) {
 			})
 		} else {
 			paste := model.Temporary{
-				Key:      key,
+				Key: key,
 				ClientIP: requests.ClientIP(),
 			}
 			if err := requests.ShouldBindJSON(&paste); err != nil {
@@ -110,7 +110,7 @@ func temporaryCreator(requests *gin.Context) {
 func readOnceCreator(requests *gin.Context) {
 	IP := requests.ClientIP()
 	paste := model.Temporary{
-		Key:      generator.Generator(),
+		Key: generator.Generator(),
 		ClientIP: IP,
 	}
 	if err := requests.ShouldBindJSON(&paste); err != nil {
@@ -212,14 +212,15 @@ func query(requests *gin.Context) {
 					}
 				}
 			} else { // permanent
-				paste := model.Permanent{Key: convert.String2uint(key)}
+				var paste model.Paste
+				paste = &model.Permanent{Key: convert.String2uint(key)}
 				if err := paste.Get(); err != nil {
 					if err.Error() == "record not found" {
 						logger.Info(util.LoggerInfo(IP, "Access empty key: "+key))
 						requests.JSON(http.StatusOK, gin.H{
 							"status":  http.StatusNotFound,
 							"error":   err.Error(),
-							"message": fmt.Sprintf("key: %d not found", paste.Key),
+							"message": fmt.Sprintf("key: %s not found", key),
 						})
 					} else {
 						logger.Info(util.LoggerInfo(IP, "Query from db failed: "+err.Error()))
@@ -230,18 +231,18 @@ func query(requests *gin.Context) {
 						})
 					}
 				} else {
-					if paste.Password == "" || paste.Password == convert.String2md5(password) { // 密码为空或者密码正确
+					if paste.GetPassword() == "" || paste.GetPassword() == convert.String2md5(password) { // 密码为空或者密码正确
 						logger.Info(util.LoggerInfo(IP, "Password accept"))
 						jsonRequest := requests.DefaultQuery("json", "false")
 						if jsonRequest == "false" {
 							logger.Info(util.LoggerInfo(IP, "jsonRequest: false"))
-							requests.String(http.StatusOK, paste.Content)
+							requests.String(http.StatusOK, paste.GetContent())
 						} else {
 							logger.Info(util.LoggerInfo(IP, "jsonRequest: true"))
 							requests.JSON(http.StatusOK, gin.H{
 								"status":  http.StatusOK,
-								"lang":    paste.Lang,
-								"content": paste.Content,
+								"lang":    paste.GetLang(),
+								"content": paste.GetContent(),
 							})
 						}
 					} else {

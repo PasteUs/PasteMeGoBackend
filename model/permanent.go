@@ -8,6 +8,7 @@ import (
 
 // Permanent 永久
 type Permanent struct {
+	Paste
 	Key       uint64    `gorm:"primary_key"`                      // 主键:索引
 	Lang      string    `json:"lang" gorm:"type:varchar(16)"`     // 语言类型
 	Content   string    `json:"content" gorm:"type:mediumtext"`   // 内容，最大长度为 16777215(2^24-1) 个字符
@@ -41,4 +42,16 @@ func (paste *Permanent) Delete() error {
 // Get 成员函数，访问
 func (paste *Permanent) Get() error {
 	return db.Find(&paste, "`key` = ?", paste.Key).Error
+}
+
+func (paste *Permanent) GetContent() string {
+	return paste.Content
+}
+
+func (paste *Permanent) GetPassword() string {
+	return paste.Password
+}
+
+func (paste *Permanent) GetLang() string {
+	return paste.Password
 }
