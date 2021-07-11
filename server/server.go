@@ -1,31 +1,31 @@
 package server
 
 import (
-	"fmt"
-	"github.com/PasteUs/PasteMeGoBackend/flag"
-	"github.com/gin-gonic/gin"
-	"github.com/wonderivan/logger"
+    "fmt"
+    "github.com/PasteUs/PasteMeGoBackend/flag"
+    "github.com/gin-gonic/gin"
+    "github.com/wonderivan/logger"
 )
 
 var router *gin.Engine
 
 func init() {
-	if !flag.Debug {
-		gin.SetMode(gin.ReleaseMode)
-	}
-	router = gin.Default()
-	router.GET("/", beat)                 // 心跳检测
-	// 访问未加密的 Paste，token 为 <Paste ID>
-	// 访问加密的 Paste，token 为 <Paste ID>,<Password>
-	router.GET("/:token", query)
-	router.POST("/", permanentCreator)    // 创建一个永久的 Paste, key 是自增键
-	router.POST("/once", readOnceCreator) // 创建一个阅后即焚的 Paste, key 是随机的
-	router.PUT("/:key", temporaryCreator) // 创建一个阅后即焚的 Paste, key 是指定的
-	router.NoRoute(notFoundHandler)
+    if !flag.Debug {
+        gin.SetMode(gin.ReleaseMode)
+    }
+    router = gin.Default()
+    router.GET("/", beat)                 // 心跳检测
+    // 访问未加密的 Paste，token 为 <Paste ID>
+    // 访问加密的 Paste，token 为 <Paste ID>,<Password>
+    router.GET("/:token", query)
+    router.POST("/", permanentCreator)    // 创建一个永久的 Paste, key 是自增键
+    router.POST("/once", readOnceCreator) // 创建一个阅后即焚的 Paste, key 是随机的
+    router.PUT("/:key", temporaryCreator) // 创建一个阅后即焚的 Paste, key 是指定的
+    router.NoRoute(notFoundHandler)
 }
 
 func Run(address string, port uint16, logToFile bool) {
-	if err := router.Run(fmt.Sprintf("%s:%d", address, port)); err != nil {
-		logger.Painc("Run server failed: " + err.Error())
-	}
+    if err := router.Run(fmt.Sprintf("%s:%d", address, port)); err != nil {
+        logger.Painc("Run server failed: " + err.Error())
+    }
 }

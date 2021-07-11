@@ -27,5 +27,5 @@ Accept: application/json
 }
 
 ### Get example
-GET {{host}}/100
+GET {{host}}/100?json
 Accept: application/json
