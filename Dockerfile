@@ -14,6 +14,9 @@ ENV TZ=Asia/Shanghai
 COPY --from=builder /pastemed /usr/local/pastemed
 RUN chmod +x /usr/local/pastemed/pastemed && \
     mkdir /data && \
-    mkdir -p /etc/pastemed/
+    mkdir -p /etc/pastemed/ && \
+    apk --no-cache add build-base tzdata && \
+    cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
+    echo "Asia/Shanghai" > /etc/timezone
 CMD ["/usr/bin/env", "sh", "/usr/local/pastemed/docker-entrypoint.sh"]
 EXPOSE 8000
