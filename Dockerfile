@@ -1,4 +1,4 @@
-FROM pasteme/golang:1.12-alpine AS builder
+FROM pasteme/golang:1.16-alpine AS builder
 COPY ./ /go/src/github.com/PasteUs/PasteMeGoBackend
 WORKDIR /go/src/github.com/PasteUs/PasteMeGoBackend
 RUN go mod download
