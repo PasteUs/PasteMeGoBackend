@@ -1,0 +1,31 @@
+### Get nothing
+GET {{host}}/?method=beat
+Accept: application/json
+
+### Get example
+GET {{host}}/example
+Accept: application/json
+
+### Create custom read once paste
+PUT {{host}}/example
+Content-Type: application/json
+Accept: application/json
+
+{
+  "lang": "plain",
+  "content": "Hello World!"
+}
+
+### Create permanent
+POST {{host}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "lang": "plain",
+  "content": "Hello World!"
+}
+
+### Get example
+GET {{host}}/100
+Accept: application/json

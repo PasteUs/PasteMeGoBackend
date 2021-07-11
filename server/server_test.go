@@ -1,12 +1,3 @@
-/*
-@File: server_test.go
-@Contact: lucien@lucien.ink
-@Licence: (C)Copyright 2019 Lucien Shui
-
-@Modify Time      @Author    @Version    @Description
-------------      -------    --------    -----------
-2019-06-21 08:37  Lucien     1.0         Init
-*/
 package server
 
 import (
@@ -54,7 +45,7 @@ func TestPermanentGet(t *testing.T) {
 }
 
 func TestTemporaryPost(t *testing.T) {
-	body := request.Set(t, router, "asdf", "plain", "Hello", "")
+	body := request.Set(t, router, "example", "plain", "Hello", "")
 
 	type JsonResponse struct {
 		Key string `json:"key"`
@@ -153,7 +144,7 @@ func TestPermanentPasswordGet(t *testing.T) {
 }
 
 func TestTemporaryPasswordPost(t *testing.T) {
-	body := request.Set(t, router, "asdf", "plain", "Hello", "password")
+	body := request.Set(t, router, "example", "plain", "Hello", "password")
 
 	type JsonResponse struct {
 		Key string `json:"key"`

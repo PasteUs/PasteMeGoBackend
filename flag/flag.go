@@ -1,12 +1,3 @@
-/*
-@File: flag.go
-@Contact: lucien@lucien.ink
-@Licence: (C)Copyright 2019 Lucien
-
-@Modify Time      @Author    @Version    @Description
-------------      -------    --------    -----------
-2019-07-25 08:36  Lucien     1.0         Init
-*/
 package flag
 
 import (
@@ -16,6 +7,7 @@ import (
 	"github.com/wonderivan/logger"
 	"os"
 	"strings"
+	"testing"
 )
 
 var (
@@ -31,6 +23,7 @@ func init() {
 	flag.BoolVar(&Debug, "debug", false, "--debug Using debug mode")
 	flag.StringVar(&DataDir, "d", "./", "-d <data dir>")
 
+	testing.Init()
 	flag.Parse()
 
 	validationCheck()

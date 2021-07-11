@@ -1,12 +1,3 @@
-/*
-@File: handler.go
-@Contact: lucien@lucien.ink
-@Licence: (C)Copyright 2019 Lucien Shui
-
-@Modify Time      @Author    @Version    @Description
-------------      -------    --------    -----------
-2019-06-23 16:02  Lucien     1.0         None
-*/
 package server
 
 import (
@@ -25,7 +16,9 @@ import (
 func permanentCreator(requests *gin.Context) {
 	IP := requests.ClientIP() // 用户 IP
 	paste := model.Permanent{
-		ClientIP: IP,
+		AbstractPaste: &model.AbstractPaste{
+			ClientIP: IP,
+		},
 	}
 	// 绑定请求参数
 	if err := requests.ShouldBindJSON(&paste); err != nil {
@@ -85,8 +78,10 @@ func temporaryCreator(requests *gin.Context) {
 			})
 		} else {
 			paste := model.Temporary{
-				Key:      key,
-				ClientIP: requests.ClientIP(),
+				Key: key,
+				AbstractPaste: &model.AbstractPaste{
+					ClientIP: requests.ClientIP(),
+				},
 			}
 			if err := requests.ShouldBindJSON(&paste); err != nil {
 				logger.Error(util.LoggerInfo(IP, "Bind failed: "+err.Error()))
@@ -119,8 +114,10 @@ func temporaryCreator(requests *gin.Context) {
 func readOnceCreator(requests *gin.Context) {
 	IP := requests.ClientIP()
 	paste := model.Temporary{
-		Key:      generator.Generator(),
-		ClientIP: IP,
+		Key: generator.Generator(),
+		AbstractPaste: &model.AbstractPaste{
+			ClientIP: IP,
+		},
 	}
 	if err := requests.ShouldBindJSON(&paste); err != nil {
 		logger.Error(util.LoggerInfo(IP, "Bind failed: "+err.Error()))
@@ -169,98 +166,62 @@ func query(requests *gin.Context) {
 				"message": "request key not valid",
 			})
 		} else {
+			var paste model.IPaste
 			if table == "temporary" {
-				paste := model.Temporary{Key: key}
-				if err := paste.Get(); err != nil {
-					if err.Error() == "record not found" {
-						logger.Info(util.LoggerInfo(IP, "Access empty key: "+key))
-						requests.JSON(http.StatusOK, gin.H{
-							"status":  http.StatusNotFound,
-							"error":   err.Error(),
-							"message": fmt.Sprintf("key: %s not found", paste.Key),
-						})
-					} else {
-						logger.Info(util.LoggerInfo(IP, "Query from db failed: "+err.Error()))
-						requests.JSON(http.StatusInternalServerError, gin.H{
-							"status":  http.StatusInternalServerError,
-							"error":   err.Error(),
-							"message": "query from db failed",
-						})
-					}
+				paste = &model.Temporary{Key: key}
+			} else {
+				paste = &model.Permanent{Key: convert.String2uint(key)}
+			}
+
+			if err := paste.Get(); err != nil {
+				if err.Error() == "record not found" {
+					logger.Info(util.LoggerInfo(IP, "Access empty key: "+key))
+					requests.JSON(http.StatusOK, gin.H{
+						"status":  http.StatusNotFound,
+						"error":   err.Error(),
+						"message": fmt.Sprintf("key: %s not found", key),
+					})
 				} else {
-					if paste.Password == "" || paste.Password == convert.String2md5(password) { // 密码为空或者密码正确
-						logger.Info(util.LoggerInfo(IP, "Password accept"))
+					logger.Info(util.LoggerInfo(IP, "Query from db failed: "+err.Error()))
+					requests.JSON(http.StatusInternalServerError, gin.H{
+						"status":  http.StatusInternalServerError,
+						"error":   err.Error(),
+						"message": "query from db failed",
+					})
+				}
+			} else {
+				if paste.GetPassword() == "" || paste.GetPassword() == convert.String2md5(password) { // 密码为空或者密码正确
+					logger.Info(util.LoggerInfo(IP, "Password accept"))
+					if table == "temporary" {
 						if err := paste.Delete(); err != nil {
 							requests.JSON(http.StatusInternalServerError, gin.H{
 								"status":  http.StatusInternalServerError,
 								"error":   err.Error(),
-								"message": fmt.Sprintf("key: %s delete failed", paste.Key),
+								"message": fmt.Sprintf("key: %s delete failed", key),
 							})
-						} else {
-							jsonRequest := requests.DefaultQuery("json", "false")
-							if jsonRequest == "false" { // API request
-								logger.Info(util.LoggerInfo(IP, "jsonRequest: false"))
-								requests.String(http.StatusOK, paste.Content)
-							} else { // json request
-								logger.Info(util.LoggerInfo(IP, "jsonRequest: true"))
-								requests.JSON(http.StatusOK, gin.H{
-									"status":  http.StatusOK,
-									"lang":    paste.Lang,
-									"content": paste.Content,
-								})
-							}
+							return
 						}
-
-					} else {
-						logger.Info(util.LoggerInfo(IP, "Password wrong")) // 密码错误
-						requests.JSON(http.StatusOK, gin.H{
-							"status":  http.StatusUnauthorized,
-							"error":   "wrong password",
-							"message": "wrong password",
-						})
 					}
-				}
-			} else { // permanent
-				paste := model.Permanent{Key: convert.String2uint(key)}
-				if err := paste.Get(); err != nil {
-					if err.Error() == "record not found" {
-						logger.Info(util.LoggerInfo(IP, "Access empty key: "+key))
+
+					jsonRequest := requests.DefaultQuery("json", "false")
+					if jsonRequest == "false" { // raw request
+						logger.Info(util.LoggerInfo(IP, "jsonRequest: false"))
+						requests.String(http.StatusOK, paste.GetContent())
+					} else { // json request
+						logger.Info(util.LoggerInfo(IP, "jsonRequest: true"))
 						requests.JSON(http.StatusOK, gin.H{
-							"status":  http.StatusNotFound,
-							"error":   err.Error(),
-							"message": fmt.Sprintf("key: %d not found", paste.Key),
-						})
-					} else {
-						logger.Info(util.LoggerInfo(IP, "Query from db failed: "+err.Error()))
-						requests.JSON(http.StatusInternalServerError, gin.H{
-							"status":  http.StatusInternalServerError,
-							"error":   err.Error(),
-							"message": "query from db failed",
+							"status":  http.StatusOK,
+							"lang":    paste.GetLang(),
+							"content": paste.GetContent(),
 						})
 					}
 				} else {
-					if paste.Password == "" || paste.Password == convert.String2md5(password) { // 密码为空或者密码正确
-						logger.Info(util.LoggerInfo(IP, "Password accept"))
-						jsonRequest := requests.DefaultQuery("json", "false")
-						if jsonRequest == "false" {
-							logger.Info(util.LoggerInfo(IP, "jsonRequest: false"))
-							requests.String(http.StatusOK, paste.Content)
-						} else {
-							logger.Info(util.LoggerInfo(IP, "jsonRequest: true"))
-							requests.JSON(http.StatusOK, gin.H{
-								"status":  http.StatusOK,
-								"lang":    paste.Lang,
-								"content": paste.Content,
-							})
-						}
-					} else {
-						logger.Info(util.LoggerInfo(IP, "Password wrong")) // 密码错误
-						requests.JSON(http.StatusOK, gin.H{
-							"status":  http.StatusUnauthorized,
-							"error":   "wrong password",
-							"message": "wrong password",
-						})
-					}
+					logger.Info(util.LoggerInfo(IP, "Password wrong")) // 密码错误
+					requests.JSON(http.StatusOK, gin.H{
+						"status":  http.StatusUnauthorized,
+						"error":   "wrong password",
+						"message": "wrong password",
+					})
 				}
 			}
 		}
