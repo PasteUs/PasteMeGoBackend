@@ -22,7 +22,7 @@ func permanentCreator(requests *gin.Context) {
     }
     // 绑定请求参数
     if err := requests.ShouldBindJSON(&paste); err != nil {
-        logger.Error(util.LoggerInfo(IP, "Bind failed: "+err.Error()))
+        logger.Error(util.LogFormat(IP, "Bind failed: %s", err.Error()))
         requests.JSON(http.StatusInternalServerError, gin.H{
             "status":  http.StatusInternalServerError,
             "message": "bind failed",
@@ -30,14 +30,14 @@ func permanentCreator(requests *gin.Context) {
         })
     } else {
         if err := paste.Save(); err != nil {
-            logger.Error(util.LoggerInfo(IP, "Save failed: "+err.Error()))
+            logger.Error(util.LogFormat(IP, "Save failed: %s", err.Error()))
             requests.JSON(http.StatusInternalServerError, gin.H{
                 "status":  http.StatusInternalServerError,
                 "message": "save failed",
                 "error":   err.Error(),
             })
         } else {
-            logger.Info(util.LoggerInfo(IP, "Create an permanent paste with key: "+convert.Uint2string(paste.Key)))
+            logger.Info(util.LogFormat(IP, "Create an permanent paste with key: "+convert.Uint2string(paste.Key)))
 
             requests.JSON(http.StatusCreated, gin.H{
                 "status": http.StatusCreated,
@@ -54,14 +54,14 @@ func temporaryCreator(requests *gin.Context) {
     table, err := util.ValidChecker(key)
     if err != nil {
         if err.Error() == "wrong length" {
-            logger.Warn(util.LoggerInfo(IP, "Trying to create temporary paste with key: "+key))
+            logger.Warn(util.LogFormat(IP, "Trying to create temporary paste with key: %s", key))
             requests.JSON(http.StatusOK, gin.H{
                 "status":  http.StatusBadRequest,
                 "error":   err.Error(),
                 "message": "key's length should at least 3 and at most 8",
             })
         } else {
-            logger.Warn(util.LoggerInfo(IP, "Trying to create temporary paste with key: "+key))
+            logger.Warn(util.LogFormat(IP, "Trying to create temporary paste with key: %s", key))
             requests.JSON(http.StatusOK, gin.H{
                 "status":  http.StatusBadRequest,
                 "error":   err.Error(),
@@ -70,7 +70,7 @@ func temporaryCreator(requests *gin.Context) {
         }
     } else {
         if table != "temporary" {
-            logger.Warn(util.LoggerInfo(IP, "Trying to create temporary paste with key: "+key))
+            logger.Warn(util.LogFormat(IP, "Trying to create temporary paste with key: %s", key))
             requests.JSON(http.StatusOK, gin.H{
                 "status":  http.StatusBadRequest,
                 "error":   "wrong key type",
@@ -84,7 +84,7 @@ func temporaryCreator(requests *gin.Context) {
                 },
             }
             if err := requests.ShouldBindJSON(&paste); err != nil {
-                logger.Error(util.LoggerInfo(IP, "Bind failed: "+err.Error()))
+                logger.Error(util.LogFormat(IP, "Bind failed: %s", err.Error()))
                 requests.JSON(http.StatusInternalServerError, gin.H{
                     "status":  http.StatusInternalServerError,
                     "error":   err.Error(),
@@ -92,14 +92,14 @@ func temporaryCreator(requests *gin.Context) {
                 })
             } else {
                 if err := paste.Save(); err != nil {
-                    logger.Error(util.LoggerInfo(IP, "Save failed: "+err.Error()))
+                    logger.Error(util.LogFormat(IP, "Save failed: %s", err.Error()))
                     requests.JSON(http.StatusInternalServerError, gin.H{
                         "status":  http.StatusInternalServerError,
                         "error":   err.Error(),
                         "message": "save failed",
                     })
                 } else {
-                    logger.Info(util.LoggerInfo(IP, "Create an temporary paste with key: "+paste.Key))
+                    logger.Info(util.LogFormat(IP, "Create an temporary paste with key: "+paste.Key))
                     requests.JSON(http.StatusCreated, gin.H{
                         "status": http.StatusCreated,
                         "key":    paste.Key,
@@ -120,7 +120,7 @@ func readOnceCreator(requests *gin.Context) {
         },
     }
     if err := requests.ShouldBindJSON(&paste); err != nil {
-        logger.Error(util.LoggerInfo(IP, "Bind failed: "+err.Error()))
+        logger.Error(util.LogFormat(IP, "Bind failed: %s", err.Error()))
         requests.JSON(http.StatusInternalServerError, gin.H{
             "status":  http.StatusInternalServerError,
             "error":   err.Error(),
@@ -128,14 +128,14 @@ func readOnceCreator(requests *gin.Context) {
         })
     } else {
         if err := paste.Save(); err != nil {
-            logger.Error(util.LoggerInfo(IP, "Save failed: "+err.Error()))
+            logger.Error(util.LogFormat(IP, "Save failed: %s", err.Error()))
             requests.JSON(http.StatusInternalServerError, gin.H{
                 "status":  http.StatusInternalServerError,
                 "error":   err.Error(),
                 "message": "save failed",
             })
         } else {
-            logger.Info(util.LoggerInfo(IP, "Create an once paste with key: "+paste.Key))
+            logger.Info(util.LogFormat(IP, "Create an once paste with key: "+paste.Key))
             requests.JSON(http.StatusCreated, gin.H{
                 "status": http.StatusCreated,
                 "key":    paste.Key,
@@ -175,14 +175,14 @@ func query(requests *gin.Context) {
 
             if err := paste.Get(); err != nil {
                 if err.Error() == "record not found" {
-                    logger.Info(util.LoggerInfo(IP, "Access empty key: "+key))
+                    logger.Info(util.LogFormat(IP, "Access empty key: %s", key))
                     requests.JSON(http.StatusOK, gin.H{
                         "status":  http.StatusNotFound,
                         "error":   err.Error(),
                         "message": fmt.Sprintf("key: %s not found", key),
                     })
                 } else {
-                    logger.Info(util.LoggerInfo(IP, "Query from db failed: "+err.Error()))
+                    logger.Info(util.LogFormat(IP, "Query from db failed: %s", err.Error()))
                     requests.JSON(http.StatusInternalServerError, gin.H{
                         "status":  http.StatusInternalServerError,
                         "error":   err.Error(),
@@ -191,7 +191,7 @@ func query(requests *gin.Context) {
                 }
             } else {
                 if paste.GetPassword() == "" || paste.GetPassword() == convert.String2md5(password) { // 密码为空或者密码正确
-                    logger.Info(util.LoggerInfo(IP, "Password accept"))
+                    logger.Info(util.LogFormat(IP, "Password accept"))
                     if table == "temporary" {
                         if err := paste.Delete(); err != nil {
                             requests.JSON(http.StatusInternalServerError, gin.H{
@@ -205,10 +205,10 @@ func query(requests *gin.Context) {
 
                     jsonRequest := requests.DefaultQuery("json", "false")
                     if jsonRequest == "false" { // raw request
-                        logger.Info(util.LoggerInfo(IP, "jsonRequest: false"))
+                        logger.Info(util.LogFormat(IP, "jsonRequest: false"))
                         requests.String(http.StatusOK, paste.GetContent())
                     } else { // json request
-                        logger.Info(util.LoggerInfo(IP, "jsonRequest: true"))
+                        logger.Info(util.LogFormat(IP, "jsonRequest: true"))
                         requests.JSON(http.StatusOK, gin.H{
                             "status":  http.StatusOK,
                             "lang":    paste.GetLang(),
@@ -216,7 +216,7 @@ func query(requests *gin.Context) {
                         })
                     }
                 } else {
-                    logger.Info(util.LoggerInfo(IP, "Password wrong")) // 密码错误
+                    logger.Info(util.LogFormat(IP, "Password wrong")) // 密码错误
                     requests.JSON(http.StatusOK, gin.H{
                         "status":  http.StatusUnauthorized,
                         "error":   "wrong password",

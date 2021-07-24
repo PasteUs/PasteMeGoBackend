@@ -14,13 +14,17 @@ func init() {
         gin.SetMode(gin.ReleaseMode)
     }
     router = gin.Default()
-    router.GET("/", beat)                 // 心跳检测
-    // 访问未加密的 Paste，token 为 <Paste ID>
-    // 访问加密的 Paste，token 为 <Paste ID>,<Password>
-    router.GET("/:token", query)
-    router.POST("/", permanentCreator)    // 创建一个永久的 Paste, key 是自增键
-    router.POST("/once", readOnceCreator) // 创建一个阅后即焚的 Paste, key 是随机的
-    router.PUT("/:key", temporaryCreator) // 创建一个阅后即焚的 Paste, key 是指定的
+    api := router.Group("/api")
+    v1 := api.Group("/v1")
+    {
+        v1.GET("/", beat) // 心跳检测
+        // 访问未加密的 Paste，token 为 <Paste ID>
+        // 访问加密的 Paste，token 为 <Paste ID>,<Password>
+        v1.GET("/:token", query)
+        v1.POST("/", permanentCreator)    // 创建一个永久的 Paste, key 是自增键
+        v1.POST("/once", readOnceCreator) // 创建一个阅后即焚的 Paste, key 是随机的
+        v1.PUT("/:key", temporaryCreator) // 创建一个阅后即焚的 Paste, key 是指定的
+    }
     router.NoRoute(notFoundHandler)
 }
 

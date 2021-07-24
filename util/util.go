@@ -47,7 +47,8 @@ func ValidChecker(key string) (string, error) {
     return "temporary", nil // key 中至少包括字母的是阅后即焚的
 }
 
-func LoggerInfo(IP string, content string) string {
+func LogFormat(IP string, format string, a ...interface{}) string {
+    content := fmt.Sprintf(format, a...)
     return fmt.Sprintf("[%s] %s", IP, content)
 }
 

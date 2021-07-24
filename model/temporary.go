@@ -2,7 +2,7 @@ package model
 
 // Temporary 临时
 type Temporary struct {
-    Key       string    `json:"key" gorm:"type:varchar(16);primary_key"` // 主键:索引
+    Key string `json:"key" gorm:"type:varchar(16);primary_key"` // 主键:索引
     *AbstractPaste
 }
 
