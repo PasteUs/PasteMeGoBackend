@@ -52,6 +52,11 @@ func Warn(msg string, a ...interface{}) {
     logger.Warn(msg, fields...)
 }
 
+func Error(msg string, a ...interface{}) {
+    fields := loggerPreprocess(a)
+    logger.Error(msg, fields...)
+}
+
 func Panic(msg string, a ...interface{}) {
     fields := loggerPreprocess(a)
     logger.Panic(msg, fields...)

@@ -16,8 +16,10 @@ func init() {
 
 type IPaste interface {
     Save() error
-    Get() error
+    Get(string) error
     Delete() error
+    GetKey() string
+    GetNamespace() string
     GetContent() string
     GetLang() string
 }

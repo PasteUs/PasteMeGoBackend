@@ -3,6 +3,7 @@ package paste
 import (
     "fmt"
     "github.com/PasteUs/PasteMeGoBackend/config"
+    "github.com/PasteUs/PasteMeGoBackend/util/convert"
     "github.com/PasteUs/PasteMeGoBackend/util/logging"
     "go.uber.org/zap"
     "time"
@@ -41,6 +42,14 @@ type Permanent struct {
 
 func (Permanent) TableName() string {
     return "permanent"
+}
+
+func (paste *Permanent) GetKey() string {
+    return convert.Uint2string(paste.Key)
+}
+
+func (paste *Permanent) GetNamespace() string {
+    return paste.Namespace
 }
 
 // Save 成员函数，创建
