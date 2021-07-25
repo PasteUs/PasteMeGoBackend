@@ -37,7 +37,7 @@ func permanentCreator(requests *gin.Context) {
                 "error":   err.Error(),
             })
         } else {
-            logger.Info(util.LogFormat(IP, "Create an permanent paste with key: "+convert.Uint2string(paste.Key)))
+            logger.Info(util.LogFormat(IP, "Create an permanent paste with key: %s", convert.Uint2string(paste.Key)))
 
             requests.JSON(http.StatusCreated, gin.H{
                 "status": http.StatusCreated,
@@ -99,7 +99,7 @@ func temporaryCreator(requests *gin.Context) {
                         "message": "save failed",
                     })
                 } else {
-                    logger.Info(util.LogFormat(IP, "Create an temporary paste with key: "+paste.Key))
+                    logger.Info(util.LogFormat(IP, "Create an temporary paste with key: %s", paste.Key))
                     requests.JSON(http.StatusCreated, gin.H{
                         "status": http.StatusCreated,
                         "key":    paste.Key,
@@ -135,7 +135,7 @@ func readOnceCreator(requests *gin.Context) {
                 "message": "save failed",
             })
         } else {
-            logger.Info(util.LogFormat(IP, "Create an once paste with key: "+paste.Key))
+            logger.Info(util.LogFormat(IP, "Create an once paste with key: %s", paste.Key))
             requests.JSON(http.StatusCreated, gin.H{
                 "status": http.StatusCreated,
                 "key":    paste.Key,
