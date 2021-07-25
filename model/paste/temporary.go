@@ -1,9 +1,11 @@
 package paste
 
 import (
+    "errors"
     "github.com/PasteUs/PasteMeGoBackend/config"
     "github.com/PasteUs/PasteMeGoBackend/util/logging"
     "go.uber.org/zap"
+    "time"
 )
 
 func init() {
@@ -29,8 +31,11 @@ func init() {
 
 // Temporary 临时
 type Temporary struct {
-    Key string `json:"key" gorm:"type:varchar(16);primary_key"` // 主键:索引
+    Key       string `json:"key" gorm:"type:varchar(16);primary_key;unique_index:idx_temporary"` // 主键:索引
+    Namespace string `json:"namespace" gorm:"type:varchar(16);unique_index:idx_temporary"`       // 用户名
     *AbstractPaste
+    Expiration time.Time // 过期时间
+    Quota      uint8     // 访问计数
 }
 
 func (Temporary) TableName() string {
@@ -42,6 +47,9 @@ func (paste *Temporary) Save() error {
     if err := paste.beforeSave(); err != nil {
         return err
     }
+    if paste.Expiration.IsZero() && paste.Quota == 0 {
+        return errors.New("both expiration and quota disabled")
+    }
     return db.Create(&paste).Error
 }
 
@@ -51,8 +59,27 @@ func (paste *Temporary) Delete() error {
 }
 
 // Get 成员函数，查看
-func (paste *Temporary) Get() error {
-    return db.Find(&paste).Error
+func (paste *Temporary) Get(password string) error {
+    if !paste.Expiration.IsZero() && paste.Expiration.Before(time.Now()) { // 如果存在过期时间且已过期
+        if err := paste.Delete(); err != nil {
+            return nil
+        }
+    }
+
+    if err := db.Find(&paste).Error; err != nil {
+        return err
+    }
+    if err := paste.checkPassword(password); err != nil {
+        return err
+    }
+
+    if paste.Quota == 1 { // 如果剩余浏览次数只有 1 次，那么本次浏览完就会归零，故删除
+        if err := paste.Delete(); err != nil {
+            return nil
+        }
+    }
+
+    return nil
 }
 
 func Exist(key string) bool {

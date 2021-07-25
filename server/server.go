@@ -40,7 +40,7 @@ func init() {
     router.NoRoute(notFoundHandler)
 }
 
-func Run(address string, port uint16, logToFile bool) {
+func Run(address string, port uint16) {
     if err := router.Run(fmt.Sprintf("%s:%d", address, port)); err != nil {
         logger.Painc("Run server failed: " + err.Error())
     }

@@ -1,12 +1,3 @@
-/*
-@File: strings.go
-@Contact: lucien@lucien.ink
-@Licence: (C)Copyright 2019 Lucien Shui
-
-@Modify Time      @Author    @Version    @Desciption
-------------      -------    --------    -----------
-2019-06-25 09:00  Lucien     1.0         Init
-*/
 package convert
 
 import (
@@ -29,7 +20,7 @@ func String2uint(value string) uint64 {
     return ret
 }
 
-// String to MD5
+// String2md5 String to MD5
 func String2md5(str string) string {
     return fmt.Sprintf("%x", md5.Sum([]byte(str)))
 }

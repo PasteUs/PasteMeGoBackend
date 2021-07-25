@@ -2,8 +2,6 @@ package flag
 
 import (
     "flag"
-    "fmt"
-    "github.com/PasteUs/PasteMeGoBackend/meta"
     "github.com/wonderivan/logger"
     "os"
     "strings"
@@ -18,8 +16,7 @@ var (
 )
 
 func init() {
-    flag.BoolVar(&version, "version", false, "--version Print version information")
-    flag.StringVar(&Config, "c", "./config.json", "-c <config file>")
+    flag.StringVar(&Config, "c", "config.json", "-c <config file>")
     flag.BoolVar(&Debug, "debug", false, "--debug Using debug mode")
     flag.StringVar(&DataDir, "d", "./", "-d <data dir>")
 
@@ -44,12 +41,4 @@ func isDir(dataDir string) bool {
         return dir.IsDir()
     }
     return false
-}
-
-func Parse() bool { // return true for continue
-    if version {
-        fmt.Println(meta.Version)
-        return false
-    }
-    return true
 }

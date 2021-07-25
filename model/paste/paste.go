@@ -20,12 +20,10 @@ type IPaste interface {
     Delete() error
     GetContent() string
     GetLang() string
-    GetPassword() string
 }
 
 type AbstractPaste struct {
     IPaste
-    Namespace string    `json:"namespace" gorm:"type:varchar(16)"` // 用户名
     Lang      string    `json:"lang" gorm:"type:varchar(16)"`      // 语言类型
     Content   string    `json:"content" gorm:"type:mediumtext"`    // 内容，最大长度为 16777215(2^24-1) 个字符
     Password  string    `json:"password" gorm:"type:varchar(32)"`  // 密码
@@ -35,10 +33,6 @@ type AbstractPaste struct {
 
 func (paste *AbstractPaste) GetContent() string {
     return paste.Content
-}
-
-func (paste *AbstractPaste) GetPassword() string {
-    return paste.Password
 }
 
 func (paste *AbstractPaste) GetLang() string {
@@ -56,4 +50,11 @@ func (paste *AbstractPaste) beforeSave() error {
         paste.Password = convert.String2md5(paste.Password) // 加密存储，设置密码
     }
     return nil
+}
+
+func (paste *AbstractPaste) checkPassword(password string) error {
+    if paste.Password == "" || paste.Password == convert.String2md5(password) {
+        return nil
+    }
+    return errors.New("wrong password")
 }

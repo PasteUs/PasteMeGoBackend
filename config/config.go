@@ -1,19 +1,12 @@
-/*
-@File: config.go
-@Contact: lucien@lucien.ink
-@Licence: (C)Copyright 2019 Lucien Shui
-
-@Modify Time      @Author    @Version    @Description
-------------      -------    --------    -----------
-2019-07-25 01:33  Lucien     1.0         Init
-*/
 package config
 
 import (
     "encoding/json"
+    "fmt"
     "github.com/PasteUs/PasteMeGoBackend/flag"
     "github.com/PasteUs/PasteMeGoBackend/meta"
-    "github.com/wonderivan/logger"
+    "github.com/PasteUs/PasteMeGoBackend/util/logging"
+    "go.uber.org/zap"
     "io/ioutil"
 )
 
@@ -26,18 +19,12 @@ type database struct {
     Database string `json:"database"`
 }
 
-type log struct {
-    Path  string `json:"path"`
-    Level string `json:"level"`
-}
-
 type Config struct {
     Version  string   `json:"version"`
     Address  string   `json:"address"`
     AdminUrl string   `json:"admin_url"` // PasteMe Admin's hostname
     Port     uint16   `json:"port"`
     Database database `json:"database"`
-    Log      log      `json:"log"`
 }
 
 var config Config
@@ -50,9 +37,6 @@ func init() {
 }
 
 func setDefault() {
-    if config.Log.Level == "" {
-        config.Log.Level = "info"
-    }
 }
 
 func isInArray(item string, array []string) bool {
@@ -68,10 +52,10 @@ func checkVersion(version string) {
     if version != meta.Version {
 
         if jsonBytes, err := json.Marshal(meta.ValidConfigVersion); err != nil {
-            logger.Painc(err)
+            logging.Panic(err.Error())
         } else {
             if !isInArray(version, meta.ValidConfigVersion) {
-                logger.Painc("Valid config versions are %s, but \"%s\" was given", string(jsonBytes), version)
+                logging.Panic(fmt.Sprintf("valid config versions are %s, but \"%s\" was given", string(jsonBytes), version))
             }
         }
     }
@@ -81,22 +65,26 @@ func checkVersion(version string) {
 func load(filename string) {
     data, err := ioutil.ReadFile(filename)
     if err != nil {
-        logger.Painc(err)
+        logging.Panic(err.Error())
     }
 
     err = json.Unmarshal(data, &config)
     if err != nil {
-        logger.Painc(err)
+        logging.Panic(err.Error())
     }
 
-    logger.Info("Load from %s\nconfig = %s", filename, data)
+    logging.Info(
+        "config loaded",
+        zap.String("config_file", filename),
+        zap.ByteString("config", data),
+    )
 
     isInitialized = true
 }
 
 func Get() Config {
     if !isInitialized {
-        logger.Painc("Trying to use uninitialized config")
+        logging.Panic("Trying to use uninitialized config")
     }
     return config
 }

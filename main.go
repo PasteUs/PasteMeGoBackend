@@ -14,12 +14,9 @@ package main
 
 import (
     "github.com/PasteUs/PasteMeGoBackend/config"
-    "github.com/PasteUs/PasteMeGoBackend/flag"
     "github.com/PasteUs/PasteMeGoBackend/server"
 )
 
 func main() {
-    if flag.Parse() {
-        server.Run(config.Get().Address, config.Get().Port, config.Get().Log.Path != "")
-    }
+    server.Run(config.Get().Address, config.Get().Port)
 }

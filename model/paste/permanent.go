@@ -31,7 +31,8 @@ func init() {
 
 // Permanent 永久
 type Permanent struct {
-    Key uint64 `gorm:"primary_key"` // 主键:索引
+    Key       uint64 `gorm:"primary_key;unique_index:idx_permanent"`                       // 主键:索引
+    Namespace string `json:"namespace" gorm:"type:varchar(16);unique_index:idx_permanent"` // 用户名
     *AbstractPaste
     // 存储记录的删除时间
     // 删除具有 DeletedAt 字段的记录，它不会从数据库中删除，但只将字段 DeletedAt 设置为当前时间，并在查询时无法找到记录
@@ -55,7 +56,12 @@ func (paste *Permanent) Delete() error {
     return db.Delete(&paste).Error
 }
 
-// Get 成员函数，访问
-func (paste *Permanent) Get() error {
-    return db.First(&paste).Error
+func (paste *Permanent) Get(password string) error {
+    if err := db.Find(&paste).Error; err != nil {
+        return err
+    }
+    if err := paste.checkPassword(password); err != nil {
+        return err
+    }
+    return nil
 }

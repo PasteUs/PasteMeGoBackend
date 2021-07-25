@@ -10,16 +10,17 @@ util
 rm -f server/pasteme.db
 
 if [[ ${#} == 1 ]]; then
-    go test -v -count=1 "${BASE}${1}"
+    go test -count=1 -cover "${BASE}${1}"
     exit ${?}
 fi
 
 for PACKAGE in ${PACKAGE_LISTS}; do
-    if ! go test -v -count=1 "${BASE}${PACKAGE}"; then
+    if ! go test -count=1 -cover "${BASE}${PACKAGE}"; then
         exit 1
     fi
 done
 
 rm -f server/pasteme.db
+rm -f server/pasteme.log
 
 echo "All test done"
