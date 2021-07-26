@@ -56,7 +56,7 @@ func (paste *Temporary) Save() error {
         return err
     }
     if paste.Expiration.IsZero() && paste.Quota == 0 {
-        return errors.New("both expiration and quota disabled")
+        return errors.New("both expiration and quota were disabled")
     }
     return db.Create(&paste).Error
 }
