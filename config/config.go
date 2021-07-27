@@ -8,6 +8,7 @@ import (
     "github.com/PasteUs/PasteMeGoBackend/util/logging"
     "go.uber.org/zap"
     "io/ioutil"
+    "os"
 )
 
 type database struct {
@@ -65,7 +66,13 @@ func checkVersion(version string) {
 func load(filename string) {
     data, err := ioutil.ReadFile(filename)
     if err != nil {
-        logging.Panic(err.Error())
+        pwd, _ := os.Getwd()
+
+        logging.Panic(
+            "open file failed",
+            zap.String("pwd", pwd),
+            zap.String("err", err.Error()),
+        )
     }
 
     err = json.Unmarshal(data, &config)

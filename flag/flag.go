@@ -2,10 +2,10 @@ package flag
 
 import (
     "flag"
+    _ "github.com/PasteUs/PasteMeGoBackend/tests"
     "github.com/wonderivan/logger"
     "os"
     "strings"
-    "testing"
 )
 
 var (
@@ -19,7 +19,6 @@ func init() {
     flag.BoolVar(&Debug, "debug", false, "--debug Using debug mode")
     flag.StringVar(&DataDir, "d", "./", "-d <data dir>")
 
-    testing.Init()
     flag.Parse()
 
     validationCheck()
