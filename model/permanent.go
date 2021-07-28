@@ -1,6 +1,7 @@
 package model
 
 import (
+    "github.com/PasteUs/PasteMeGoBackend/model/dao"
     "time"
 )
 
@@ -18,15 +19,15 @@ func (paste *Permanent) Save() error {
     if err := paste.beforeSave(); err != nil {
         return err
     }
-    return db.Create(&paste).Error
+    return dao.Connection().Create(&paste).Error
 }
 
 // Delete 成员函数，删除
 func (paste *Permanent) Delete() error {
-    return db.Delete(&paste).Error
+    return dao.Connection().Delete(&paste).Error
 }
 
 // Get 成员函数，访问
 func (paste *Permanent) Get() error {
-    return db.First(&paste).Error
+    return dao.Connection().First(&paste).Error
 }

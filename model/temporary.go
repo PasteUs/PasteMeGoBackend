@@ -1,5 +1,7 @@
 package model
 
+import "github.com/PasteUs/PasteMeGoBackend/model/dao"
+
 // Temporary 临时
 type Temporary struct {
     Key string `json:"key" gorm:"type:varchar(16);primary_key"` // 主键:索引
@@ -11,21 +13,21 @@ func (paste *Temporary) Save() error {
     if err := paste.beforeSave(); err != nil {
         return err
     }
-    return db.Create(&paste).Error
+    return dao.Connection().Create(&paste).Error
 }
 
 // Delete 成员函数，删除
 func (paste *Temporary) Delete() error {
-    return db.Delete(&paste).Error
+    return dao.Connection().Delete(&paste).Error
 }
 
 // Get 成员函数，查看
 func (paste *Temporary) Get() error {
-    return db.Find(&paste).Error
+    return dao.Connection().Find(&paste).Error
 }
 
 func Exist(key string) bool {
     count := uint8(0)
-    db.Model(&Temporary{}).Where("`key` = ?", key).Count(&count)
+    dao.Connection().Model(&Temporary{}).Where("`key` = ?", key).Count(&count)
     return count > 0
 }

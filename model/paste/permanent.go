@@ -3,23 +3,24 @@ package paste
 import (
     "fmt"
     "github.com/PasteUs/PasteMeGoBackend/config"
+    "github.com/PasteUs/PasteMeGoBackend/model/dao"
     "github.com/PasteUs/PasteMeGoBackend/util/convert"
     "github.com/PasteUs/PasteMeGoBackend/util/logging"
     "go.uber.org/zap"
     "time"
 )
 
-func init() {
-    if !db.HasTable(&Permanent{}) {
+func initPermanent() {
+    if !dao.Connection().HasTable(&Permanent{}) {
         var err error = nil
         tableName := zap.String("table_name", Permanent{}.TableName())
         logging.Warn("Table not found, start creating", tableName)
 
         if config.Get().Database.Type != "mysql" {
-            err = db.CreateTable(&Permanent{}).Error
-            db.Exec(fmt.Sprintf("INSERT INTO `sqlite_sequence` (`name`, `seq`) VALUES ('%s', 99)", Permanent{}.TableName()))
+            err = dao.Connection().CreateTable(&Permanent{}).Error
+            dao.Connection().Exec(fmt.Sprintf("INSERT INTO `sqlite_sequence` (`name`, `seq`) VALUES ('%s', 99)", Permanent{}.TableName()))
         } else {
-            err = db.Set(
+            err = dao.Connection().Set(
                 "gorm:table_options",
                 "ENGINE=Innodb DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=100",
             ).CreateTable(&Permanent{}).Error
@@ -57,16 +58,16 @@ func (paste *Permanent) Save() error {
     if err := paste.beforeSave(); err != nil {
         return err
     }
-    return db.Create(&paste).Error
+    return dao.Connection().Create(&paste).Error
 }
 
 // Delete 成员函数，删除
 func (paste *Permanent) Delete() error {
-    return db.Delete(&paste).Error
+    return dao.Connection().Delete(&paste).Error
 }
 
 func (paste *Permanent) Get(password string) error {
-    if err := db.Find(&paste).Error; err != nil {
+    if err := dao.Connection().Find(&paste).Error; err != nil {
         return err
     }
     if err := paste.checkPassword(password); err != nil {

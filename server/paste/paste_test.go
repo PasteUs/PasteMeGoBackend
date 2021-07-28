@@ -3,6 +3,7 @@ package paste
 import (
     "bytes"
     "encoding/json"
+    _ "github.com/PasteUs/PasteMeGoBackend/tests"
     "github.com/gin-gonic/gin"
     "io"
     "net/http"

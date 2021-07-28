@@ -2,16 +2,13 @@ package paste
 
 import (
     "errors"
-    "github.com/PasteUs/PasteMeGoBackend/model/dao"
     "github.com/PasteUs/PasteMeGoBackend/util/convert"
-    "github.com/jinzhu/gorm"
     "time"
 )
 
-var db *gorm.DB
-
-func init() {
-    db = dao.Connection()
+func Init() {
+    initPermanent()
+    initTemporary()
 }
 
 type IPaste interface {

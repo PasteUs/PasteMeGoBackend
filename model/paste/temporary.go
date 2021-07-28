@@ -3,20 +3,21 @@ package paste
 import (
 	"errors"
 	"github.com/PasteUs/PasteMeGoBackend/config"
+	"github.com/PasteUs/PasteMeGoBackend/model/dao"
 	"github.com/PasteUs/PasteMeGoBackend/util/logging"
 	"go.uber.org/zap"
 )
 
-func init() {
-	if !db.HasTable(&Temporary{}) {
+func initTemporary() {
+	if !dao.Connection().HasTable(&Temporary{}) {
 		var err error = nil
 		tableName := zap.String("table_name", Temporary{}.TableName())
 		logging.Warn("Table not found, start creating", tableName)
 
 		if config.Get().Database.Type != "mysql" {
-			err = db.CreateTable(&Temporary{}).Error
+			err = dao.Connection().CreateTable(&Temporary{}).Error
 		} else {
-			err = db.Set(
+			err = dao.Connection().Set(
 				"gorm:table_options",
 				"ENGINE=Innodb DEFAULT CHARSET=utf8mb4",
 			).CreateTable(&Temporary{}).Error
@@ -58,12 +59,12 @@ func (paste *Temporary) Save() error {
 		return errors.New("empty expire_type or expiration")
 	}
 	// TODO 过期字段校验
-	return db.Create(&paste).Error
+	return dao.Connection().Create(&paste).Error
 }
 
 // Delete 成员函数，删除
 func (paste *Temporary) Delete() error {
-	return db.Delete(&paste).Error
+	return dao.Connection().Delete(&paste).Error
 }
 
 // Get 成员函数，查看
@@ -75,7 +76,7 @@ func (paste *Temporary) Get(password string) error {
 	//	}
 	//}
 
-	if err := db.Find(&paste).Error; err != nil {
+	if err := dao.Connection().Find(&paste).Error; err != nil {
 		return err
 	}
 	if err := paste.checkPassword(password); err != nil {
@@ -93,6 +94,6 @@ func (paste *Temporary) Get(password string) error {
 
 func Exist(key string) bool {
 	count := uint8(0)
-	db.Model(&Temporary{}).Where("`key` = ?", key).Count(&count)
+	dao.Connection().Model(&Temporary{}).Where("`key` = ?", key).Count(&count)
 	return count > 0
 }

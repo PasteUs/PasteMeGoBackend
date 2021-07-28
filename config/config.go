@@ -9,6 +9,7 @@ import (
     "go.uber.org/zap"
     "io/ioutil"
     "os"
+    "sync"
 )
 
 type database struct {
@@ -28,11 +29,13 @@ type Config struct {
     Database database `json:"database"`
 }
 
-var config Config
-var isInitialized bool
+var (
+    config Config
+    once   sync.Once
+)
 
-func init() {
-    load(flag.Config)
+func Init() {
+    load(flag.GetArgv().Config)
     checkVersion(config.Version)
     setDefault()
 }
@@ -85,13 +88,9 @@ func load(filename string) {
         zap.String("config_file", filename),
         zap.ByteString("config", data),
     )
-
-    isInitialized = true
 }
 
 func Get() Config {
-    if !isInitialized {
-        logging.Panic("Trying to use uninitialized config")
-    }
+    once.Do(Init)
     return config
 }

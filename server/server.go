@@ -12,7 +12,7 @@ import (
 var router *gin.Engine
 
 func init() {
-    if !flag.Debug {
+    if !flag.GetArgv().Debug {
         gin.SetMode(gin.ReleaseMode)
     }
     router = gin.Default()

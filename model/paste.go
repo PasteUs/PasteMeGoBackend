@@ -4,35 +4,34 @@ import (
     "errors"
     "github.com/PasteUs/PasteMeGoBackend/config"
     "github.com/PasteUs/PasteMeGoBackend/model/dao"
+    "github.com/PasteUs/PasteMeGoBackend/model/paste"
     "github.com/PasteUs/PasteMeGoBackend/util/convert"
-    "github.com/jinzhu/gorm"
     "github.com/wonderivan/logger"
     "time"
 )
 
-var db *gorm.DB
+func Init() {
+    paste.Init()
 
-func init() {
-    db = dao.Connection()
     if config.Get().Database.Type != "mysql" {
-        if !db.HasTable(&Permanent{}) {
+        if !dao.Connection().HasTable(&Permanent{}) {
             logger.Warn("Table permanents not found, start creating")
-            if err := db.CreateTable(&Permanent{}).Error; err != nil {
+            if err := dao.Connection().CreateTable(&Permanent{}).Error; err != nil {
                 logger.Painc("Create table permanents failed: " + err.Error())
             }
-            db.Exec("INSERT INTO `sqlite_sequence` (`name`, `seq`) VALUES ('permanents', 99)")
+            dao.Connection().Exec("INSERT INTO `sqlite_sequence` (`name`, `seq`) VALUES ('permanents', 99)")
         }
 
-        if !db.HasTable(&Temporary{}) {
+        if !dao.Connection().HasTable(&Temporary{}) {
             logger.Warn("Table temporaries not found, start creating")
-            if err := db.CreateTable(&Temporary{}).Error; err != nil {
+            if err := dao.Connection().CreateTable(&Temporary{}).Error; err != nil {
                 logger.Painc("Create table temporaries failed: " + err.Error())
             }
         }
     } else {
-        if !db.HasTable(&Permanent{}) {
+        if !dao.Connection().HasTable(&Permanent{}) {
             logger.Warn("Table permanents not found, start creating")
-            if err := db.Set(
+            if err := dao.Connection().Set(
                 "gorm:table_options",
                 "ENGINE=Innodb DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=100",
             ).CreateTable(&Permanent{}).Error; err != nil {
@@ -40,9 +39,9 @@ func init() {
             }
         }
 
-        if !db.HasTable(&Temporary{}) {
+        if !dao.Connection().HasTable(&Temporary{}) {
             logger.Warn("Table temporaries not found, start creating")
-            if err := db.Set(
+            if err := dao.Connection().Set(
                 "gorm:table_options",
                 "ENGINE=Innodb DEFAULT CHARSET=utf8mb4",
             ).CreateTable(&Temporary{}).Error; err != nil {

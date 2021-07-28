@@ -9,6 +9,7 @@ import (
     "github.com/jinzhu/gorm"
     _ "github.com/mattn/go-sqlite3"
     "go.uber.org/zap"
+    "sync"
 )
 
 func format(
@@ -27,36 +28,34 @@ func formatWithConfig(config config.Config) string {
     return format(database.Username, database.Password, "tcp", database.Server, database.Port, database.Database)
 }
 
-var db *gorm.DB
+var (
+    db   *gorm.DB
+    once sync.Once
+)
 
-func init() {
+func Init() {
     var err error
     if config.Get().Database.Type != "mysql" {
-        sqlitePath := flag.DataDir + "pasteme.db"
-        db, err = gorm.Open("sqlite3", sqlitePath)
-        if err != nil {
+        sqlitePath := flag.GetArgv().DataDir + "pasteme.db"
+        if db, err = gorm.Open("sqlite3", sqlitePath); err != nil {
             logging.Panic("SQLite connect failed", zap.String("sqlite_path", sqlitePath), zap.String("err", err.Error()))
-        } else {
-            logging.Info("SQLite connect success", zap.String("sqlite_path", sqlitePath))
-            if flag.Debug {
-                logging.Warn("Running in debug mode, database execute will be displayed")
-                db = db.Debug()
-            }
+            return
         }
+        logging.Info("SQLite connect success", zap.String("sqlite_path", sqlitePath))
     } else {
-        db, err = gorm.Open("mysql", formatWithConfig(config.Get()))
-        if err != nil {
+        if db, err = gorm.Open("mysql", formatWithConfig(config.Get())); err != nil {
             logging.Panic("Connect to MySQL failed", zap.String("err", err.Error()))
-        } else {
-            logging.Info("MySQL connected")
-            if flag.Debug {
-                logging.Warn("Running in debug mode, database execute will be displayed")
-                db = db.Debug()
-            }
+            return
         }
+        logging.Info("MySQL connected")
+    }
+    if flag.GetArgv().Debug {
+        logging.Warn("Running in debug mode, database execute will be displayed")
+        db = db.Debug()
     }
 }
 
 func Connection() *gorm.DB {
+    once.Do(Init)
     return db
 }

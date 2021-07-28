@@ -2,35 +2,46 @@ package flag
 
 import (
     "flag"
-    _ "github.com/PasteUs/PasteMeGoBackend/tests"
     "github.com/wonderivan/logger"
     "os"
     "strings"
+    "sync"
 )
 
-var (
+type Argv struct {
     Config  string
     Debug   bool
     DataDir string
+}
+
+var (
+    argv Argv
+    once sync.Once
 )
 
 func init() {
-    flag.StringVar(&Config, "c", "config.json", "-c <config file>")
-    flag.BoolVar(&Debug, "debug", false, "--debug Using debug mode")
-    flag.StringVar(&DataDir, "d", "./", "-d <data dir>")
-
-    flag.Parse()
-
-    validationCheck()
+    flag.StringVar(&argv.Config, "c", "config.json", "-c <config file>")
+    flag.BoolVar(&argv.Debug, "debug", false, "--debug Using debug mode")
+    flag.StringVar(&argv.DataDir, "d", "./", "-d <data dir>")
 }
 
-func validationCheck() {
-    if !isDir(DataDir) {
-        logger.Painc("%s is not a directory", DataDir)
+func Init() {
+    flag.Parse()
+    validationCheck(argv.DataDir)
+}
+
+func GetArgv() Argv {
+    once.Do(Init)
+    return argv
+}
+
+func validationCheck(dataDir string) {
+    if !isDir(dataDir) {
+        logger.Painc("%s is not a directory", dataDir)
     }
 
-    if !strings.HasSuffix(DataDir, "/") {
-        DataDir = DataDir + "/"
+    if !strings.HasSuffix(dataDir, "/") {
+        dataDir = dataDir + "/"
     }
 }
 

@@ -3,6 +3,7 @@ package server
 import (
     "encoding/json"
     "github.com/PasteUs/PasteMeGoBackend/model"
+    _ "github.com/PasteUs/PasteMeGoBackend/tests"
     "github.com/PasteUs/PasteMeGoBackend/tests/request"
     "github.com/PasteUs/PasteMeGoBackend/util/convert"
     "testing"
@@ -198,4 +199,9 @@ func TestExist(t *testing.T) {
     if model.Exist(keyR) {
         t.Fatalf("test once key: %s failed.", keyR)
     }
+}
+
+func TestMain(m *testing.M) {
+    model.Init()
+    m.Run()
 }
