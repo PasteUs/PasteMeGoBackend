@@ -90,6 +90,33 @@ func TestCreate(t *testing.T) {
         }
     }
 
+    for _, name := range []string{"bind_failed", "invalid_param", "db_error"} {
+        var expectedStatus uint
+        var expiration interface{}
+        if name == "db_error" {
+            expectedStatus = 500
+            expiration = 1
+        } else {
+            expectedStatus = 400
+            expiration = "1"
+        }
+
+        testCaseList = append(testCaseList, testCase{
+            name,
+            Input{map[string]string{
+                "namespace": "nobody",
+            }, map[string]interface{}{
+                "content":       "print('Hello World!')",
+                "lang":          "python",
+                "password":      "",
+                "self_destruct": true,
+                "expire_type":   "",
+                "expiration":    expiration,
+            }, "127.0.0.1:10086"},
+            Expect{"127.0.0.1", expectedStatus},
+        })
+    }
+
     type Response struct {
         Message   string `json:"message"`
         Key       string `json:"key"`
@@ -108,9 +135,7 @@ func TestCreate(t *testing.T) {
             if response.Status != c.status {
                 t.Errorf("test %d | check status failed | expected = %d, actual = %d, message = %s",
                     i, c.status, response.Status, response.Message)
-            }
-
-            if response.Namespace != c.ginParams["namespace"] {
+            } else if c.status == 201 && response.Namespace != c.ginParams["namespace"] {
                 t.Errorf("test %d | check namespace failed | expected = %s, actual = %s, message = %s",
                     i, c.Input.ginParams["namespace"], response.Namespace, response.Message)
             }

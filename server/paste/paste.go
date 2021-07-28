@@ -8,6 +8,30 @@ import (
     "net/http"
 )
 
+
+func validator(expireType string, expiration uint64) error {
+    if expireType == "" || expiration == 0 {
+        return ErrEmptyExpireTypeOrExpiration
+    }
+
+    if expiration <= 0 {
+        return ErrZeroExpiration
+    }
+
+    if expireType == model.EnumTime {
+        if expiration > model.OneMonth {
+            return ErrExpirationGreaterThanMonth
+        }
+    } else if expireType == model.EnumCount {
+        if expiration > model.MaxCount {
+            return ErrExpirationGreaterThanMaxCount
+        }
+    } else {
+        return ErrInvalidExpireType
+    }
+    return nil
+}
+
 func Create(context *gin.Context) {
     namespace := context.Param("namespace")
     util.Info("create paste", context, zap.String("namespace", namespace))
@@ -24,10 +48,10 @@ func Create(context *gin.Context) {
     }
 
     if err := context.ShouldBindJSON(&body); err != nil {
-        util.Error("bind body failed", context, zap.String("err", err.Error()))
-        context.JSON(http.StatusInternalServerError, gin.H{
-            "status":  http.StatusInternalServerError,
-            "message": "bind body failed",
+        util.Warn("bind body failed", context, zap.String("err", err.Error()))
+        context.JSON(http.StatusBadRequest, gin.H{
+            "status":  http.StatusBadRequest,
+            "message": "wrong param type",
         })
         return
     }
@@ -35,6 +59,14 @@ func Create(context *gin.Context) {
     var paste model.IPaste
 
     if body.SelfDestruct {
+        if err := validator(body.ExpireType, body.Expiration); err != nil {
+            util.Info("temporary param validate failed", zap.String("err", err.Error()))
+            context.JSON(http.StatusBadRequest, gin.H{
+                "status":  http.StatusBadRequest,
+                "message": err.Error(),
+            })
+        }
+
         paste = &model.Temporary{
             Key:           model.Generator(),
             Namespace:     namespace,
@@ -47,7 +79,7 @@ func Create(context *gin.Context) {
     }
 
     if err := paste.Save(); err != nil {
-        util.Error("save failed", context, zap.String("err", err.Error()))
+        util.Warn("save failed", context, zap.String("err", err.Error()))
         context.JSON(http.StatusInternalServerError, gin.H{
             "status":  http.StatusInternalServerError,
             "message": "save failed",

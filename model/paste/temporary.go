@@ -1,7 +1,6 @@
 package paste
 
 import (
-    "errors"
     "fmt"
     "github.com/PasteUs/PasteMeGoBackend/config"
     "github.com/PasteUs/PasteMeGoBackend/model/dao"
@@ -60,35 +59,9 @@ func (paste *Temporary) GetNamespace() string {
     return paste.Namespace
 }
 
-func validator(expireType string, expiration uint64) error {
-    if expireType == "" || expiration == 0 {
-        return errors.New("empty expire_type or expiration")
-    }
-
-    if expiration <= 0 {
-        return errors.New("zero expiration")
-    }
-
-    if expireType == EnumTime {
-        if expiration > OneMonth {
-            return errors.New("expiration greater than a month")
-        }
-    } else if expireType == EnumCount {
-        if expiration > MaxCount {
-            return errors.New(fmt.Sprintf("expiration greater than %d", MaxCount))
-        }
-    } else {
-        return errors.New("invalid expire_type")
-    }
-    return nil
-}
-
 // Save 成员函数，保存
 func (paste *Temporary) Save() error {
     if err := paste.beforeSave(); err != nil {
-        return err
-    }
-    if err := validator(paste.ExpireType, paste.Expiration); err != nil {
         return err
     }
     return dao.DB().Create(&paste).Error

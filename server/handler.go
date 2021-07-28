@@ -6,6 +6,7 @@ import (
     paste2 "github.com/PasteUs/PasteMeGoBackend/model/paste"
     "github.com/PasteUs/PasteMeGoBackend/util"
     "github.com/gin-gonic/gin"
+    "github.com/jinzhu/gorm"
     "github.com/wonderivan/logger"
     "net/http"
     "strings"
@@ -173,7 +174,7 @@ func query(requests *gin.Context) {
             }
 
             if err := paste.Get(); err != nil {
-                if err.Error() == "record not found" {
+                if err == gorm.ErrRecordNotFound {
                     logger.Info(util.LogFormat(IP, "Access empty key: %s", key))
                     requests.JSON(http.StatusOK, gin.H{
                         "status":  http.StatusNotFound,
