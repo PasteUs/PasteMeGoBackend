@@ -5,8 +5,9 @@ import (
     "github.com/PasteUs/PasteMeGoBackend/flag"
     "github.com/PasteUs/PasteMeGoBackend/server/paste"
     "github.com/PasteUs/PasteMeGoBackend/server/session"
+    "github.com/PasteUs/PasteMeGoBackend/util"
     "github.com/gin-gonic/gin"
-    "github.com/wonderivan/logger"
+    "go.uber.org/zap"
 )
 
 var router *gin.Engine
@@ -42,6 +43,6 @@ func init() {
 
 func Run(address string, port uint16) {
     if err := router.Run(fmt.Sprintf("%s:%d", address, port)); err != nil {
-        logger.Painc("Run server failed: " + err.Error())
+        util.Panic("Run server failed", zap.String("err", err.Error()))
     }
 }

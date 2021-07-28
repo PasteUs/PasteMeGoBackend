@@ -3,9 +3,7 @@ package util
 import (
     "errors"
     "fmt"
-    "github.com/wonderivan/logger"
     "math/rand"
-    "os"
     "regexp"
     "strings"
     "time"
@@ -50,12 +48,4 @@ func ValidChecker(key string) (string, error) {
 func LogFormat(IP string, format string, a ...interface{}) string {
     content := fmt.Sprintf(format, a...)
     return fmt.Sprintf("[%s] %s", IP, content)
-}
-
-func GetEnvOrFatal(key string) string {
-    value, exist := os.LookupEnv(key)
-    if !exist {
-        logger.Painc(fmt.Sprintf("Enviromental variable %s is not set", key))
-    }
-    return value
 }

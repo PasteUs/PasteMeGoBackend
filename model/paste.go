@@ -5,7 +5,7 @@ import (
     "github.com/PasteUs/PasteMeGoBackend/config"
     "github.com/PasteUs/PasteMeGoBackend/model/dao"
     "github.com/PasteUs/PasteMeGoBackend/model/paste"
-    "github.com/PasteUs/PasteMeGoBackend/util/convert"
+    "github.com/PasteUs/PasteMeGoBackend/util"
     "github.com/wonderivan/logger"
     "time"
 )
@@ -14,24 +14,24 @@ func Init() {
     paste.Init()
 
     if config.Get().Database.Type != "mysql" {
-        if !dao.Connection().HasTable(&Permanent{}) {
+        if !dao.DB().HasTable(&Permanent{}) {
             logger.Warn("Table permanents not found, start creating")
-            if err := dao.Connection().CreateTable(&Permanent{}).Error; err != nil {
+            if err := dao.DB().CreateTable(&Permanent{}).Error; err != nil {
                 logger.Painc("Create table permanents failed: " + err.Error())
             }
-            dao.Connection().Exec("INSERT INTO `sqlite_sequence` (`name`, `seq`) VALUES ('permanents', 99)")
+            dao.DB().Exec("INSERT INTO `sqlite_sequence` (`name`, `seq`) VALUES ('permanents', 99)")
         }
 
-        if !dao.Connection().HasTable(&Temporary{}) {
+        if !dao.DB().HasTable(&Temporary{}) {
             logger.Warn("Table temporaries not found, start creating")
-            if err := dao.Connection().CreateTable(&Temporary{}).Error; err != nil {
+            if err := dao.DB().CreateTable(&Temporary{}).Error; err != nil {
                 logger.Painc("Create table temporaries failed: " + err.Error())
             }
         }
     } else {
-        if !dao.Connection().HasTable(&Permanent{}) {
+        if !dao.DB().HasTable(&Permanent{}) {
             logger.Warn("Table permanents not found, start creating")
-            if err := dao.Connection().Set(
+            if err := dao.DB().Set(
                 "gorm:table_options",
                 "ENGINE=Innodb DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=100",
             ).CreateTable(&Permanent{}).Error; err != nil {
@@ -39,9 +39,9 @@ func Init() {
             }
         }
 
-        if !dao.Connection().HasTable(&Temporary{}) {
+        if !dao.DB().HasTable(&Temporary{}) {
             logger.Warn("Table temporaries not found, start creating")
-            if err := dao.Connection().Set(
+            if err := dao.DB().Set(
                 "gorm:table_options",
                 "ENGINE=Innodb DEFAULT CHARSET=utf8mb4",
             ).CreateTable(&Temporary{}).Error; err != nil {
@@ -89,7 +89,7 @@ func (paste *AbstractPaste) beforeSave() error {
         return errors.New("empty lang") // 语言类型为空，返回错误信息 "empty lang"
     }
     if paste.Password != "" {
-        paste.Password = convert.String2md5(paste.Password) // 加密存储，设置密码
+        paste.Password = util.String2md5(paste.Password) // 加密存储，设置密码
     }
     return nil
 }

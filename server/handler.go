@@ -3,9 +3,8 @@ package server
 import (
     "fmt"
     "github.com/PasteUs/PasteMeGoBackend/model"
+    paste2 "github.com/PasteUs/PasteMeGoBackend/model/paste"
     "github.com/PasteUs/PasteMeGoBackend/util"
-    "github.com/PasteUs/PasteMeGoBackend/util/convert"
-    "github.com/PasteUs/PasteMeGoBackend/util/generator"
     "github.com/gin-gonic/gin"
     "github.com/wonderivan/logger"
     "net/http"
@@ -37,7 +36,7 @@ func permanentCreator(requests *gin.Context) {
                 "error":   err.Error(),
             })
         } else {
-            logger.Info(util.LogFormat(IP, "Create an permanent paste with key: %s", convert.Uint2string(paste.Key)))
+            logger.Info(util.LogFormat(IP, "Create an permanent paste with key: %s", util.Uint2string(paste.Key)))
 
             requests.JSON(http.StatusCreated, gin.H{
                 "status": http.StatusCreated,
@@ -114,7 +113,7 @@ func temporaryCreator(requests *gin.Context) {
 func readOnceCreator(requests *gin.Context) {
     IP := requests.ClientIP()
     paste := model.Temporary{
-        Key: generator.Generator(),
+        Key: paste2.Generator(),
         AbstractPaste: &model.AbstractPaste{
             ClientIP: IP,
         },
@@ -170,7 +169,7 @@ func query(requests *gin.Context) {
             if table == "temporary" {
                 paste = &model.Temporary{Key: key}
             } else {
-                paste = &model.Permanent{Key: convert.String2uint(key)}
+                paste = &model.Permanent{Key: util.String2uint(key)}
             }
 
             if err := paste.Get(); err != nil {
@@ -190,7 +189,7 @@ func query(requests *gin.Context) {
                     })
                 }
             } else {
-                if paste.GetPassword() == "" || paste.GetPassword() == convert.String2md5(password) { // 密码为空或者密码正确
+                if paste.GetPassword() == "" || paste.GetPassword() == util.String2md5(password) { // 密码为空或者密码正确
                     logger.Info(util.LogFormat(IP, "Password accept"))
                     if table == "temporary" {
                         if err := paste.Delete(); err != nil {

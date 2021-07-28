@@ -2,7 +2,7 @@ package paste
 
 import (
     "errors"
-    "github.com/PasteUs/PasteMeGoBackend/util/convert"
+    "github.com/PasteUs/PasteMeGoBackend/util"
     "time"
 )
 
@@ -46,13 +46,13 @@ func (paste *AbstractPaste) beforeSave() error {
         return errors.New("empty lang") // 语言类型为空，返回错误信息 "empty lang"
     }
     if paste.Password != "" {
-        paste.Password = convert.String2md5(paste.Password) // 加密存储，设置密码
+        paste.Password = util.String2md5(paste.Password) // 加密存储，设置密码
     }
     return nil
 }
 
 func (paste *AbstractPaste) checkPassword(password string) error {
-    if paste.Password == "" || paste.Password == convert.String2md5(password) {
+    if paste.Password == "" || paste.Password == util.String2md5(password) {
         return nil
     }
     return errors.New("wrong password")

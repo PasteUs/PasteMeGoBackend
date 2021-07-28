@@ -13,21 +13,21 @@ func (paste *Temporary) Save() error {
     if err := paste.beforeSave(); err != nil {
         return err
     }
-    return dao.Connection().Create(&paste).Error
+    return dao.DB().Create(&paste).Error
 }
 
 // Delete 成员函数，删除
 func (paste *Temporary) Delete() error {
-    return dao.Connection().Delete(&paste).Error
+    return dao.DB().Delete(&paste).Error
 }
 
 // Get 成员函数，查看
 func (paste *Temporary) Get() error {
-    return dao.Connection().Find(&paste).Error
+    return dao.DB().Find(&paste).Error
 }
 
 func Exist(key string) bool {
     count := uint8(0)
-    dao.Connection().Model(&Temporary{}).Where("`key` = ?", key).Count(&count)
+    dao.DB().Model(&Temporary{}).Where("`key` = ?", key).Count(&count)
     return count > 0
 }

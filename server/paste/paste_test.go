@@ -8,6 +8,7 @@ import (
     "io"
     "net/http"
     "net/http/httptest"
+    "strings"
     "testing"
 )
 
@@ -54,39 +55,39 @@ func TestCreate(t *testing.T) {
         requestBody map[string]interface{}
         mockIPPort  string
     }
+
     type Expect struct {
         ip     string
         status uint
     }
-    var testCases = []struct {
+
+    type testCase struct {
         name string
         Input
         Expect
-    }{
-        {
-            "permanent",
-            Input{map[string]string{
-                "namespace": "nobody",
-            }, map[string]interface{}{
-                "content":       "print('Hello World!')",
-                "lang":          "python",
-                "self_destruct": false,
-            }, "127.0.0.1:10086"},
-            Expect{"127.0.0.1", 201},
-        },
-        {
-            "temporary",
-            Input{map[string]string{
-                "namespace": "lucien",
-            }, map[string]interface{}{
-                "content":       "print('Hello World!')",
-                "lang":          "python",
-                "self_destruct": true,
-                "expire_type":   "",
-                "expiration":    "3",
-            }, "127.0.0.1:10086"},
-            Expect{"127.0.0.1", 400},
-        },
+    }
+
+    var testCaseList []testCase
+
+    for _, pasteType := range []string{"permanent", "temporary_count", "temporary_time"} {
+        for _, password := range []string{"", "_with_password"} {
+            s := strings.Split(pasteType, "_")
+            expireType := s[len(s)-1]
+            testCaseList = append(testCaseList, testCase{
+                pasteType + password,
+                Input{map[string]string{
+                    "namespace": "nobody",
+                }, map[string]interface{}{
+                    "content":       "print('Hello World!')",
+                    "lang":          "python",
+                    "password":      password,
+                    "self_destruct": pasteType != "permanent",
+                    "expire_type":   expireType,
+                    "expiration":    1,
+                }, "127.0.0.1:10086"},
+                Expect{"127.0.0.1", 201},
+            })
+        }
     }
 
     type Response struct {
@@ -96,16 +97,22 @@ func TestCreate(t *testing.T) {
         Status    uint   `json:"status"`
     }
 
-    for i, c := range testCases {
+    for i, c := range testCaseList {
         t.Run(c.name, func(t *testing.T) {
             response := Response{}
 
             if err := testHandler(c.ginParams, c.requestBody, c.mockIPPort, "POST", Create, &response); err != nil {
-                t.Fatal(err.Error())
+                t.Error(err.Error())
             }
 
-            if response.Status != c.status || response.Namespace != c.ginParams["namespace"] {
-                t.Fatalf("Test %d | Input: %+v, Expected: %+v, Output: %+v\n", i, c.Input, c.Expect, response)
+            if response.Status != c.status {
+                t.Errorf("test %d | check status failed | expected = %d, actual = %d, message = %s",
+                    i, c.status, response.Status, response.Message)
+            }
+
+            if response.Namespace != c.ginParams["namespace"] {
+                t.Errorf("test %d | check namespace failed | expected = %s, actual = %s, message = %s",
+                    i, c.Input.ginParams["namespace"], response.Namespace, response.Message)
             }
         })
     }

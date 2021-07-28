@@ -4,29 +4,28 @@ import (
     "fmt"
     "github.com/PasteUs/PasteMeGoBackend/config"
     "github.com/PasteUs/PasteMeGoBackend/model/dao"
-    "github.com/PasteUs/PasteMeGoBackend/util/convert"
-    "github.com/PasteUs/PasteMeGoBackend/util/logging"
+    "github.com/PasteUs/PasteMeGoBackend/util"
     "go.uber.org/zap"
     "time"
 )
 
 func initPermanent() {
-    if !dao.Connection().HasTable(&Permanent{}) {
+    if !dao.DB().HasTable(&Permanent{}) {
         var err error = nil
         tableName := zap.String("table_name", Permanent{}.TableName())
-        logging.Warn("Table not found, start creating", tableName)
+        util.Warn("Table not found, start creating", tableName)
 
         if config.Get().Database.Type != "mysql" {
-            err = dao.Connection().CreateTable(&Permanent{}).Error
-            dao.Connection().Exec(fmt.Sprintf("INSERT INTO `sqlite_sequence` (`name`, `seq`) VALUES ('%s', 99)", Permanent{}.TableName()))
+            err = dao.DB().CreateTable(&Permanent{}).Error
+            dao.DB().Exec(fmt.Sprintf("INSERT INTO `sqlite_sequence` (`name`, `seq`) VALUES ('%s', 99)", Permanent{}.TableName()))
         } else {
-            err = dao.Connection().Set(
+            err = dao.DB().Set(
                 "gorm:table_options",
                 "ENGINE=Innodb DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=100",
             ).CreateTable(&Permanent{}).Error
         }
         if err != nil {
-            logging.Panic("Create table failed", tableName, zap.String("err", err.Error()))
+            util.Panic("Create table failed", tableName, zap.String("err", err.Error()))
         }
     }
 }
@@ -46,7 +45,7 @@ func (Permanent) TableName() string {
 }
 
 func (paste *Permanent) GetKey() string {
-    return convert.Uint2string(paste.Key)
+    return util.Uint2string(paste.Key)
 }
 
 func (paste *Permanent) GetNamespace() string {
@@ -58,16 +57,16 @@ func (paste *Permanent) Save() error {
     if err := paste.beforeSave(); err != nil {
         return err
     }
-    return dao.Connection().Create(&paste).Error
+    return dao.DB().Create(&paste).Error
 }
 
 // Delete 成员函数，删除
 func (paste *Permanent) Delete() error {
-    return dao.Connection().Delete(&paste).Error
+    return dao.DB().Delete(&paste).Error
 }
 
 func (paste *Permanent) Get(password string) error {
-    if err := dao.Connection().Find(&paste).Error; err != nil {
+    if err := dao.DB().Find(&paste).Error; err != nil {
         return err
     }
     if err := paste.checkPassword(password); err != nil {

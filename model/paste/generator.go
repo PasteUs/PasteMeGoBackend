@@ -1,7 +1,6 @@
-package generator
+package paste
 
 import (
-    "github.com/PasteUs/PasteMeGoBackend/model"
     "math/rand"
     "regexp"
 )
@@ -26,7 +25,7 @@ func check(key string) bool {
     if err != nil {
         return false
     }
-    return flag && !model.Exist(key)
+    return flag && !Exist(key)
 }
 
 // Generator Generate a string that contains at least one alphabet and not occur in temporary database on field key

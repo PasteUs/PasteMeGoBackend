@@ -2,7 +2,7 @@
 
 rm -f server/pasteme.db
 
-UNITTEST=1 go test -count=1 -cover ./...
+go test -count=1 -cover ./...
 
 rm -f server/pasteme.db
 rm -f server/pasteme.log

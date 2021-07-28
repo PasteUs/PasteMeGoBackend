@@ -4,7 +4,7 @@ import (
     "fmt"
     "github.com/PasteUs/PasteMeGoBackend/config"
     "github.com/PasteUs/PasteMeGoBackend/flag"
-    "github.com/PasteUs/PasteMeGoBackend/util/logging"
+    "github.com/PasteUs/PasteMeGoBackend/util"
     _ "github.com/go-sql-driver/mysql"
     "github.com/jinzhu/gorm"
     _ "github.com/mattn/go-sqlite3"
@@ -38,24 +38,24 @@ func Init() {
     if config.Get().Database.Type != "mysql" {
         sqlitePath := flag.GetArgv().DataDir + "pasteme.db"
         if db, err = gorm.Open("sqlite3", sqlitePath); err != nil {
-            logging.Panic("SQLite connect failed", zap.String("sqlite_path", sqlitePath), zap.String("err", err.Error()))
+            util.Panic("SQLite connect failed", zap.String("sqlite_path", sqlitePath), zap.String("err", err.Error()))
             return
         }
-        logging.Info("SQLite connect success", zap.String("sqlite_path", sqlitePath))
+        util.Info("SQLite connect success", zap.String("sqlite_path", sqlitePath))
     } else {
         if db, err = gorm.Open("mysql", formatWithConfig(config.Get())); err != nil {
-            logging.Panic("Connect to MySQL failed", zap.String("err", err.Error()))
+            util.Panic("Connect to MySQL failed", zap.String("err", err.Error()))
             return
         }
-        logging.Info("MySQL connected")
+        util.Info("MySQL connected")
     }
     if flag.GetArgv().Debug {
-        logging.Warn("Running in debug mode, database execute will be displayed")
+        util.Warn("Running in debug mode, database execute will be displayed")
         db = db.Debug()
     }
 }
 
-func Connection() *gorm.DB {
+func DB() *gorm.DB {
     once.Do(Init)
     return db
 }

@@ -5,7 +5,7 @@ import (
     "github.com/PasteUs/PasteMeGoBackend/model"
     _ "github.com/PasteUs/PasteMeGoBackend/tests"
     "github.com/PasteUs/PasteMeGoBackend/tests/request"
-    "github.com/PasteUs/PasteMeGoBackend/util/convert"
+    "github.com/PasteUs/PasteMeGoBackend/util"
     "testing"
 )
 
@@ -20,15 +20,15 @@ func checkGetResponse(t *testing.T, body []byte) {
 
     response := JsonResponse{}
     if err := json.Unmarshal(body, &response); err != nil {
-        t.Fatal(err)
+        t.Error(err)
     }
 
     if response.Content != "Hello" {
-        t.Fatalf("content not equal: \"%s\"", response.Content)
+        t.Errorf("content not equal: \"%s\"", response.Content)
     }
 
     if response.Lang != "plain" {
-        t.Fatalf("lang not equal: \"%s\"", response.Lang)
+        t.Errorf("lang not equal: \"%s\"", response.Lang)
     }
 }
 
@@ -41,14 +41,14 @@ func TestPermanentPost(t *testing.T) {
 
     response := JsonResponse{}
     if err := json.Unmarshal(body, &response); err != nil {
-        t.Fatal(err)
+        t.Error(err)
     }
 
     keyP = response.Key
 }
 
 func TestPermanentGet(t *testing.T) {
-    body := request.Get(t, router, convert.Uint2string(uint64(keyP)), "")
+    body := request.Get(t, router, util.Uint2string(uint64(keyP)), "")
     checkGetResponse(t, body)
 }
 
@@ -60,7 +60,7 @@ func TestTemporaryPost(t *testing.T) {
 
     response := JsonResponse{}
     if err := json.Unmarshal(body, &response); err != nil {
-        t.Fatal(err)
+        t.Error(err)
     }
 
     keyT = response.Key
@@ -80,7 +80,7 @@ func TestReadOncePost(t *testing.T) {
 
     response := JsonResponse{}
     if err := json.Unmarshal(body, &response); err != nil {
-        t.Fatal(err)
+        t.Error(err)
     }
 
     keyR = response.Key
@@ -100,14 +100,14 @@ func TestPermanentPasswordPost(t *testing.T) {
 
     response := JsonResponse{}
     if err := json.Unmarshal(body, &response); err != nil {
-        t.Fatal(err)
+        t.Error(err)
     }
 
     keyP = response.Key
 }
 
 func TestPermanentPasswordGet(t *testing.T) {
-    body := request.Get(t, router, convert.Uint2string(uint64(keyP)), "password")
+    body := request.Get(t, router, util.Uint2string(uint64(keyP)), "password")
     checkGetResponse(t, body)
 }
 
@@ -120,7 +120,7 @@ func TestTemporaryPasswordPost(t *testing.T) {
 
     response := JsonResponse{}
     if err := json.Unmarshal(body, &response); err != nil {
-        t.Fatal(err)
+        t.Error(err)
     }
 
     keyT = response.Key
@@ -140,7 +140,7 @@ func TestReadOncePasswordPost(t *testing.T) {
 
     response := JsonResponse{}
     if err := json.Unmarshal(body, &response); err != nil {
-        t.Fatal(err)
+        t.Error(err)
     }
 
     keyR = response.Key
@@ -153,55 +153,50 @@ func TestReadOncePasswordGet(t *testing.T) {
 
 func TestExist(t *testing.T) {
     if model.Exist(keyT) {
-        t.Fatalf("test temporary key: %s failed.", keyT)
+        t.Errorf("test temporary key: %s failed.", keyT)
     }
 
     if model.Exist(keyR) {
-        t.Fatalf("test once key: %s failed.", keyR)
+        t.Errorf("test once key: %s failed.", keyR)
     }
 
     TestTemporaryPost(t)
     if !model.Exist(keyT) {
-        t.Fatalf("test temporary key: %s failed.", keyT)
+        t.Errorf("test temporary key: %s failed.", keyT)
     }
 
     TestTemporaryGet(t)
     if model.Exist(keyT) {
-        t.Fatalf("test temporary key: %s failed.", keyT)
+        t.Errorf("test temporary key: %s failed.", keyT)
     }
 
     TestReadOncePost(t)
     if !model.Exist(keyR) {
-        t.Fatalf("test once key: %s failed.", keyR)
+        t.Errorf("test once key: %s failed.", keyR)
     }
 
     TestReadOnceGet(t)
     if model.Exist(keyR) {
-        t.Fatalf("test once key: %s failed.", keyR)
+        t.Errorf("test once key: %s failed.", keyR)
     }
 
     TestTemporaryPasswordPost(t)
     if !model.Exist(keyT) {
-        t.Fatalf("test temporary key: %s failed.", keyT)
+        t.Errorf("test temporary key: %s failed.", keyT)
     }
 
     TestTemporaryPasswordGet(t)
     if model.Exist(keyT) {
-        t.Fatalf("test temporary key: %s failed.", keyT)
+        t.Errorf("test temporary key: %s failed.", keyT)
     }
 
     TestReadOncePasswordPost(t)
     if !model.Exist(keyR) {
-        t.Fatalf("test once key: %s failed.", keyR)
+        t.Errorf("test once key: %s failed.", keyR)
     }
 
     TestReadOncePasswordGet(t)
     if model.Exist(keyR) {
-        t.Fatalf("test once key: %s failed.", keyR)
+        t.Errorf("test once key: %s failed.", keyR)
     }
-}
-
-func TestMain(m *testing.M) {
-    model.Init()
-    m.Run()
 }

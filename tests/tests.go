@@ -1,6 +1,7 @@
 package tests
 
 import (
+    "github.com/PasteUs/PasteMeGoBackend/model"
     "os"
     "path"
     "runtime"
@@ -16,4 +17,6 @@ func init() {
     if err != nil {
         panic(err)
     }
+
+    model.Init()
 }

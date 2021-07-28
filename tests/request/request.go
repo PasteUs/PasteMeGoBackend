@@ -20,7 +20,7 @@ func get(t *testing.T, uri string, router *gin.Engine) []byte {
     result := w.Result()                        // 提取响应
     body, err := ioutil.ReadAll(result.Body)    // 读取响应body
     if err != nil {
-        t.Fatal(err)
+        t.Error(err)
     }
     return body
 }
@@ -29,7 +29,7 @@ func get(t *testing.T, uri string, router *gin.Engine) []byte {
 func requestJson(t *testing.T, method string, uri string, param map[string]interface{}, router *gin.Engine) []byte {
     jsonByte, err := json.Marshal(param) // 将参数转化为 json 比特流
     if err != nil {
-        t.Fatal(err)
+        t.Error(err)
     }
     req := httptest.NewRequest(method, uri, bytes.NewReader(jsonByte)) // 构造post请求，json数据以请求body的形式传递
     w := httptest.NewRecorder()                                        // 初始化响应
@@ -37,7 +37,7 @@ func requestJson(t *testing.T, method string, uri string, param map[string]inter
     result := w.Result()                                               // 提取响应
     body, err := ioutil.ReadAll(result.Body)                           // 读取响应body
     if err != nil {
-        t.Fatal(err)
+        t.Error(err)
     }
     return body
 }
