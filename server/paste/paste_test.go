@@ -3,6 +3,7 @@ package paste
 import (
     "bytes"
     "encoding/json"
+    model "github.com/PasteUs/PasteMeGoBackend/model/paste"
     _ "github.com/PasteUs/PasteMeGoBackend/tests"
     "github.com/gin-gonic/gin"
     "io"
@@ -49,24 +50,25 @@ func testHandler(
     return json.Unmarshal(recorder.Body.Bytes(), &response)
 }
 
-func TestCreate(t *testing.T) {
-    type Input struct {
-        ginParams   map[string]string
-        requestBody map[string]interface{}
-        mockIPPort  string
-    }
+type Input struct {
+    ginParams   map[string]string
+    requestBody map[string]interface{}
+    mockIPPort  string
+}
 
-    type Expect struct {
-        ip     string
-        status uint
-    }
+type Expect struct {
+    ip      string
+    status  uint
+    message string
+}
 
-    type testCase struct {
-        name string
-        Input
-        Expect
-    }
+type testCase struct {
+    name string
+    Input
+    Expect
+}
 
+func creatCaseGenerator() []testCase {
     var testCaseList []testCase
 
     for _, pasteType := range []string{"permanent", "temporary_count", "temporary_time"} {
@@ -85,20 +87,51 @@ func TestCreate(t *testing.T) {
                     "expire_type":   expireType,
                     "expiration":    1,
                 }, "127.0.0.1:10086"},
-                Expect{"127.0.0.1", 201},
+                Expect{"127.0.0.1", 201, ""},
             })
         }
     }
 
-    for _, name := range []string{"bind_failed", "invalid_param", "db_error"} {
-        var expectedStatus uint
-        var expiration interface{}
-        if name == "db_error" {
-            expectedStatus = 500
-            expiration = 1
-        } else {
-            expectedStatus = 400
+    for _, name := range []string{
+        "bind_failed", "empty_lang", "empty_content",
+        "zero_expiration", "empty_expire_type", "other_expire_type",
+        "month_expiration", "big_expiration",
+    } {
+        var (
+            expectedStatus uint        = 400
+            expiration     interface{} = model.OneMonth
+            expireType                 = "time"
+            content                    = "print('Hello World!')"
+            lang                       = "python"
+            message                    = ""
+        )
+
+        switch name {
+        case "empty_lang":
+            lang = ""
+            message = ErrEmptyLang.Error()
+        case "empty_content":
+            content = ""
+            message = ErrEmptyContent.Error()
+        case "bind_failed":
             expiration = "1"
+            message = "wrong param type"
+        case "zero_expiration":
+            expiration = 0
+            message = ErrZeroExpiration.Error()
+        case "empty_expire_type":
+            expireType = ""
+            message = ErrEmptyExpireType.Error()
+        case "other_expire_type":
+            expireType = "other"
+            message = ErrInvalidExpireType.Error()
+        case "month_expiration":
+            expiration = model.OneMonth + 1
+            message = ErrExpirationGreaterThanMonth.Error()
+        case "big_expiration":
+            expireType = "count"
+            expiration = model.MaxCount + 1
+            message = ErrExpirationGreaterThanMaxCount.Error()
         }
 
         testCaseList = append(testCaseList, testCase{
@@ -106,23 +139,28 @@ func TestCreate(t *testing.T) {
             Input{map[string]string{
                 "namespace": "nobody",
             }, map[string]interface{}{
-                "content":       "print('Hello World!')",
-                "lang":          "python",
+                "content":       content,
+                "lang":          lang,
                 "password":      "",
                 "self_destruct": true,
-                "expire_type":   "",
+                "expire_type":   expireType,
                 "expiration":    expiration,
             }, "127.0.0.1:10086"},
-            Expect{"127.0.0.1", expectedStatus},
+            Expect{"127.0.0.1", expectedStatus, message},
         })
     }
+    return testCaseList
+}
 
+func TestCreate(t *testing.T) {
     type Response struct {
         Message   string `json:"message"`
         Key       string `json:"key"`
         Namespace string `json:"namespace"`
         Status    uint   `json:"status"`
     }
+
+    testCaseList := creatCaseGenerator()
 
     for i, c := range testCaseList {
         t.Run(c.name, func(t *testing.T) {
@@ -138,6 +176,9 @@ func TestCreate(t *testing.T) {
             } else if c.status == 201 && response.Namespace != c.ginParams["namespace"] {
                 t.Errorf("test %d | check namespace failed | expected = %s, actual = %s, message = %s",
                     i, c.Input.ginParams["namespace"], response.Namespace, response.Message)
+            } else if c.status != 201 && response.Message != c.Expect.message {
+                t.Errorf("test %d | check error message failed | expected = %s, actual = %s",
+                    i, c.Expect.message, response.Message)
             }
         })
     }

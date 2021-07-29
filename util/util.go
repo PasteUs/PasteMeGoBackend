@@ -1,7 +1,6 @@
 package util
 
 import (
-    "errors"
     "fmt"
     "math/rand"
     "regexp"
@@ -26,14 +25,14 @@ func Parse(token string) (string, string) {
 
 func ValidChecker(key string) (string, error) {
     if len(key) > 8 || len(key) < 3 {
-        return "", errors.New("wrong length") // key's length should at least 3 and at most 8
+        return "", ErrWrongLength // key's length should at least 3 and at most 8
     }
     flag, err := regexp.MatchString("^[0-9a-z]{3,8}$", key) // 正则匹配
     if err != nil {
         return "", err
     }
     if !flag {
-        return "", errors.New("wrong format") // key's format checking failed, should only contains digital or lowercase letters
+        return "", ErrWrongFormat // key's format checking failed, should only contains digital or lowercase letters
     }
     flag, err = regexp.MatchString("[a-z]", key) // 正则匹配
     if err != nil {

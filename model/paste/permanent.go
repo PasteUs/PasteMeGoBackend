@@ -54,9 +54,6 @@ func (paste *Permanent) GetNamespace() string {
 
 // Save 成员函数，创建
 func (paste *Permanent) Save() error {
-    if err := paste.beforeSave(); err != nil {
-        return err
-    }
     return dao.DB().Create(&paste).Error
 }
 

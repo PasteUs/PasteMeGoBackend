@@ -61,9 +61,6 @@ func (paste *Temporary) GetNamespace() string {
 
 // Save 成员函数，保存
 func (paste *Temporary) Save() error {
-    if err := paste.beforeSave(); err != nil {
-        return err
-    }
     return dao.DB().Create(&paste).Error
 }
 
