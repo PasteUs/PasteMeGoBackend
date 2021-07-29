@@ -1,4 +1,4 @@
-package model
+package v2
 
 import (
     "github.com/PasteUs/PasteMeGoBackend/model/dao"

@@ -5,6 +5,7 @@ Accept: application/json
 ### Get example
 GET {{host}}/api/v2/example
 Accept: application/json
+Accept: text/plain
 
 ### Create custom read once paste
 PUT {{host}}/api/v2/example
@@ -33,6 +34,24 @@ Accept: application/json
 ### Get nothing
 GET {{host}}/api/v3/?method=beat
 Accept: application/json
+
+### Greate paste
+POST {{host}}/api/v3/nobody
+Content-Type: application/json
+Accept: application/json
+
+{
+  "lang": "python",
+  "content": "print('Hello World!')"
+}
+
+### Get paste
+GET {{host}}/api/v3/nobody/100
+Accept: application/json
+
+### Get paste
+GET {{host}}/api/v3/nobody/100
+Accept: text/plain
 
 ### Get paste
 GET {{host}}/api/v3/lucienshui/100

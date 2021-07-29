@@ -40,11 +40,10 @@ func initTemporary() {
 
 // Temporary 临时
 type Temporary struct {
-    Key            string `json:"key" gorm:"type:varchar(16);primary_key;unique_index:idx_temporary"` // 主键:索引
-    Namespace      string `json:"namespace" gorm:"type:varchar(16);unique_index:idx_temporary"`       // 用户名
-    *AbstractPaste                                                                                    // 公有字段
-    ExpireType     string                                                                             // 过期类型
-    Expiration     uint64                                                                             // 过期的数据
+    Key            string `json:"key" gorm:"type:varchar(16);primary_key"` // 主键:索引
+    *AbstractPaste                                                         // 公有字段
+    ExpireType     string                                                  // 过期类型
+    Expiration     uint64                                                  // 过期的数据
 }
 
 func (Temporary) TableName() string {

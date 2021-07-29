@@ -1,6 +1,7 @@
 package util
 
 import (
+    _ "github.com/PasteUs/PasteMeGoBackend/tests"
     "testing"
 )
 

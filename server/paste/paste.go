@@ -4,8 +4,10 @@ import (
     model "github.com/PasteUs/PasteMeGoBackend/model/paste"
     "github.com/PasteUs/PasteMeGoBackend/util"
     "github.com/gin-gonic/gin"
+    "github.com/jinzhu/gorm"
     "go.uber.org/zap"
     "net/http"
+    "strings"
 )
 
 func pasteValidator(lang string, content string) error {
@@ -22,7 +24,6 @@ func expireValidator(expireType string, expiration uint64) error {
     if expireType == "" {
         return ErrEmptyExpireType
     }
-
     if expiration <= 0 {
         return ErrZeroExpiration
     }
@@ -52,7 +53,8 @@ func Create(context *gin.Context) {
         Expiration   uint64 `json:"expiration"`
     }{
         AbstractPaste: &model.AbstractPaste{
-            ClientIP: context.ClientIP(),
+            ClientIP:  context.ClientIP(),
+            Namespace: namespace,
         },
     }
 
@@ -93,13 +95,12 @@ func Create(context *gin.Context) {
     if body.SelfDestruct {
         paste = &model.Temporary{
             Key:           model.Generator(),
-            Namespace:     namespace,
             AbstractPaste: body.AbstractPaste,
             ExpireType:    body.ExpireType,
             Expiration:    body.Expiration,
         }
     } else {
-        paste = &model.Permanent{Namespace: namespace, AbstractPaste: body.AbstractPaste}
+        paste = &model.Permanent{AbstractPaste: body.AbstractPaste}
     }
 
     if err := paste.Save(); err != nil {
@@ -120,9 +121,52 @@ func Create(context *gin.Context) {
 
 func Get(context *gin.Context) {
     namespace, key := context.Param("namespace"), context.Param("key")
-    util.Info("test", context, zap.String("namespace", namespace), zap.String("key", key))
-    context.JSON(http.StatusOK, gin.H{
-        "status": http.StatusOK,
-        "token":  "Hello World!",
-    })
+
+    var (
+        table string
+        err   error
+        paste model.IPaste
+    )
+
+    if table, err = util.ValidChecker(key); err != nil {
+        context.JSON(http.StatusOK, gin.H{
+            "status":  http.StatusBadRequest,
+            "message": "request key not valid",
+        })
+        return
+    }
+
+    abstractPaste := model.AbstractPaste{Namespace: namespace}
+
+    if table == "temporary" {
+        paste = &model.Temporary{Key: key, AbstractPaste: &abstractPaste}
+    } else {
+        paste = &model.Permanent{Key: util.String2uint(key), AbstractPaste: &abstractPaste}
+    }
+
+    if err = paste.Get(context.DefaultQuery("password", "")); err != nil {
+        if err == gorm.ErrRecordNotFound || err == model.ErrWrongPassword {
+            context.JSON(http.StatusOK, gin.H{
+                "status":  http.StatusNotFound,
+                "message": err.Error(),
+            })
+        } else {
+            util.Error("query from db failed", context, zap.String("err", err.Error()))
+            context.JSON(http.StatusInternalServerError, gin.H{
+                "status":  http.StatusInternalServerError,
+                "message": "query from db failed",
+            })
+        }
+        return
+    }
+
+    if strings.Contains(context.GetHeader("Accept"), "json") { // raw request
+        context.JSON(http.StatusOK, gin.H{
+            "status":  http.StatusOK,
+            "lang":    paste.GetLang(),
+            "content": paste.GetContent(),
+        })
+    } else { // json request
+        context.String(http.StatusOK, paste.GetContent())
+    }
 }

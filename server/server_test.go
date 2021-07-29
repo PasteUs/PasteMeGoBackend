@@ -2,7 +2,7 @@ package server
 
 import (
     "encoding/json"
-    "github.com/PasteUs/PasteMeGoBackend/model"
+    "github.com/PasteUs/PasteMeGoBackend/model/v2"
     _ "github.com/PasteUs/PasteMeGoBackend/tests"
     "github.com/PasteUs/PasteMeGoBackend/tests/request"
     "github.com/PasteUs/PasteMeGoBackend/util"
@@ -152,51 +152,51 @@ func TestReadOncePasswordGet(t *testing.T) {
 }
 
 func TestExist(t *testing.T) {
-    if model.Exist(keyT) {
+    if v2.Exist(keyT) {
         t.Errorf("test temporary key: %s failed.", keyT)
     }
 
-    if model.Exist(keyR) {
+    if v2.Exist(keyR) {
         t.Errorf("test once key: %s failed.", keyR)
     }
 
     TestTemporaryPost(t)
-    if !model.Exist(keyT) {
+    if !v2.Exist(keyT) {
         t.Errorf("test temporary key: %s failed.", keyT)
     }
 
     TestTemporaryGet(t)
-    if model.Exist(keyT) {
+    if v2.Exist(keyT) {
         t.Errorf("test temporary key: %s failed.", keyT)
     }
 
     TestReadOncePost(t)
-    if !model.Exist(keyR) {
+    if !v2.Exist(keyR) {
         t.Errorf("test once key: %s failed.", keyR)
     }
 
     TestReadOnceGet(t)
-    if model.Exist(keyR) {
+    if v2.Exist(keyR) {
         t.Errorf("test once key: %s failed.", keyR)
     }
 
     TestTemporaryPasswordPost(t)
-    if !model.Exist(keyT) {
+    if !v2.Exist(keyT) {
         t.Errorf("test temporary key: %s failed.", keyT)
     }
 
     TestTemporaryPasswordGet(t)
-    if model.Exist(keyT) {
+    if v2.Exist(keyT) {
         t.Errorf("test temporary key: %s failed.", keyT)
     }
 
     TestReadOncePasswordPost(t)
-    if !model.Exist(keyR) {
+    if !v2.Exist(keyR) {
         t.Errorf("test once key: %s failed.", keyR)
     }
 
     TestReadOncePasswordGet(t)
-    if model.Exist(keyR) {
+    if v2.Exist(keyR) {
         t.Errorf("test once key: %s failed.", keyR)
     }
 }

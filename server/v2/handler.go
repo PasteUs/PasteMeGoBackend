@@ -1,9 +1,9 @@
-package server
+package v2
 
 import (
     "fmt"
-    "github.com/PasteUs/PasteMeGoBackend/model"
     paste2 "github.com/PasteUs/PasteMeGoBackend/model/paste"
+    "github.com/PasteUs/PasteMeGoBackend/model/v2"
     "github.com/PasteUs/PasteMeGoBackend/util"
     "github.com/gin-gonic/gin"
     "github.com/jinzhu/gorm"
@@ -12,11 +12,11 @@ import (
     "strings"
 )
 
-// 创建一个永久的 Paste, key 是自增键
-func permanentCreator(requests *gin.Context) {
+// PermanentCreator 创建一个永久的 Paste, key 是自增键
+func PermanentCreator(requests *gin.Context) {
     IP := requests.ClientIP() // 用户 IP
-    paste := model.Permanent{
-        AbstractPaste: &model.AbstractPaste{
+    paste := v2.Permanent{
+        AbstractPaste: &v2.AbstractPaste{
             ClientIP: IP,
         },
     }
@@ -47,8 +47,8 @@ func permanentCreator(requests *gin.Context) {
     }
 }
 
-// 创建一个阅后即焚的 Paste, key 是指定的
-func temporaryCreator(requests *gin.Context) {
+// TemporaryCreator 创建一个阅后即焚的 Paste, key 是指定的
+func TemporaryCreator(requests *gin.Context) {
     IP, key := requests.ClientIP(), requests.Param("key")
     key = strings.ToLower(key) // 进行大写到小写的转换
     table, err := util.ValidChecker(key)
@@ -77,9 +77,9 @@ func temporaryCreator(requests *gin.Context) {
                 "message": "temporary key should only contains digits and lowercase letters, at least one alpha is required",
             })
         } else {
-            paste := model.Temporary{
+            paste := v2.Temporary{
                 Key: key,
-                AbstractPaste: &model.AbstractPaste{
+                AbstractPaste: &v2.AbstractPaste{
                     ClientIP: requests.ClientIP(),
                 },
             }
@@ -110,12 +110,12 @@ func temporaryCreator(requests *gin.Context) {
     }
 }
 
-// 创建一个阅后即焚的 Paste, key 是随机的
-func readOnceCreator(requests *gin.Context) {
+// ReadOnceCreator 创建一个阅后即焚的 Paste, key 是随机的
+func ReadOnceCreator(requests *gin.Context) {
     IP := requests.ClientIP()
-    paste := model.Temporary{
+    paste := v2.Temporary{
         Key: paste2.Generator(),
-        AbstractPaste: &model.AbstractPaste{
+        AbstractPaste: &v2.AbstractPaste{
             ClientIP: IP,
         },
     }
@@ -144,9 +144,9 @@ func readOnceCreator(requests *gin.Context) {
     }
 }
 
-// 访问未加密的 Paste, token 为 <Paste ID>
+// Query 访问未加密的 Paste, token 为 <Paste ID>
 // 访问加密的 Paste, token 为 <Paste ID>,<Password>
-func query(requests *gin.Context) {
+func Query(requests *gin.Context) {
     IP, token := requests.ClientIP(), requests.Param("token")
     if token == "" { // 空的 token
         requests.JSON(http.StatusOK, gin.H{
@@ -166,11 +166,11 @@ func query(requests *gin.Context) {
                 "message": "request key not valid",
             })
         } else {
-            var paste model.IPaste
+            var paste v2.IPaste
             if table == "temporary" {
-                paste = &model.Temporary{Key: key}
+                paste = &v2.Temporary{Key: key}
             } else {
-                paste = &model.Permanent{Key: util.String2uint(key)}
+                paste = &v2.Permanent{Key: util.String2uint(key)}
             }
 
             if err := paste.Get(); err != nil {
@@ -228,7 +228,7 @@ func query(requests *gin.Context) {
     }
 }
 
-func notFoundHandler(requests *gin.Context) {
+func NotFoundHandler(requests *gin.Context) {
     requests.JSON(http.StatusNotFound, gin.H{
         "status":  http.StatusNotFound,
         "error":   "not found",
@@ -236,13 +236,13 @@ func notFoundHandler(requests *gin.Context) {
     })
 }
 
-func beat(requests *gin.Context) {
+func Beat(requests *gin.Context) {
     method := requests.DefaultQuery("method", "none")
     if method == "beat" {
         requests.JSON(http.StatusOK, gin.H{
             "status": http.StatusOK,
         })
     } else {
-        notFoundHandler(requests)
+        NotFoundHandler(requests)
     }
 }
