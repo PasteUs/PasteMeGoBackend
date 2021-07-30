@@ -1,6 +1,7 @@
 package paste
 
 import (
+    "github.com/PasteUs/PasteMeGoBackend/logging"
     model "github.com/PasteUs/PasteMeGoBackend/model/paste"
     "github.com/PasteUs/PasteMeGoBackend/util"
     "github.com/gin-gonic/gin"
@@ -44,7 +45,7 @@ func expireValidator(expireType string, expiration uint64) error {
 
 func Create(context *gin.Context) {
     namespace := context.Param("namespace")
-    util.Info("create paste", context, zap.String("namespace", namespace))
+    logging.Info("create paste", context, zap.String("namespace", namespace))
 
     body := struct {
         *model.AbstractPaste
@@ -59,7 +60,7 @@ func Create(context *gin.Context) {
     }
 
     if err := context.ShouldBindJSON(&body); err != nil {
-        util.Warn("bind body failed", context, zap.String("err", err.Error()))
+        logging.Warn("bind body failed", context, zap.String("err", err.Error()))
         context.JSON(http.StatusBadRequest, gin.H{
             "status":  http.StatusBadRequest,
             "message": "wrong param type",
@@ -78,7 +79,7 @@ func Create(context *gin.Context) {
         }
         return nil
     }(); err != nil {
-        util.Info("param validate failed", zap.String("err", err.Error()))
+        logging.Info("param validate failed", zap.String("err", err.Error()))
         context.JSON(http.StatusBadRequest, gin.H{
             "status":  http.StatusBadRequest,
             "message": err.Error(),
@@ -104,7 +105,7 @@ func Create(context *gin.Context) {
     }
 
     if err := paste.Save(); err != nil {
-        util.Warn("save failed", context, zap.String("err", err.Error()))
+        logging.Warn("save failed", context, zap.String("err", err.Error()))
         context.JSON(http.StatusInternalServerError, gin.H{
             "status":  http.StatusInternalServerError,
             "message": "save failed",
@@ -151,7 +152,7 @@ func Get(context *gin.Context) {
                 "message": err.Error(),
             })
         } else {
-            util.Error("query from db failed", context, zap.String("err", err.Error()))
+            logging.Error("query from db failed", context, zap.String("err", err.Error()))
             context.JSON(http.StatusInternalServerError, gin.H{
                 "status":  http.StatusInternalServerError,
                 "message": "query from db failed",

@@ -1,11 +1,11 @@
 package tests
 
 import (
-    "github.com/PasteUs/PasteMeGoBackend/model/v2"
+    "github.com/PasteUs/PasteMeGoBackend/v2/model"
     "testing"
 )
 
 func init() {
     testing.Init()
-    v2.Init()
+    model.Init()
 }

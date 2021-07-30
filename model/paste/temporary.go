@@ -3,8 +3,8 @@ package paste
 import (
     "fmt"
     "github.com/PasteUs/PasteMeGoBackend/config"
+    "github.com/PasteUs/PasteMeGoBackend/logging"
     "github.com/PasteUs/PasteMeGoBackend/model/dao"
-    "github.com/PasteUs/PasteMeGoBackend/util"
     "github.com/jinzhu/gorm"
     "go.uber.org/zap"
     "time"
@@ -21,7 +21,7 @@ func initTemporary() {
     if !dao.DB().HasTable(&Temporary{}) {
         var err error = nil
         tableName := zap.String("table_name", Temporary{}.TableName())
-        util.Warn("Table not found, start creating", tableName)
+        logging.Warn("Table not found, start creating", tableName)
 
         if config.Get().Database.Type != "mysql" {
             err = dao.DB().CreateTable(&Temporary{}).Error
@@ -33,7 +33,7 @@ func initTemporary() {
         }
 
         if err != nil {
-            util.Panic("Create table failed", tableName, zap.String("err", err.Error()))
+            logging.Panic("Create table failed", tableName, zap.String("err", err.Error()))
         }
     }
 }

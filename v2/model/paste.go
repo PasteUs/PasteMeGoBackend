@@ -1,18 +1,15 @@
-package v2
+package model
 
 import (
     "errors"
     "github.com/PasteUs/PasteMeGoBackend/config"
     "github.com/PasteUs/PasteMeGoBackend/model/dao"
-    "github.com/PasteUs/PasteMeGoBackend/model/paste"
     "github.com/PasteUs/PasteMeGoBackend/util"
     "github.com/wonderivan/logger"
     "time"
 )
 
 func Init() {
-    paste.Init()
-
     if config.Get().Database.Type != "mysql" {
         if !dao.DB().HasTable(&Permanent{}) {
             logger.Warn("Table permanents not found, start creating")

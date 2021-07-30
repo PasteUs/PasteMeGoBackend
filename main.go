@@ -2,11 +2,13 @@ package main
 
 import (
     "github.com/PasteUs/PasteMeGoBackend/config"
-    "github.com/PasteUs/PasteMeGoBackend/model/v2"
-    "github.com/PasteUs/PasteMeGoBackend/server"
+    "github.com/PasteUs/PasteMeGoBackend/model/paste"
+    "github.com/PasteUs/PasteMeGoBackend/router"
+    "github.com/PasteUs/PasteMeGoBackend/v2/model"
 )
 
 func main() {
-    v2.Init()
-    server.Run(config.Get().Address, config.Get().Port)
+    model.Init() // v2 paste model
+    paste.Init() // v3 paste model
+    router.Run(config.Get().Address, config.Get().Port)
 }

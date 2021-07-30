@@ -2,7 +2,7 @@ package flag
 
 import (
     "flag"
-    "github.com/PasteUs/PasteMeGoBackend/util"
+    "github.com/PasteUs/PasteMeGoBackend/logging"
     "go.uber.org/zap"
     "os"
     "strings"
@@ -38,7 +38,7 @@ func GetArgv() Argv {
 
 func validationCheck(dataDir string) {
     if !isDir(dataDir) {
-        util.Panic("not a directory", zap.String("data_dir", dataDir))
+        logging.Panic("not a directory", zap.String("data_dir", dataDir))
     }
 
     if !strings.HasSuffix(dataDir, "/") {

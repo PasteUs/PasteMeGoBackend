@@ -3,7 +3,7 @@ package config
 import (
     "encoding/json"
     "github.com/PasteUs/PasteMeGoBackend/flag"
-    "github.com/PasteUs/PasteMeGoBackend/util"
+    "github.com/PasteUs/PasteMeGoBackend/logging"
     "go.uber.org/zap"
     "io/ioutil"
     "os"
@@ -51,7 +51,7 @@ func isInArray(item string, array []string) bool {
 func checkVersion(v string) {
     if v != version {
         if !isInArray(v, validConfigVersion) {
-            util.Panic(
+            logging.Panic(
                 "invalid config version",
                 zap.Strings("valid_config_version_list", validConfigVersion),
                 zap.String("config_version", v),
@@ -62,7 +62,7 @@ func checkVersion(v string) {
 
 func exportConfig(filename string, c Config) {
     if flag.GetArgv().Debug {
-        util.Info(
+        logging.Info(
             "config loaded",
             zap.String("config_file", filename),
             zap.String("config_version", c.Version),
@@ -72,7 +72,7 @@ func exportConfig(filename string, c Config) {
         )
 
         if c.Database.Type == "mysql" {
-            util.Info(
+            logging.Info(
                 "database",
                 zap.String("type", c.Database.Type),
                 zap.String("username", c.Database.Username),
@@ -82,7 +82,7 @@ func exportConfig(filename string, c Config) {
                 zap.String("database", c.Database.Database),
             )
         } else {
-            util.Info(
+            logging.Info(
                 "database",
                 zap.String("type", c.Database.Type),
             )
@@ -95,7 +95,7 @@ func load(filename string) {
     if err != nil {
         pwd, _ := os.Getwd()
 
-        util.Panic(
+        logging.Panic(
             "open file failed",
             zap.String("pwd", pwd),
             zap.String("err", err.Error()),
@@ -104,7 +104,7 @@ func load(filename string) {
 
     err = json.Unmarshal(data, &config)
     if err != nil {
-        util.Panic("parse config failed", zap.String("err", err.Error()))
+        logging.Panic("parse config failed", zap.String("err", err.Error()))
     }
 
     exportConfig(filename, config)

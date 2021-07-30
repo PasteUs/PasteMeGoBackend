@@ -1,10 +1,10 @@
-package v2
+package handler
 
 import (
     "fmt"
     paste2 "github.com/PasteUs/PasteMeGoBackend/model/paste"
-    "github.com/PasteUs/PasteMeGoBackend/model/v2"
     "github.com/PasteUs/PasteMeGoBackend/util"
+    "github.com/PasteUs/PasteMeGoBackend/v2/model"
     "github.com/gin-gonic/gin"
     "github.com/jinzhu/gorm"
     "github.com/wonderivan/logger"
@@ -15,8 +15,8 @@ import (
 // PermanentCreator 创建一个永久的 Paste, key 是自增键
 func PermanentCreator(requests *gin.Context) {
     IP := requests.ClientIP() // 用户 IP
-    paste := v2.Permanent{
-        AbstractPaste: &v2.AbstractPaste{
+    paste := model.Permanent{
+        AbstractPaste: &model.AbstractPaste{
             ClientIP: IP,
         },
     }
@@ -77,9 +77,9 @@ func TemporaryCreator(requests *gin.Context) {
                 "message": "temporary key should only contains digits and lowercase letters, at least one alpha is required",
             })
         } else {
-            paste := v2.Temporary{
+            paste := model.Temporary{
                 Key: key,
-                AbstractPaste: &v2.AbstractPaste{
+                AbstractPaste: &model.AbstractPaste{
                     ClientIP: requests.ClientIP(),
                 },
             }
@@ -113,9 +113,9 @@ func TemporaryCreator(requests *gin.Context) {
 // ReadOnceCreator 创建一个阅后即焚的 Paste, key 是随机的
 func ReadOnceCreator(requests *gin.Context) {
     IP := requests.ClientIP()
-    paste := v2.Temporary{
+    paste := model.Temporary{
         Key: paste2.Generator(),
-        AbstractPaste: &v2.AbstractPaste{
+        AbstractPaste: &model.AbstractPaste{
             ClientIP: IP,
         },
     }
@@ -166,11 +166,11 @@ func Query(requests *gin.Context) {
                 "message": "request key not valid",
             })
         } else {
-            var paste v2.IPaste
+            var paste model.IPaste
             if table == "temporary" {
-                paste = &v2.Temporary{Key: key}
+                paste = &model.Temporary{Key: key}
             } else {
-                paste = &v2.Permanent{Key: util.String2uint(key)}
+                paste = &model.Permanent{Key: util.String2uint(key)}
             }
 
             if err := paste.Get(); err != nil {

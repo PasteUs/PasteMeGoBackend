@@ -3,6 +3,7 @@ package paste
 import (
     "fmt"
     "github.com/PasteUs/PasteMeGoBackend/config"
+    "github.com/PasteUs/PasteMeGoBackend/logging"
     "github.com/PasteUs/PasteMeGoBackend/model/dao"
     "github.com/PasteUs/PasteMeGoBackend/util"
     "go.uber.org/zap"
@@ -13,7 +14,7 @@ func initPermanent() {
     if !dao.DB().HasTable(&Permanent{}) {
         var err error = nil
         tableName := zap.String("table_name", Permanent{}.TableName())
-        util.Warn("Table not found, start creating", tableName)
+        logging.Warn("Table not found, start creating", tableName)
 
         if config.Get().Database.Type != "mysql" {
             err = dao.DB().CreateTable(&Permanent{}).Error
@@ -25,7 +26,7 @@ func initPermanent() {
             ).CreateTable(&Permanent{}).Error
         }
         if err != nil {
-            util.Panic("Create table failed", tableName, zap.String("err", err.Error()))
+            logging.Panic("Create table failed", tableName, zap.String("err", err.Error()))
         }
     }
 }

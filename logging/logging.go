@@ -1,4 +1,4 @@
-package util
+package logging
 
 import (
     "github.com/gin-gonic/gin"
