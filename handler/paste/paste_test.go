@@ -3,12 +3,14 @@ package paste
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	model "github.com/PasteUs/PasteMeGoBackend/model/paste"
 	_ "github.com/PasteUs/PasteMeGoBackend/tests"
 	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"strings"
 	"testing"
 )
@@ -29,7 +31,7 @@ func mockJSONRequest(c *gin.Context, jsonMap map[string]interface{}, method stri
 }
 
 func testHandler(
-	ginParams map[string]string, requestBody map[string]interface{},
+	ginParams map[string]string, requestBody map[string]interface{}, header map[string]string,
 	mockIPPort string, method string, handler func(*gin.Context), response interface{},
 ) error {
 	recorder := httptest.NewRecorder()
@@ -44,8 +46,22 @@ func testHandler(
 	context.Request = &http.Request{
 		Header:     http.Header{},
 		RemoteAddr: mockIPPort,
+		URL:        &url.URL{},
 	}
-	mockJSONRequest(context, requestBody, method)
+
+	for k, v := range header {
+		context.Request.Header[k] = []string{v}
+	}
+
+	if method == "GET" {
+		var rawQueryList []string
+		for k, v := range requestBody {
+			rawQueryList = append(rawQueryList, fmt.Sprintf("%v=%v", k, v))
+		}
+		context.Request.URL.RawQuery = strings.Join(rawQueryList, "&")
+	} else {
+		mockJSONRequest(context, requestBody, method)
+	}
 	handler(context)
 	return json.Unmarshal(recorder.Body.Bytes(), &response)
 }
@@ -53,6 +69,7 @@ func testHandler(
 type Input struct {
 	ginParams   map[string]string
 	requestBody map[string]interface{}
+	header      map[string]string
 	mockIPPort  string
 	method      string
 }
@@ -61,35 +78,55 @@ type Expect struct {
 	ip      string
 	status  uint
 	message string
+	content string
+	lang    string
+}
+
+type Response struct {
+	Message   string `json:"message"`
+	Key       string `json:"key"`
+	Content   string `json:"content"`
+	Lang      string `json:"lang"`
+	Namespace string `json:"namespace"`
+	Status    uint   `json:"status"`
 }
 
 type testCase struct {
-	name string
-	Input
-	Expect
+	input    Input
+	expect   Expect
+	response *Response
 }
 
-func creatCaseGenerator() []testCase {
-	var testCaseList []testCase
+var (
+	createTestCaseDict map[string]testCase
+	getTestCaseDict    map[string]testCase
+)
+
+func creatTestCaseGenerator() map[string]testCase {
+	testCaseMap := map[string]testCase{}
 
 	for _, pasteType := range []string{"permanent", "temporary_count", "temporary_time"} {
 		for _, password := range []string{"", "_with_password"} {
 			s := strings.Split(pasteType, "_")
 			expireType := s[len(s)-1]
-			testCaseList = append(testCaseList, testCase{
-				pasteType + password,
-				Input{map[string]string{
-					"namespace": "nobody",
-				}, map[string]interface{}{
-					"content":       "print('Hello World!')",
-					"lang":          "python",
-					"password":      password,
-					"self_destruct": pasteType != "permanent",
-					"expire_type":   expireType,
-					"expiration":    1,
-				}, "127.0.0.1:10086", "POST"},
-				Expect{"127.0.0.1", 201, ""},
-			})
+			testCaseMap[pasteType+password] = testCase{
+				Input{
+					map[string]string{
+						"namespace": "nobody",
+					},
+					map[string]interface{}{
+						"content":       "print('Hello World!')",
+						"lang":          "python",
+						"password":      password,
+						"self_destruct": pasteType != "permanent",
+						"expire_type":   expireType,
+						"expiration":    1,
+					},
+					map[string]string{},
+					"127.0.0.1:10086", "POST"},
+				Expect{"127.0.0.1", 201, "", "", ""},
+				&Response{},
+			}
 		}
 	}
 
@@ -135,52 +172,108 @@ func creatCaseGenerator() []testCase {
 			message = ErrExpirationGreaterThanMaxCount.Error()
 		}
 
-		testCaseList = append(testCaseList, testCase{
-			name,
+		testCaseMap[name] = testCase{
 			Input{map[string]string{
 				"namespace": "nobody",
-			}, map[string]interface{}{
-				"content":       content,
-				"lang":          lang,
-				"password":      "",
-				"self_destruct": true,
-				"expire_type":   expireType,
-				"expiration":    expiration,
-			}, "127.0.0.1:10086", "POST"},
-			Expect{"127.0.0.1", expectedStatus, message},
-		})
+			},
+				map[string]interface{}{
+					"content":       content,
+					"lang":          lang,
+					"password":      "",
+					"self_destruct": true,
+					"expire_type":   expireType,
+					"expiration":    expiration,
+				},
+				map[string]string{},
+				"127.0.0.1:10086", "POST"},
+			Expect{"127.0.0.1", expectedStatus, message, "", ""},
+			&Response{},
+		}
 	}
-	return testCaseList
+	return testCaseMap
 }
 
 func TestCreate(t *testing.T) {
-	type Response struct {
-		Message   string `json:"message"`
-		Key       string `json:"key"`
-		Namespace string `json:"namespace"`
-		Status    uint   `json:"status"`
-	}
+	createTestCaseDict = creatTestCaseGenerator()
 
-	testCaseList := creatCaseGenerator()
-
-	for i, c := range testCaseList {
-		t.Run(c.name, func(t *testing.T) {
-			response := Response{}
-
-			if err := testHandler(c.Input.ginParams, c.Input.requestBody, c.Input.mockIPPort,
-				c.Input.method, Create, &response); err != nil {
+	for name, c := range createTestCaseDict {
+		t.Run(name, func(t *testing.T) {
+			if err := testHandler(c.input.ginParams, c.input.requestBody, c.input.header, c.input.mockIPPort,
+				c.input.method, Create, &c.response); err != nil {
 				t.Error(err.Error())
 			}
 
-			if response.Status != c.status {
-				t.Errorf("test %d | check status failed | expected = %d, actual = %d, message = %s",
-					i, c.status, response.Status, response.Message)
-			} else if c.status == 201 && response.Namespace != c.ginParams["namespace"] {
-				t.Errorf("test %d | check namespace failed | expected = %s, actual = %s, message = %s",
-					i, c.Input.ginParams["namespace"], response.Namespace, response.Message)
-			} else if c.status != 201 && response.Message != c.Expect.message {
-				t.Errorf("test %d | check error message failed | expected = %s, actual = %s",
-					i, c.Expect.message, response.Message)
+			if c.response.Status != c.expect.status {
+				t.Errorf("check status failed | expected = %d, actual = %d, message = %s",
+					c.expect.status, c.response.Status, c.response.Message)
+			} else if c.expect.status == 201 && c.response.Namespace != c.input.ginParams["namespace"] {
+				t.Errorf("check namespace failed | expected = %s, actual = %s, message = %s",
+					c.input.ginParams["namespace"], c.response.Namespace, c.response.Message)
+			} else if c.expect.status != 201 && c.response.Message != c.expect.message {
+				t.Errorf("check error message failed | expected = %s, actual = %s",
+					c.expect.message, c.response.Message)
+			}
+		})
+	}
+}
+
+func getTestCaseGenerator() map[string]testCase {
+	testCaseMap := map[string]testCase{}
+
+	for _, pasteType := range []string{"permanent", "temporary_count", "temporary_time"} {
+		for _, password := range []string{"", "_with_password"} {
+			name := pasteType + password
+			testCaseMap[name] = testCase{
+				Input{
+					map[string]string{
+						"namespace": "nobody",
+						"key":       createTestCaseDict[name].response.Key,
+					},
+					map[string]interface{}{
+						"password": password,
+					},
+					map[string]string{"Accept": "application/json"},
+					"127.0.0.1:10086", "GET",
+				},
+				Expect{
+					"127.0.0.1",
+					200,
+					"",
+					createTestCaseDict[name].input.requestBody["content"].(string),
+					createTestCaseDict[name].input.requestBody["lang"].(string),
+				},
+				&Response{},
+			}
+		}
+	}
+
+	return testCaseMap
+}
+
+func TestGet(t *testing.T) {
+	getTestCaseDict = getTestCaseGenerator()
+
+	for name, c := range getTestCaseDict {
+		t.Run(name, func(t *testing.T) {
+			if err := testHandler(c.input.ginParams, c.input.requestBody, c.input.header, c.input.mockIPPort,
+				c.input.method, Get, &c.response); err != nil {
+				t.Error(err.Error())
+			}
+
+			if c.response.Status != c.expect.status {
+				t.Errorf("check status failed | expected = %d, actual = %d, message = %s",
+					c.expect.status, c.response.Status, c.response.Message)
+			} else if c.expect.status == 200 {
+				if c.expect.lang != c.response.Lang {
+					t.Errorf("check lang failed | expected = %s, actual = %s, message = %s",
+						c.expect.lang, c.response.Lang, c.response.Message)
+				} else if c.expect.content != c.response.Content {
+					t.Errorf("check content failed | expected = %s, actual = %s, message = %s",
+						c.expect.content, c.response.Content, c.response.Message)
+				}
+			} else if c.expect.status != 200 && c.response.Message != c.expect.message {
+				t.Errorf("check error message failed | expected = %s, actual = %s",
+					c.expect.message, c.response.Message)
 			}
 		})
 	}
