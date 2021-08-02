@@ -93,7 +93,7 @@ func (paste *Temporary) Get(password string) error {
 
 		if paste.ExpireType == EnumCount {
 			if paste.Expiration <= 1 {
-				if e := paste.Delete(); e != nil {
+				if e := tx.Delete(&paste).Error; e != nil {
 					return e
 				}
 			} else {
