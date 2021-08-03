@@ -104,7 +104,6 @@ jobs:
 
       - name: Test
         run: |
-          rm -f pasteme.db server/pasteme.db
           cp .github/config/config.mysql.json server/config.json
           bash gotest.sh
 
@@ -139,6 +138,5 @@ jobs:
 
       - name: Test
         run: |
-          rm -f pasteme.db server/pasteme.db
           cp .github/config/config.sqlite3.json server/config.json
           bash gotest.sh

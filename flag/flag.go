@@ -1,55 +1,54 @@
 package flag
 
 import (
-    "flag"
-    "fmt"
-    "github.com/PasteUs/PasteMeGoBackend/meta"
-    "github.com/wonderivan/logger"
-    "os"
-    "strings"
-    "testing"
+	"flag"
+	"github.com/PasteUs/PasteMeGoBackend/logging"
+	"go.uber.org/zap"
+	"os"
+	"strings"
+	"sync"
 )
 
+type Argv struct {
+	Config  string
+	Debug   bool
+	DataDir string
+}
+
 var (
-    version bool
-    Config  string
-    Debug   bool
-    DataDir string
+	argv Argv
+	once sync.Once
 )
 
 func init() {
-    flag.BoolVar(&version, "version", false, "--version Print version information")
-    flag.StringVar(&Config, "c", "./config.json", "-c <config file>")
-    flag.BoolVar(&Debug, "debug", false, "--debug Using debug mode")
-    flag.StringVar(&DataDir, "d", "./", "-d <data dir>")
-
-    testing.Init()
-    flag.Parse()
-
-    validationCheck()
+	flag.StringVar(&argv.Config, "c", "config.json", "-c <config file>")
+	flag.BoolVar(&argv.Debug, "debug", false, "--debug Using debug mode")
+	flag.StringVar(&argv.DataDir, "d", "./", "-d <data dir>")
 }
 
-func validationCheck() {
-    if !isDir(DataDir) {
-        logger.Painc("%s is not a directory", DataDir)
-    }
+func Init() {
+	flag.Parse()
+	validationCheck(argv.DataDir)
+}
 
-    if !strings.HasSuffix(DataDir, "/") {
-        DataDir = DataDir + "/"
-    }
+func GetArgv() Argv {
+	once.Do(Init)
+	return argv
+}
+
+func validationCheck(dataDir string) {
+	if !isDir(dataDir) {
+		logging.Panic("not a directory", zap.String("data_dir", dataDir))
+	}
+
+	if !strings.HasSuffix(dataDir, "/") {
+		dataDir = dataDir + "/"
+	}
 }
 
 func isDir(dataDir string) bool {
-    if dir, err := os.Stat(dataDir); err == nil && dir != nil {
-        return dir.IsDir()
-    }
-    return false
-}
-
-func Parse() bool { // return true for continue
-    if version {
-        fmt.Println(meta.Version)
-        return false
-    }
-    return true
+	if dir, err := os.Stat(dataDir); err == nil && dir != nil {
+		return dir.IsDir()
+	}
+	return false
 }

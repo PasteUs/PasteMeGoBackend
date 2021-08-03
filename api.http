@@ -1,13 +1,14 @@
 ### Get nothing
-GET {{host}}/?method=beat
+GET {{host}}/api/v2/?method=beat
 Accept: application/json
 
 ### Get example
-GET {{host}}/example
+GET {{host}}/api/v2/example
 Accept: application/json
+Accept: text/plain
 
 ### Create custom read once paste
-PUT {{host}}/example
+PUT {{host}}/api/v2/example
 Content-Type: application/json
 Accept: application/json
 
@@ -17,7 +18,7 @@ Accept: application/json
 }
 
 ### Create permanent
-POST {{host}}
+POST {{host}}/api/v2
 Content-Type: application/json
 Accept: application/json
 
@@ -27,5 +28,31 @@ Accept: application/json
 }
 
 ### Get example
-GET {{host}}/100?json
+GET {{host}}/api/v2/100?json
+Accept: application/json
+
+### Get nothing
+GET {{host}}/api/v3/?method=beat
+Accept: application/json
+
+### Greate paste
+POST {{host}}/api/v3/nobody
+Content-Type: application/json
+Accept: application/json
+
+{
+  "lang": "python",
+  "content": "print('Hello World!')"
+}
+
+### Get paste
+GET {{host}}/api/v3/nobody/100
+Accept: application/json
+
+### Get paste
+GET {{host}}/api/v3/nobody/100
+Accept: text/plain
+
+### Get paste
+GET {{host}}/api/v3/lucienshui/100
 Accept: application/json
