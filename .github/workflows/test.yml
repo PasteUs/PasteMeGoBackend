@@ -104,8 +104,8 @@ jobs:
 
       - name: Test
         run: |
-          cp .github/config/config.mysql.json server/config.json
-          bash gotest.sh
+          cp .github/config/config.mysql.json config.json
+          bash -x gotest.sh
 
   test_with_sqlite3:
     strategy:
@@ -138,5 +138,5 @@ jobs:
 
       - name: Test
         run: |
-          cp .github/config/config.sqlite3.json server/config.json
-          bash gotest.sh
+          cp .github/config/config.sqlite3.json config.json
+          bash -x gotest.sh
