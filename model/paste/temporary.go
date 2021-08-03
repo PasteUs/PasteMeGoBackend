@@ -1,7 +1,6 @@
 package paste
 
 import (
-	"fmt"
 	"github.com/PasteUs/PasteMeGoBackend/config"
 	"github.com/PasteUs/PasteMeGoBackend/logging"
 	"github.com/PasteUs/PasteMeGoBackend/model/dao"
@@ -76,15 +75,12 @@ func (paste *Temporary) Get(password string) error {
 		}
 
 		if paste.ExpireType == EnumTime {
-			if d, e := time.ParseDuration(fmt.Sprintf("%dm", paste.Expiration)); e != nil {
-				return e
-			} else {
-				if time.Now().After(paste.CreatedAt.Add(d)) {
-					if e = tx.Delete(&paste).Error; e != nil {
-						return e
-					}
-					return gorm.ErrRecordNotFound
+			duration := time.Minute * time.Duration(paste.Expiration)
+			if time.Now().After(paste.CreatedAt.Add(duration)) {
+				if e := tx.Delete(&paste).Error; e != nil {
+					return e
 				}
+				return gorm.ErrRecordNotFound
 			}
 		}
 
