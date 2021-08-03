@@ -11,4 +11,5 @@ var (
 	ErrEmptyContent                  = errors.New("empty content")
 	ErrEmptyLang                     = errors.New("empty lang")
 	ErrQueryDBFailed                 = errors.New("query from db failed")
+	ErrSaveFailed                    = errors.New("save failed")
 )

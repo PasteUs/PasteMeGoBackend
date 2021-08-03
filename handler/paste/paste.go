@@ -108,7 +108,7 @@ func Create(context *gin.Context) {
 		logging.Warn("save failed", context, zap.String("err", err.Error()))
 		context.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusInternalServerError,
-			"message": "save failed",
+			"message": ErrSaveFailed,
 		})
 		return
 	}
