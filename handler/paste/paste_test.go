@@ -6,7 +6,9 @@ import (
 	"fmt"
 	model "github.com/PasteUs/PasteMeGoBackend/model/paste"
 	_ "github.com/PasteUs/PasteMeGoBackend/tests"
+	"github.com/PasteUs/PasteMeGoBackend/util"
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -49,8 +51,13 @@ func testHandler(
 		URL:        &url.URL{},
 	}
 
+	acceptType := ""
+
 	for k, v := range header {
 		context.Request.Header[k] = []string{v}
+		if k == "Accept" && strings.Contains(v, "json") {
+			acceptType = "json"
+		}
 	}
 
 	if method == "GET" {
@@ -63,6 +70,12 @@ func testHandler(
 		mockJSONRequest(context, requestBody, method)
 	}
 	handler(context)
+	if method == "GET" && acceptType != "json" {
+		p := response.(**Response)
+		(*p).Content = recorder.Body.String()
+		(*p).Status = http.StatusOK
+		return nil
+	}
 	return json.Unmarshal(recorder.Body.Bytes(), &response)
 }
 
@@ -124,7 +137,7 @@ func creatTestCaseGenerator() map[string]testCase {
 					},
 					map[string]string{},
 					"127.0.0.1:10086", "POST"},
-				Expect{"127.0.0.1", 201, "", "", ""},
+				Expect{"127.0.0.1", http.StatusCreated, "", "", ""},
 				&Response{},
 			}
 		}
@@ -133,10 +146,10 @@ func creatTestCaseGenerator() map[string]testCase {
 	for _, name := range []string{
 		"bind_failed", "empty_lang", "empty_content",
 		"zero_expiration", "empty_expire_type", "other_expire_type",
-		"month_expiration", "big_expiration",
+		"month_expiration", "big_expiration",// "db_locked",
 	} {
 		var (
-			expectedStatus uint        = 400
+			expectedStatus uint        = http.StatusBadRequest
 			expiration     interface{} = model.OneMonth
 			expireType                 = "time"
 			content                    = "print('Hello World!')"
@@ -170,6 +183,9 @@ func creatTestCaseGenerator() map[string]testCase {
 			expireType = "count"
 			expiration = model.MaxCount + 1
 			message = ErrExpirationGreaterThanMaxCount.Error()
+		case "db_locked":
+			expectedStatus = http.StatusInternalServerError
+			message = ErrQueryDBFailed.Error()
 		}
 
 		testCaseMap[name] = testCase{
@@ -206,10 +222,10 @@ func TestCreate(t *testing.T) {
 			if c.response.Status != c.expect.status {
 				t.Errorf("check status failed | expected = %d, actual = %d, message = %s",
 					c.expect.status, c.response.Status, c.response.Message)
-			} else if c.expect.status == 201 && c.response.Namespace != c.input.ginParams["namespace"] {
+			} else if c.expect.status == http.StatusCreated && c.response.Namespace != c.input.ginParams["namespace"] {
 				t.Errorf("check namespace failed | expected = %s, actual = %s, message = %s",
 					c.input.ginParams["namespace"], c.response.Namespace, c.response.Message)
-			} else if c.expect.status != 201 && c.response.Message != c.expect.message {
+			} else if c.expect.status != http.StatusCreated && c.response.Message != c.expect.message {
 				t.Errorf("check error message failed | expected = %s, actual = %s",
 					c.expect.message, c.response.Message)
 			}
@@ -221,8 +237,25 @@ func getTestCaseGenerator() map[string]testCase {
 	testCaseMap := map[string]testCase{}
 
 	for _, pasteType := range []string{"permanent", "temporary_count", "temporary_time"} {
-		for _, password := range []string{"", "_with_password"} {
-			name := pasteType + password
+		passwordList := []string{"", "_with_password"}
+
+		if pasteType == "permanent" {
+			passwordList = append(passwordList, "_wrong_password")
+		}
+
+		for _, password := range passwordList {
+			var (
+				name         = pasteType + password
+				status  uint = http.StatusOK
+				message      = ""
+			)
+
+			if password == "_wrong_password" {
+				status = http.StatusForbidden
+				message = model.ErrWrongPassword.Error()
+				createTestCaseDict[name] = createTestCaseDict[pasteType+"_with_password"]
+			}
+
 			testCaseMap[name] = testCase{
 				Input{
 					map[string]string{
@@ -237,13 +270,72 @@ func getTestCaseGenerator() map[string]testCase {
 				},
 				Expect{
 					"127.0.0.1",
-					200,
-					"",
+					status,
+					message,
 					createTestCaseDict[name].input.requestBody["content"].(string),
 					createTestCaseDict[name].input.requestBody["lang"].(string),
 				},
 				&Response{},
 			}
+		}
+	}
+
+	for _, name := range []string{
+		"not_found", "invalid_key_length",
+		"invalid_key_format", "raw_content",// "db_locked",
+	} {
+		var (
+			key     string
+			status  uint
+			message string
+			header  = map[string]string{"Accept": "application/json"}
+			content string
+		)
+
+		switch name {
+		case "not_found":
+			key = "12345678"
+			status = http.StatusNotFound
+			message = gorm.ErrRecordNotFound.Error()
+		case "invalid_key_length":
+			key = "123456789"
+			status = http.StatusBadRequest
+			message = util.ErrInvalidKeyLength.Error()
+		case "invalid_key_format":
+			key = "123__456"
+			status = http.StatusBadRequest
+			message = util.ErrInvalidKeyFormat.Error()
+		case "raw_content":
+			key = createTestCaseDict["permanent"].response.Key
+			content = createTestCaseDict["permanent"].input.requestBody["content"].(string)
+			status = http.StatusOK
+			header = map[string]string{}
+		case "db_locked":
+			key = createTestCaseDict["permanent"].response.Key
+			status = http.StatusInternalServerError
+			message = ErrQueryDBFailed.Error()
+		}
+
+		testCaseMap[name] = testCase{
+			Input{
+				map[string]string{
+					"namespace": "nobody",
+					"key":       key,
+				},
+				map[string]interface{}{
+					"password": "",
+				},
+				header,
+				"127.0.0.1:10086", "GET",
+			},
+			Expect{
+				"127.0.0.1",
+				status,
+				message,
+				content,
+				"",
+			},
+			&Response{},
 		}
 	}
 
@@ -263,7 +355,7 @@ func TestGet(t *testing.T) {
 			if c.response.Status != c.expect.status {
 				t.Errorf("check status failed | expected = %d, actual = %d, message = %s",
 					c.expect.status, c.response.Status, c.response.Message)
-			} else if c.expect.status == 200 {
+			} else if c.expect.status == http.StatusOK {
 				if c.expect.lang != c.response.Lang {
 					t.Errorf("check lang failed | expected = %s, actual = %s, message = %s",
 						c.expect.lang, c.response.Lang, c.response.Message)
@@ -271,7 +363,7 @@ func TestGet(t *testing.T) {
 					t.Errorf("check content failed | expected = %s, actual = %s, message = %s",
 						c.expect.content, c.response.Content, c.response.Message)
 				}
-			} else if c.expect.status != 200 && c.response.Message != c.expect.message {
+			} else if c.expect.status != http.StatusOK && c.response.Message != c.expect.message {
 				t.Errorf("check error message failed | expected = %s, actual = %s",
 					c.expect.message, c.response.Message)
 			}

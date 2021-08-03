@@ -10,4 +10,5 @@ var (
 	ErrInvalidExpireType             = errors.New("invalid expire_type")
 	ErrEmptyContent                  = errors.New("empty content")
 	ErrEmptyLang                     = errors.New("empty lang")
+	ErrQueryDBFailed                 = errors.New("query from db failed")
 )

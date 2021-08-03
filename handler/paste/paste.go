@@ -132,7 +132,7 @@ func Get(context *gin.Context) {
 	if table, err = util.ValidChecker(key); err != nil {
 		context.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusBadRequest,
-			"message": "request key not valid",
+			"message": err.Error(),
 		})
 		return
 	}
@@ -161,7 +161,7 @@ func Get(context *gin.Context) {
 		default:
 			logging.Error("query from db failed", context, zap.String("err", err.Error()))
 			status = http.StatusInternalServerError
-			message = "query from db failed"
+			message = ErrQueryDBFailed.Error()
 		}
 
 		context.JSON(http.StatusOK, gin.H{
@@ -172,13 +172,13 @@ func Get(context *gin.Context) {
 		return
 	}
 
-	if strings.Contains(context.GetHeader("Accept"), "json") { // raw request
+	if strings.Contains(context.GetHeader("Accept"), "json") {
 		context.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusOK,
 			"lang":    paste.GetLang(),
 			"content": paste.GetContent(),
 		})
-	} else { // json request
+	} else {
 		context.String(http.StatusOK, paste.GetContent())
 	}
 }
