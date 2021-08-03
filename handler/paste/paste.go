@@ -61,7 +61,7 @@ func Create(context *gin.Context) {
 
 	if err := context.ShouldBindJSON(&body); err != nil {
 		logging.Warn("bind body failed", context, zap.String("err", err.Error()))
-		context.JSON(http.StatusBadRequest, gin.H{
+		context.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusBadRequest,
 			"message": "wrong param type",
 		})
@@ -80,7 +80,7 @@ func Create(context *gin.Context) {
 		return nil
 	}(); err != nil {
 		logging.Info("param validate failed", zap.String("err", err.Error()))
-		context.JSON(http.StatusBadRequest, gin.H{
+		context.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusBadRequest,
 			"message": err.Error(),
 		})
@@ -106,7 +106,7 @@ func Create(context *gin.Context) {
 
 	if err := paste.Save(); err != nil {
 		logging.Warn("save failed", context, zap.String("err", err.Error()))
-		context.JSON(http.StatusInternalServerError, gin.H{
+		context.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusInternalServerError,
 			"message": "save failed",
 		})
@@ -146,18 +146,29 @@ func Get(context *gin.Context) {
 	}
 
 	if err = paste.Get(context.DefaultQuery("password", "")); err != nil {
-		if err == gorm.ErrRecordNotFound || err == model.ErrWrongPassword {
-			context.JSON(http.StatusOK, gin.H{
-				"status":  http.StatusNotFound,
-				"message": err.Error(),
-			})
-		} else {
+		var (
+			status  int
+			message string
+		)
+
+		switch err {
+		case gorm.ErrRecordNotFound:
+			status = http.StatusNotFound
+			message = err.Error()
+		case model.ErrWrongPassword:
+			status = http.StatusForbidden
+			message = err.Error()
+		default:
 			logging.Error("query from db failed", context, zap.String("err", err.Error()))
-			context.JSON(http.StatusInternalServerError, gin.H{
-				"status":  http.StatusInternalServerError,
-				"message": "query from db failed",
-			})
+			status = http.StatusInternalServerError
+			message = "query from db failed"
 		}
+
+		context.JSON(http.StatusOK, gin.H{
+			"status":  status,
+			"message": message,
+		})
+
 		return
 	}
 

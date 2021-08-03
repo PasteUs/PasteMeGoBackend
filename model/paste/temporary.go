@@ -80,9 +80,10 @@ func (paste *Temporary) Get(password string) error {
 				return e
 			} else {
 				if time.Now().After(paste.CreatedAt.Add(d)) {
-					if e = paste.Delete(); e != nil {
+					if e = tx.Delete(&paste).Error; e != nil {
 						return e
 					}
+					return gorm.ErrRecordNotFound
 				}
 			}
 		}
