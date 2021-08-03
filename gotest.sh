@@ -3,23 +3,44 @@
 BASE=github.com/PasteUs/PasteMeGoBackend/
 
 PACKAGE_LISTS="
-server
+handler/paste
+router
 util
 "
 
-rm -f server/pasteme.db
+export UNITTEST=1
+
+clear() {
+    rm -f "${1}/pasteme.db"
+    rm -f "${1}/pasteme.log"
+}
 
 if [[ ${#} == 1 ]]; then
-    go test -v -count=1 "${BASE}${1}"
+    if [[ ${1} == "clear" ]]; then
+        find "${PWD}" -name "*.log" -exec rm -f {} \;
+        exit ${?}
+    fi
+    clear "${1}"
+    go test -count=1 -cover "${BASE}${1}"
     exit ${?}
 fi
 
 for PACKAGE in ${PACKAGE_LISTS}; do
-    if ! go test -v -count=1 "${BASE}${PACKAGE}"; then
-        exit 1
-    fi
-done
+    clear "${PACKAGE}"
 
-rm -f server/pasteme.db
+    if [[ ${PACKAGE} == "util" ]]; then
+        if ! go test -count=1 -cover "${BASE}${PACKAGE}"; then
+            echo "test ${PACKAGE} failed"
+            exit 1
+        fi
+    else
+        if ! go test -count=1 -cover "${BASE}${PACKAGE}" -args -c "${PWD}/config.json"; then
+            echo "test ${PACKAGE} failed"
+            exit 1
+        fi
+    fi
+
+    echo "test ${PACKAGE} finished"
+done
 
 echo "All test done"

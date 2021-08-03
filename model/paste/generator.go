@@ -1,16 +1,6 @@
-/*
-@File: generator.go
-@Contact: lucien@lucien.ink
-@Licence: (C)Copyright 2019 Lucien Shui
-
-@Modify Time      @Author    @Version    @Description
-------------      -------    --------    -----------
-2019-07-03 01:09  Lucien     1.0         Init
-*/
-package generator
+package paste
 
 import (
-	"github.com/PasteUs/PasteMeGoBackend/model"
 	"math/rand"
 	"regexp"
 )
@@ -35,10 +25,10 @@ func check(key string) bool {
 	if err != nil {
 		return false
 	}
-	return flag && !model.Exist(key)
+	return flag && !Exist(key)
 }
 
-// Generate a string that contains at least one alphabet and not occur in temporary database on field key
+// Generator Generate a string that contains at least one alphabet and not occur in temporary database on field key
 func Generator() string {
 	str := generator(8)
 	for !check(str) { // do {...} while (...)

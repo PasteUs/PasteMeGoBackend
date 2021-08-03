@@ -1,18 +1,10 @@
-/*
-@File: strings.go
-@Contact: lucien@lucien.ink
-@Licence: (C)Copyright 2019 Lucien Shui
-
-@Modify Time      @Author    @Version    @Desciption
-------------      -------    --------    -----------
-2019-06-25 09:00  Lucien     1.0         Init
-*/
-package convert
+package util
 
 import (
 	"crypto/md5"
 	"fmt"
-	"github.com/wonderivan/logger"
+	"github.com/PasteUs/PasteMeGoBackend/logging"
+	"go.uber.org/zap"
 	"strconv"
 )
 
@@ -23,13 +15,13 @@ func Uint2string(value uint64) string {
 func String2uint(value string) uint64 {
 	ret, err := strconv.ParseUint(value, 10, 64) // 字符串转无符号整型
 	if err != nil {
-		logger.Painc("Convert String to Uint failed: " + value)
+		logging.Panic("convert string to uint failed", zap.String("string", value))
 		return 0
 	}
 	return ret
 }
 
-// String to MD5
+// String2md5 String to MD5
 func String2md5(str string) string {
 	return fmt.Sprintf("%x", md5.Sum([]byte(str)))
 }

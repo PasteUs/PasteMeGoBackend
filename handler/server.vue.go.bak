@@ -1,0 +1,56 @@
+/*
+@File: server.go
+@Contact: lucien@lucien.ink
+@Licence: (C)Copyright 2019 Lucien Shui
+
+@Modify Time      @Author    @Version    @Description
+------------      -------    --------    -----------
+2019-06-21 08:37  Lucien     1.0         Init
+*/
+package server
+
+import (
+    "fmt"
+    "github.com/PasteUs/PasteMeGoBackend/flag"
+    "github.com/gin-gonic/gin"
+    "github.com/wonderivan/logger"
+    "os"
+)
+
+var router *gin.Engine
+
+func init() {
+    if !flag.Debug {
+        gin.SetMode(gin.ReleaseMode)
+    }
+    router = gin.Default()
+
+    api := router.Group("/api")
+    {
+        api.GET("/:token", get)
+        api.POST("/", permanent)
+        api.POST("/once", readOnce)
+        api.PUT("/:key", temporary)
+        // router.NoRoute(notFound)
+    }
+
+    router.Static("/css/", "pasteme/css/")
+    router.Static("/js/", "pasteme/js/")
+    router.Static("/img/", "pasteme/img/")
+
+    router.GET("/config.json", func(requests *gin.Context) {
+        requests.File("pasteme/config.json")
+    })
+    router.GET("/usr.js", func(requests *gin.Context) {
+        requests.File("pasteme/usr.js")
+    })
+    router.NoRoute(func(requests *gin.Context) {
+        requests.File("pasteme/index.html")
+    })
+}
+
+func Run(address string, port uint16) {
+    if err := router.Run(fmt.Sprintf("%s:%d", address, port)); err != nil {
+        logger.Painc("Run server failed: " + err.Error())
+    }
+}

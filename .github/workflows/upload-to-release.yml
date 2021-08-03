@@ -2,7 +2,7 @@ name: Upload to release and publish
 
 on:
   release:
-    types: [published]
+    types: [ published ]
 
 jobs:
 
@@ -13,8 +13,8 @@ jobs:
 
     strategy:
       matrix:
-        go_version: [1.12]
-        os: [ubuntu-latest]
+        go_version: [ 1.16 ]
+        os: [ ubuntu-latest ]
 
     steps:
 
@@ -58,6 +58,24 @@ jobs:
           args: pastemed-${{ steps.release_version.outputs.tag }}-linux-amd64.tar.gz application/octet-stream
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  docker_push:
+    if: github.repository == 'PasteUs/PasteMeGoBackend'
+    name: Build with docker on ${{ matrix.os }} and upload
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ]
+
+    steps:
+      - name: Release Version
+        id: release_version
+        run: |
+          echo ::set-output name=tag::$(echo "${GITHUB_REF}" | sed -e "s/refs\/tags\///g" | sed -E "s/release-v?([0-9]+)\.([0-9]+)\.([0-9]+)(-[a-zA-Z]+(\.[0-9]+)?)?/\1.\2.\3\4/g")
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v1
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
