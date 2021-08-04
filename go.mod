@@ -3,6 +3,7 @@ module github.com/PasteUs/PasteMeGoBackend
 go 1.16
 
 require (
+	github.com/appleboy/gin-jwt/v2 v2.6.4
 	github.com/gin-gonic/gin v1.7.2
 	github.com/go-playground/validator/v10 v10.7.0 // indirect
 	github.com/go-sql-driver/mysql v1.6.0
@@ -12,8 +13,6 @@ require (
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/mattn/go-isatty v0.0.13 // indirect
 	github.com/mattn/go-sqlite3 v1.14.7
-	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
-	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/ugorji/go v1.2.6 // indirect
 	github.com/wonderivan/logger v1.0.0
 	go.uber.org/zap v1.18.1

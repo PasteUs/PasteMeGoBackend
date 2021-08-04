@@ -16,7 +16,7 @@ func initPermanent() {
 		tableName := zap.String("table_name", Permanent{}.TableName())
 		logging.Warn("Table not found, start creating", tableName)
 
-		if config.Get().Database.Type != "mysql" {
+		if config.Config.Database.Type != "mysql" {
 			err = dao.DB().CreateTable(&Permanent{}).Error
 			dao.DB().Exec(fmt.Sprintf("INSERT INTO `sqlite_sequence` (`name`, `seq`) VALUES ('%s', 99)", Permanent{}.TableName()))
 		} else {

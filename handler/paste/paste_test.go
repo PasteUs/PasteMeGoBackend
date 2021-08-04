@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	model "github.com/PasteUs/PasteMeGoBackend/model/paste"
-	_ "github.com/PasteUs/PasteMeGoBackend/tests"
 	"github.com/PasteUs/PasteMeGoBackend/util"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"

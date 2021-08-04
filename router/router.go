@@ -14,10 +14,11 @@ import (
 var router *gin.Engine
 
 func init() {
-	if !flag.GetArgv().Debug {
+	if !flag.Debug {
 		gin.SetMode(gin.ReleaseMode)
 	}
 	router = gin.Default()
+
 	api := router.Group("/api")
 	{
 		v2 := api.Group("/v2")
@@ -33,10 +34,14 @@ func init() {
 
 		v3 := api.Group("/v3")
 		{
-			v3.POST("/session", session.Create)    // 创建 Session（登陆）
-			v3.DELETE("/session", session.Destroy) // 销毁 Session（登出）
-			v3.POST("/:namespace", paste.Create)   // 创建一个 Paste
-			v3.GET("/:namespace/:key", paste.Get)  // 读取 Paste
+			s := v3.Group("/session")
+			{
+				s.POST("", session.AuthMiddleware.LoginHandler)    // 创建 Session（登陆）
+				s.DELETE("", session.AuthMiddleware.LogoutHandler) // 销毁 Session（登出）
+				s.GET("", session.AuthMiddleware.RefreshHandler)   // 刷新 Session
+			}
+			v3.POST("/paste", session.AuthMiddleware.MiddlewareFunc(), paste.Create)  // 创建一个 Paste
+			v3.GET("/:namespace/:key", paste.Get) // 读取 Paste
 		}
 	}
 

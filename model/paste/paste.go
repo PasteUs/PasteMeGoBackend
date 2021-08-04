@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-func Init() {
+func init() {
 	initPermanent()
 	initTemporary()
 }

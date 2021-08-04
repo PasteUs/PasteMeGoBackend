@@ -9,7 +9,6 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/mattn/go-sqlite3"
 	"go.uber.org/zap"
-	"sync"
 )
 
 func format(
@@ -23,39 +22,34 @@ func format(
 		username, password, network, server, port, database)
 }
 
-func formatWithConfig(config config.Config) string {
-	database := config.Database
+func formatWithConfig(database config.Database) string {
 	return format(database.Username, database.Password, "tcp", database.Server, database.Port, database.Database)
 }
 
-var (
-	db   *gorm.DB
-	once sync.Once
-)
+var db *gorm.DB
 
-func Init() {
+func init() {
 	var err error
-	if config.Get().Database.Type != "mysql" {
-		sqlitePath := flag.GetArgv().DataDir + "pasteme.db"
+	if config.Config.Database.Type != "mysql" {
+		sqlitePath := flag.DataDir + "pasteme.db"
 		if db, err = gorm.Open("sqlite3", sqlitePath); err != nil {
 			logging.Panic("sqlite connect failed", zap.String("sqlite_path", sqlitePath), zap.String("err", err.Error()))
 			return
 		}
 		logging.Info("sqlite connect success", zap.String("sqlite_path", sqlitePath))
 	} else {
-		if db, err = gorm.Open("mysql", formatWithConfig(config.Get())); err != nil {
+		if db, err = gorm.Open("mysql", formatWithConfig(config.Config.Database)); err != nil {
 			logging.Panic("connect to mysql failed", zap.String("err", err.Error()))
 			return
 		}
 		logging.Info("mysql connected")
 	}
-	if flag.GetArgv().Debug {
+	if flag.Debug {
 		logging.Warn("running in debug mode, database execute will be displayed")
 		db = db.Debug()
 	}
 }
 
 func DB() *gorm.DB {
-	once.Do(Init)
 	return db
 }

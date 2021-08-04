@@ -1,8 +1,10 @@
 package paste
 
 import (
+	"github.com/PasteUs/PasteMeGoBackend/handler/session"
 	"github.com/PasteUs/PasteMeGoBackend/logging"
 	model "github.com/PasteUs/PasteMeGoBackend/model/paste"
+	"github.com/PasteUs/PasteMeGoBackend/model/user"
 	"github.com/PasteUs/PasteMeGoBackend/util"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -44,7 +46,8 @@ func expireValidator(expireType string, expiration uint64) error {
 }
 
 func Create(context *gin.Context) {
-	namespace := context.Param("namespace")
+	u := session.AuthMiddleware.IdentityHandler(context).(*user.User)
+	namespace := u.Username
 	logging.Info("create paste", context, zap.String("namespace", namespace))
 
 	body := struct {

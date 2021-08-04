@@ -9,8 +9,8 @@ import (
 	"time"
 )
 
-func Init() {
-	if config.Get().Database.Type != "mysql" {
+func init() {
+	if config.Config.Database.Type != "mysql" {
 		if !dao.DB().HasTable(&Permanent{}) {
 			logger.Warn("Table permanents not found, start creating")
 			if err := dao.DB().CreateTable(&Permanent{}).Error; err != nil {

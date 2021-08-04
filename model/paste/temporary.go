@@ -22,7 +22,7 @@ func initTemporary() {
 		tableName := zap.String("table_name", Temporary{}.TableName())
 		logging.Warn("Table not found, start creating", tableName)
 
-		if config.Get().Database.Type != "mysql" {
+		if config.Config.Database.Type != "mysql" {
 			err = dao.DB().CreateTable(&Temporary{}).Error
 		} else {
 			err = dao.DB().Set(

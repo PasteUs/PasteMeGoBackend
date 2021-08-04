@@ -6,34 +6,25 @@ import (
 	"go.uber.org/zap"
 	"os"
 	"strings"
-	"sync"
+	"testing"
 )
 
-type Argv struct {
+var (
 	Config  string
 	Debug   bool
 	DataDir string
-}
-
-var (
-	argv Argv
-	once sync.Once
 )
 
 func init() {
-	flag.StringVar(&argv.Config, "c", "config.json", "-c <config file>")
-	flag.BoolVar(&argv.Debug, "debug", false, "--debug Using debug mode")
-	flag.StringVar(&argv.DataDir, "d", "./", "-d <data dir>")
+	flag.StringVar(&Config, "c", "config.json", "-c <config file>")
+	flag.BoolVar(&Debug, "debug", false, "--debug Using debug mode")
+	flag.StringVar(&DataDir, "d", "./", "-d <data dir>")
 }
 
-func Init() {
+func init() {
+	testing.Init()
 	flag.Parse()
-	validationCheck(argv.DataDir)
-}
-
-func GetArgv() Argv {
-	once.Do(Init)
-	return argv
+	validationCheck(DataDir)
 }
 
 func validationCheck(dataDir string) {
