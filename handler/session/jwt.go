@@ -10,13 +10,8 @@ import (
 	"time"
 )
 
-type login struct {
-	Username string `form:"username" json:"username" binding:"required"`
-	Password string `form:"password" json:"password" binding:"required"`
-}
-
 var (
-	identityKey    = "username"
+	IdentityKey    = "username"
 	AuthMiddleware *jwt.GinJWTMiddleware
 )
 
@@ -27,35 +22,29 @@ func init() {
 		Key:         []byte(config.Config.Secret),
 		Timeout:     time.Hour,
 		MaxRefresh:  time.Hour,
-		IdentityKey: identityKey,
+		IdentityKey: IdentityKey,
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
 			if v, ok := data.(*user.User); ok {
 				return jwt.MapClaims{
-					identityKey: v.Username,
+					IdentityKey: v.Username,
 				}
 			}
 			return jwt.MapClaims{}
 		},
 		IdentityHandler: func(c *gin.Context) interface{} {
 			claims := jwt.ExtractClaims(c)
-			return &user.User{
-				Username: claims[identityKey].(string),
+			if username, ok := claims[IdentityKey]; ok {
+				return username
 			}
+			return "nobody"
 		},
 		Authenticator: func(c *gin.Context) (interface{}, error) {
-			var body login
+			var body user.User
 			if err := c.ShouldBind(&body); err != nil {
 				return "", jwt.ErrMissingLoginValues
 			}
-			username := body.Username
-			password := body.Password
 
-			if (username == "admin" && password == "admin") || (username == "test" && password == "test") {
-				c.Set("username", username)
-				return &user.User{
-					Username: username,
-				}, nil
-			}
+			// TODO login authenticator
 
 			return nil, jwt.ErrFailedAuthentication
 		},
@@ -68,6 +57,7 @@ func init() {
 		TokenLookup:   "cookie: token",
 		TokenHeadName: "PasteMe",
 		TimeFunc:      time.Now,
+		DisabledAbort: true,
 	}); err != nil {
 		logging.Panic("jwt initializer create failed", zap.String("err", err.Error()))
 	}

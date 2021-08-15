@@ -11,24 +11,24 @@ import (
 
 func init() {
 	if config.Config.Database.Type != "mysql" {
-		if !dao.DB().HasTable(&Permanent{}) {
+		if !dao.DB.HasTable(&Permanent{}) {
 			logger.Warn("Table permanents not found, start creating")
-			if err := dao.DB().CreateTable(&Permanent{}).Error; err != nil {
+			if err := dao.DB.CreateTable(&Permanent{}).Error; err != nil {
 				logger.Painc("Create table permanents failed: " + err.Error())
 			}
-			dao.DB().Exec("INSERT INTO `sqlite_sequence` (`name`, `seq`) VALUES ('permanents', 99)")
+			dao.DB.Exec("INSERT INTO `sqlite_sequence` (`name`, `seq`) VALUES ('permanents', 99)")
 		}
 
-		if !dao.DB().HasTable(&Temporary{}) {
+		if !dao.DB.HasTable(&Temporary{}) {
 			logger.Warn("Table temporaries not found, start creating")
-			if err := dao.DB().CreateTable(&Temporary{}).Error; err != nil {
+			if err := dao.DB.CreateTable(&Temporary{}).Error; err != nil {
 				logger.Painc("Create table temporaries failed: " + err.Error())
 			}
 		}
 	} else {
-		if !dao.DB().HasTable(&Permanent{}) {
+		if !dao.DB.HasTable(&Permanent{}) {
 			logger.Warn("Table permanents not found, start creating")
-			if err := dao.DB().Set(
+			if err := dao.DB.Set(
 				"gorm:table_options",
 				"ENGINE=Innodb DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=100",
 			).CreateTable(&Permanent{}).Error; err != nil {
@@ -36,9 +36,9 @@ func init() {
 			}
 		}
 
-		if !dao.DB().HasTable(&Temporary{}) {
+		if !dao.DB.HasTable(&Temporary{}) {
 			logger.Warn("Table temporaries not found, start creating")
-			if err := dao.DB().Set(
+			if err := dao.DB.Set(
 				"gorm:table_options",
 				"ENGINE=Innodb DEFAULT CHARSET=utf8mb4",
 			).CreateTable(&Temporary{}).Error; err != nil {

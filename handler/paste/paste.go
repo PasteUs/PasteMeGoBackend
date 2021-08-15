@@ -4,7 +4,6 @@ import (
 	"github.com/PasteUs/PasteMeGoBackend/handler/session"
 	"github.com/PasteUs/PasteMeGoBackend/logging"
 	model "github.com/PasteUs/PasteMeGoBackend/model/paste"
-	"github.com/PasteUs/PasteMeGoBackend/model/user"
 	"github.com/PasteUs/PasteMeGoBackend/util"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -13,49 +12,63 @@ import (
 	"strings"
 )
 
-func pasteValidator(lang string, content string) error {
-	if content == "" {
+type requestBody struct {
+	*model.AbstractPaste
+	SelfDestruct bool   `json:"self_destruct"`
+	ExpireType   string `json:"expire_type"`
+	Expiration   uint64 `json:"expiration"`
+}
+
+func validator(body requestBody) error {
+	if body.Content == "" {
 		return ErrEmptyContent // 内容为空，返回错误信息 "empty content"
 	}
-	if lang == "" {
+	if body.Lang == "" {
 		return ErrEmptyLang // 语言类型为空，返回错误信息 "empty lang"
+	}
+
+	if body.SelfDestruct {
+		if body.ExpireType == "" {
+			return ErrEmptyExpireType
+		}
+		if body.Expiration <= 0 {
+			return ErrZeroExpiration
+		}
+
+		if body.ExpireType == model.EnumTime {
+			if body.Expiration > model.OneMonth {
+				return ErrExpirationGreaterThanMonth
+			}
+		} else if body.ExpireType == model.EnumCount {
+			if body.Expiration > model.MaxCount {
+				return ErrExpirationGreaterThanMaxCount
+			}
+		} else {
+			return ErrInvalidExpireType
+		}
 	}
 	return nil
 }
 
-func expireValidator(expireType string, expiration uint64) error {
-	if expireType == "" {
-		return ErrEmptyExpireType
-	}
-	if expiration <= 0 {
-		return ErrZeroExpiration
-	}
-
-	if expireType == model.EnumTime {
-		if expiration > model.OneMonth {
-			return ErrExpirationGreaterThanMonth
+func authenticator(body requestBody) error {
+	if body.Namespace == "nobody" {
+		if !body.SelfDestruct {
+			return ErrUnauthorized
 		}
-	} else if expireType == model.EnumCount {
-		if expiration > model.MaxCount {
-			return ErrExpirationGreaterThanMaxCount
+		if body.ExpireType == model.EnumCount && body.Expiration > 1 {
+			return ErrUnauthorized
 		}
-	} else {
-		return ErrInvalidExpireType
+		if body.ExpireType == model.EnumTime && body.Expiration > 3 {
+			return ErrUnauthorized
+		}
 	}
 	return nil
 }
 
 func Create(context *gin.Context) {
-	u := session.AuthMiddleware.IdentityHandler(context).(*user.User)
-	namespace := u.Username
-	logging.Info("create paste", context, zap.String("namespace", namespace))
+	namespace := context.GetString(session.IdentityKey)
 
-	body := struct {
-		*model.AbstractPaste
-		SelfDestruct bool   `json:"self_destruct"`
-		ExpireType   string `json:"expire_type"`
-		Expiration   uint64 `json:"expiration"`
-	}{
+	body := requestBody{
 		AbstractPaste: &model.AbstractPaste{
 			ClientIP:  context.ClientIP(),
 			Namespace: namespace,
@@ -71,20 +84,19 @@ func Create(context *gin.Context) {
 		return
 	}
 
-	if err := func() error {
-		if e := pasteValidator(body.Lang, body.Content); e != nil {
-			return e
-		}
-		if body.SelfDestruct {
-			if e := expireValidator(body.ExpireType, body.Expiration); e != nil {
-				return e
-			}
-		}
-		return nil
-	}(); err != nil {
+	if err := validator(body); err != nil {
 		logging.Info("param validate failed", zap.String("err", err.Error()))
 		context.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusBadRequest,
+			"message": err.Error(),
+		})
+		return
+	}
+
+	if err := authenticator(body); err != nil {
+		logging.Info("unauthorized request")
+		context.JSON(http.StatusOK, gin.H{
+			"status":  http.StatusUnauthorized,
 			"message": err.Error(),
 		})
 		return

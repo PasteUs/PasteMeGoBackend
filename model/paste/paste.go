@@ -5,11 +5,6 @@ import (
 	"time"
 )
 
-func init() {
-	initPermanent()
-	initTemporary()
-}
-
 type IPaste interface {
 	Save() error
 	Get(string) error

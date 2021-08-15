@@ -26,19 +26,19 @@ func formatWithConfig(database config.Database) string {
 	return format(database.Username, database.Password, "tcp", database.Server, database.Port, database.Database)
 }
 
-var db *gorm.DB
+var DB *gorm.DB
 
 func init() {
 	var err error
 	if config.Config.Database.Type != "mysql" {
 		sqlitePath := flag.DataDir + "pasteme.db"
-		if db, err = gorm.Open("sqlite3", sqlitePath); err != nil {
+		if DB, err = gorm.Open("sqlite3", sqlitePath); err != nil {
 			logging.Panic("sqlite connect failed", zap.String("sqlite_path", sqlitePath), zap.String("err", err.Error()))
 			return
 		}
 		logging.Info("sqlite connect success", zap.String("sqlite_path", sqlitePath))
 	} else {
-		if db, err = gorm.Open("mysql", formatWithConfig(config.Config.Database)); err != nil {
+		if DB, err = gorm.Open("mysql", formatWithConfig(config.Config.Database)); err != nil {
 			logging.Panic("connect to mysql failed", zap.String("err", err.Error()))
 			return
 		}
@@ -46,10 +46,6 @@ func init() {
 	}
 	if flag.Debug {
 		logging.Warn("running in debug mode, database execute will be displayed")
-		db = db.Debug()
+		DB = DB.Debug()
 	}
-}
-
-func DB() *gorm.DB {
-	return db
 }

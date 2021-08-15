@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/PasteUs/PasteMeGoBackend/handler/session"
 	model "github.com/PasteUs/PasteMeGoBackend/model/paste"
 	"github.com/PasteUs/PasteMeGoBackend/util"
 	"github.com/gin-gonic/gin"
@@ -67,6 +68,7 @@ func testHandler(
 		context.Request.URL.RawQuery = strings.Join(rawQueryList, "&")
 	} else {
 		mockJSONRequest(context, requestBody, method)
+		context.Set(session.IdentityKey, ginParams["namespace"])
 	}
 	handler(context)
 	if method == "GET" && acceptType != "json" {
@@ -121,10 +123,14 @@ func creatTestCaseGenerator() map[string]testCase {
 		for _, password := range []string{"", "_with_password"} {
 			s := strings.Split(pasteType, "_")
 			expireType := s[len(s)-1]
+			namespace := "nobody"
+			if pasteType == "permanent" {
+				namespace = "unittest"
+			}
 			testCaseMap[pasteType+password] = testCase{
 				Input{
 					map[string]string{
-						"namespace": "nobody",
+						"namespace": namespace,
 					},
 					map[string]interface{}{
 						"content":       "print('Hello World!')",
@@ -258,7 +264,7 @@ func getTestCaseGenerator() map[string]testCase {
 			testCaseMap[name] = testCase{
 				Input{
 					map[string]string{
-						"namespace": "nobody",
+						"namespace": createTestCaseDict[name].input.ginParams["namespace"],
 						"key":       createTestCaseDict[name].response.Key,
 					},
 					map[string]interface{}{
@@ -288,6 +294,7 @@ func getTestCaseGenerator() map[string]testCase {
 			status  uint
 			message string
 			header  = map[string]string{"Accept": "application/json"}
+			namespace = "nobody"
 			content string
 		)
 
@@ -307,6 +314,7 @@ func getTestCaseGenerator() map[string]testCase {
 		case "raw_content":
 			key = createTestCaseDict["permanent"].response.Key
 			content = createTestCaseDict["permanent"].input.requestBody["content"].(string)
+			namespace = createTestCaseDict["permanent"].input.ginParams["namespace"]
 			status = http.StatusOK
 			header = map[string]string{}
 		case "db_locked":
@@ -318,7 +326,7 @@ func getTestCaseGenerator() map[string]testCase {
 		testCaseMap[name] = testCase{
 			Input{
 				map[string]string{
-					"namespace": "nobody",
+					"namespace": namespace,
 					"key":       key,
 				},
 				map[string]interface{}{
