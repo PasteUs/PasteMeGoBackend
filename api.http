@@ -46,6 +46,19 @@ Cookie: token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjgwOTkwOTQsIm9ya
   "content": "print('Hello World!')"
 }
 
+### Greate self destruct paste
+POST {{host}}/api/v3/paste
+Content-Type: application/json
+Accept: application/json
+
+{
+  "lang": "python",
+  "content": "print('Hello World!')",
+  "self_destruct": true,
+  "expire_type": "count",
+  "expiration": 1
+}
+
 ### Get paste
 GET {{host}}/api/v3/nobody/100
 Accept: application/json

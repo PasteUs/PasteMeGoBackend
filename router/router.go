@@ -21,9 +21,10 @@ func init() {
 
 	api := router.Group("/api")
 	{
+		api.GET("/", v2Handler.Beat) // 心跳检测
+
 		v2 := api.Group("/v2")
 		{
-			v2.GET("/", v2Handler.Beat) // 心跳检测
 			// 访问未加密的 Paste，token 为 <Paste ID>
 			// 访问加密的 Paste，token 为 <Paste ID>,<Password>
 			v2.GET("/:token", v2Handler.Query)
@@ -40,8 +41,8 @@ func init() {
 				s.DELETE("", session.AuthMiddleware.LogoutHandler) // 销毁 Session（登出）
 				s.GET("", session.AuthMiddleware.RefreshHandler)   // 刷新 Session
 			}
-			v3.POST("/paste", session.AuthMiddleware.MiddlewareFunc(), paste.Create)  // 创建一个 Paste
-			v3.GET("/:namespace/:key", paste.Get) // 读取 Paste
+			v3.POST("/paste", session.AuthMiddleware.MiddlewareFunc(), paste.Create) // 创建一个 Paste
+			v3.GET("/:namespace/:key", paste.Get)                                    // 读取 Paste
 		}
 	}
 
