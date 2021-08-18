@@ -51,7 +51,7 @@ func validator(body requestBody) error {
 }
 
 func authenticator(body requestBody) error {
-	if body.Namespace == "nobody" {
+	if body.Username == "nobody" {
 		if !body.SelfDestruct {
 			return ErrUnauthorized
 		}
@@ -66,12 +66,12 @@ func authenticator(body requestBody) error {
 }
 
 func Create(context *gin.Context) {
-	namespace := context.GetString(session.IdentityKey)
+	username := context.GetString(session.IdentityKey)
 
 	body := requestBody{
 		AbstractPaste: &model.AbstractPaste{
 			ClientIP:  context.ClientIP(),
-			Namespace: namespace,
+			Username: username,
 		},
 	}
 
@@ -123,7 +123,7 @@ func Create(context *gin.Context) {
 		logging.Warn("save failed", context, zap.String("err", err.Error()))
 		context.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusInternalServerError,
-			"message": ErrSaveFailed,
+			"message": ErrSaveFailed.Error(),
 		})
 		return
 	}
@@ -131,12 +131,11 @@ func Create(context *gin.Context) {
 	context.JSON(http.StatusCreated, gin.H{
 		"status":    http.StatusCreated,
 		"key":       paste.GetKey(),
-		"namespace": paste.GetNamespace(),
 	})
 }
 
 func Get(context *gin.Context) {
-	namespace, key := context.Param("namespace"), context.Param("key")
+	key := context.Param("key")
 
 	var (
 		table string
@@ -152,7 +151,7 @@ func Get(context *gin.Context) {
 		return
 	}
 
-	abstractPaste := model.AbstractPaste{Namespace: namespace}
+	abstractPaste := model.AbstractPaste{}
 
 	if table == "temporary" {
 		paste = &model.Temporary{Key: key, AbstractPaste: &abstractPaste}

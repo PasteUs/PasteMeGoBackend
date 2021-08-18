@@ -48,8 +48,8 @@ func (paste *Permanent) GetKey() string {
 	return util.Uint2string(paste.Key)
 }
 
-func (paste *Permanent) GetNamespace() string {
-	return paste.Namespace
+func (paste *Permanent) GetUsername() string {
+	return paste.Username
 }
 
 // Save 成员函数，创建

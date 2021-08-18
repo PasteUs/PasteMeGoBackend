@@ -53,8 +53,8 @@ func (paste *Temporary) GetKey() string {
 	return paste.Key
 }
 
-func (paste *Temporary) GetNamespace() string {
-	return paste.Namespace
+func (paste *Temporary) GetUsername() string {
+	return paste.Username
 }
 
 // Save 成员函数，保存

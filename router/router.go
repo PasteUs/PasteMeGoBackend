@@ -41,8 +41,20 @@ func init() {
 				s.DELETE("", session.AuthMiddleware.LogoutHandler) // 销毁 Session（登出）
 				s.GET("", session.AuthMiddleware.RefreshHandler)   // 刷新 Session
 			}
-			v3.POST("/paste", session.AuthMiddleware.MiddlewareFunc(), paste.Create) // 创建一个 Paste
-			v3.GET("/:namespace/:key", paste.Get)                                    // 读取 Paste
+
+			u := v3.Group("/user")
+			{
+				u.POST("")
+				u.DELETE("")
+				u.PUT("")
+			}
+
+			p := v3.Group("/paste")
+			{
+				p.POST("/", session.AuthMiddleware.MiddlewareFunc(true),
+					paste.Create)         // 创建一个 Paste
+				p.GET("/:key", paste.Get) // 读取 Paste
+			}
 		}
 	}
 
