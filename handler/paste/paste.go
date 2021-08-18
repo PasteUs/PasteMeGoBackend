@@ -106,11 +106,12 @@ func Create(context *gin.Context) {
 		body.AbstractPaste.Password = util.String2md5(body.AbstractPaste.Password)
 	}
 
+	body.AbstractPaste.Key = model.Generator()
+
 	var paste model.IPaste
 
 	if body.SelfDestruct {
 		paste = &model.Temporary{
-			Key:           model.Generator(),
 			AbstractPaste: body.AbstractPaste,
 			ExpireType:    body.ExpireType,
 			Expiration:    body.Expiration,
@@ -151,12 +152,12 @@ func Get(context *gin.Context) {
 		return
 	}
 
-	abstractPaste := model.AbstractPaste{}
+	abstractPaste := model.AbstractPaste{Key: key}
 
 	if table == "temporary" {
-		paste = &model.Temporary{Key: key, AbstractPaste: &abstractPaste}
+		paste = &model.Temporary{AbstractPaste: &abstractPaste}
 	} else {
-		paste = &model.Permanent{Key: util.String2uint(key), AbstractPaste: &abstractPaste}
+		paste = &model.Permanent{AbstractPaste: &abstractPaste}
 	}
 
 	if err = paste.Get(context.DefaultQuery("password", "")); err != nil {

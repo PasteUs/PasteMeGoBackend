@@ -1,11 +1,8 @@
 package paste
 
 import (
-	"github.com/PasteUs/PasteMeGoBackend/config"
-	"github.com/PasteUs/PasteMeGoBackend/logging"
 	"github.com/PasteUs/PasteMeGoBackend/model/dao"
 	"github.com/jinzhu/gorm"
-	"go.uber.org/zap"
 	"time"
 )
 
@@ -17,6 +14,8 @@ const (
 )
 
 func init() {
+	dao.CreateTable(&Temporary{})
+	/*
 	if !dao.DB.HasTable(&Temporary{}) {
 		var err error = nil
 		tableName := zap.String("table_name", Temporary{}.TableName())
@@ -35,11 +34,11 @@ func init() {
 			logging.Panic("Create table failed", tableName, zap.String("err", err.Error()))
 		}
 	}
+	*/
 }
 
 // Temporary 临时
 type Temporary struct {
-	Key            string `json:"key" gorm:"type:varchar(16);primary_key"` // 主键:索引
 	*AbstractPaste        // 公有字段
 	ExpireType     string // 过期类型
 	Expiration     uint64 // 过期的数据
@@ -47,14 +46,6 @@ type Temporary struct {
 
 func (Temporary) TableName() string {
 	return "temporary"
-}
-
-func (paste *Temporary) GetKey() string {
-	return paste.Key
-}
-
-func (paste *Temporary) GetUsername() string {
-	return paste.Username
 }
 
 // Save 成员函数，保存

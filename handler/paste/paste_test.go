@@ -227,9 +227,6 @@ func TestCreate(t *testing.T) {
 			if c.response.Status != c.expect.status {
 				t.Errorf("check status failed | expected = %d, actual = %d, message = %s",
 					c.expect.status, c.response.Status, c.response.Message)
-			} else if c.expect.status == http.StatusCreated && c.response.Username != c.input.ginParams["username"] {
-				t.Errorf("check username failed | expected = %s, actual = %s, message = %s",
-					c.input.ginParams["username"], c.response.Username, c.response.Message)
 			} else if c.expect.status != http.StatusCreated && c.response.Message != c.expect.message {
 				t.Errorf("check error message failed | expected = %s, actual = %s",
 					c.expect.message, c.response.Message)
