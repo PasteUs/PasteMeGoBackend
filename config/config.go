@@ -7,32 +7,31 @@ import (
 	"go.uber.org/zap"
 	"io/ioutil"
 	"os"
-	"sync"
 )
 
-type Config struct {
-	Version  string `json:"version"`
-	Address  string `json:"address"`
-	AdminUrl string `json:"admin_url"` // PasteMe Admin's hostname
+type Database struct {
+	Type     string `json:"type"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Server   string `json:"server"`
 	Port     uint16 `json:"port"`
-	Database struct {
-		Type     string `json:"type"`
-		Username string `json:"username"`
-		Password string `json:"password"`
-		Server   string `json:"server"`
-		Port     uint16 `json:"port"`
-		Database string `json:"database"`
-	} `json:"database"`
+	Database string `json:"database"`
 }
 
-var (
-	config Config
-	once   sync.Once
-)
+type config struct {
+	Version  string   `json:"version"`
+	Address  string   `json:"address"`
+	AdminUrl string   `json:"admin_url"` // PasteMe Admin's hostname
+	Port     uint16   `json:"port"`
+	Secret   string   `json:"secret"`
+	Database Database `json:"database"`
+}
 
-func Init() {
-	load(flag.GetArgv().Config)
-	checkVersion(config.Version)
+var Config config
+
+func init() {
+	load(flag.Config)
+	checkVersion(Config.Version)
 	setDefault()
 }
 
@@ -52,7 +51,7 @@ func checkVersion(v string) {
 	if v != version {
 		if !isInArray(v, validConfigVersion) {
 			logging.Panic(
-				"invalid config version",
+				"invalid Config version",
 				zap.Strings("valid_config_version_list", validConfigVersion),
 				zap.String("config_version", v),
 			)
@@ -60,10 +59,10 @@ func checkVersion(v string) {
 	}
 }
 
-func exportConfig(filename string, c Config) {
-	if flag.GetArgv().Debug {
+func exportConfig(filename string, c config) {
+	if flag.Debug {
 		logging.Info(
-			"config loaded",
+			"Config loaded",
 			zap.String("config_file", filename),
 			zap.String("config_version", c.Version),
 			zap.String("address", c.Address),
@@ -102,15 +101,10 @@ func load(filename string) {
 		)
 	}
 
-	err = json.Unmarshal(data, &config)
+	err = json.Unmarshal(data, &Config)
 	if err != nil {
-		logging.Panic("parse config failed", zap.String("err", err.Error()))
+		logging.Panic("parse Config failed", zap.String("err", err.Error()))
 	}
 
-	exportConfig(filename, config)
-}
-
-func Get() Config {
-	once.Do(Init)
-	return config
+	exportConfig(filename, Config)
 }

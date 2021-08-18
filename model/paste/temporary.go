@@ -16,16 +16,16 @@ const (
 	MaxCount  = 3
 )
 
-func initTemporary() {
-	if !dao.DB().HasTable(&Temporary{}) {
+func init() {
+	if !dao.DB.HasTable(&Temporary{}) {
 		var err error = nil
 		tableName := zap.String("table_name", Temporary{}.TableName())
 		logging.Warn("Table not found, start creating", tableName)
 
-		if config.Get().Database.Type != "mysql" {
-			err = dao.DB().CreateTable(&Temporary{}).Error
+		if config.Config.Database.Type != "mysql" {
+			err = dao.DB.CreateTable(&Temporary{}).Error
 		} else {
-			err = dao.DB().Set(
+			err = dao.DB.Set(
 				"gorm:table_options",
 				"ENGINE=Innodb DEFAULT CHARSET=utf8mb4",
 			).CreateTable(&Temporary{}).Error
@@ -59,17 +59,17 @@ func (paste *Temporary) GetNamespace() string {
 
 // Save 成员函数，保存
 func (paste *Temporary) Save() error {
-	return dao.DB().Create(&paste).Error
+	return dao.DB.Create(&paste).Error
 }
 
 // Delete 成员函数，删除
 func (paste *Temporary) Delete() error {
-	return dao.DB().Delete(&paste).Error
+	return dao.DB.Delete(&paste).Error
 }
 
 // Get 成员函数，查看
 func (paste *Temporary) Get(password string) error {
-	err := dao.DB().Transaction(func(tx *gorm.DB) error {
+	err := dao.DB.Transaction(func(tx *gorm.DB) error {
 		if e := tx.Find(&paste).Error; e != nil {
 			return e
 		}
@@ -104,6 +104,6 @@ func (paste *Temporary) Get(password string) error {
 
 func Exist(key string) bool {
 	count := uint8(0)
-	dao.DB().Model(&Temporary{}).Where("`key` = ?", key).Count(&count)
+	dao.DB.Model(&Temporary{}).Where("`key` = ?", key).Count(&count)
 	return count > 0
 }

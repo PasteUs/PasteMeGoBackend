@@ -2,7 +2,6 @@ package router
 
 import (
 	"encoding/json"
-	_ "github.com/PasteUs/PasteMeGoBackend/tests"
 	"github.com/PasteUs/PasteMeGoBackend/tests/request"
 	"github.com/PasteUs/PasteMeGoBackend/util"
 	"github.com/PasteUs/PasteMeGoBackend/v2/model"

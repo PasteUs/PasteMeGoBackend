@@ -10,17 +10,17 @@ import (
 	"time"
 )
 
-func initPermanent() {
-	if !dao.DB().HasTable(&Permanent{}) {
+func init() {
+	if !dao.DB.HasTable(&Permanent{}) {
 		var err error = nil
 		tableName := zap.String("table_name", Permanent{}.TableName())
 		logging.Warn("Table not found, start creating", tableName)
 
-		if config.Get().Database.Type != "mysql" {
-			err = dao.DB().CreateTable(&Permanent{}).Error
-			dao.DB().Exec(fmt.Sprintf("INSERT INTO `sqlite_sequence` (`name`, `seq`) VALUES ('%s', 99)", Permanent{}.TableName()))
+		if config.Config.Database.Type != "mysql" {
+			err = dao.DB.CreateTable(&Permanent{}).Error
+			dao.DB.Exec(fmt.Sprintf("INSERT INTO `sqlite_sequence` (`name`, `seq`) VALUES ('%s', 99)", Permanent{}.TableName()))
 		} else {
-			err = dao.DB().Set(
+			err = dao.DB.Set(
 				"gorm:table_options",
 				"ENGINE=Innodb DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=100",
 			).CreateTable(&Permanent{}).Error
@@ -54,16 +54,16 @@ func (paste *Permanent) GetNamespace() string {
 
 // Save 成员函数，创建
 func (paste *Permanent) Save() error {
-	return dao.DB().Create(&paste).Error
+	return dao.DB.Create(&paste).Error
 }
 
 // Delete 成员函数，删除
 func (paste *Permanent) Delete() error {
-	return dao.DB().Delete(&paste).Error
+	return dao.DB.Delete(&paste).Error
 }
 
 func (paste *Permanent) Get(password string) error {
-	if err := dao.DB().Find(&paste).Error; err != nil {
+	if err := dao.DB.Find(&paste).Error; err != nil {
 		return err
 	}
 	if err := paste.checkPassword(password); err != nil {
