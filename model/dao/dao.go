@@ -9,6 +9,7 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/mattn/go-sqlite3"
 	"go.uber.org/zap"
+	"os"
 )
 
 func format(
@@ -32,6 +33,8 @@ func init() {
 	var err error
 	if config.Config.Database.Type != "mysql" {
 		sqlitePath := flag.DataDir + "pasteme.db"
+		pwd, _ := os.Getwd()
+		logging.Info("using sqlite", zap.String("database_type", config.Config.Database.Type), zap.String("work_dir", pwd))
 		if DB, err = gorm.Open("sqlite3", sqlitePath); err != nil {
 			logging.Panic("sqlite connect failed", zap.String("sqlite_path", sqlitePath), zap.String("err", err.Error()))
 			return

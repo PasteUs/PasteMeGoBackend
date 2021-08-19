@@ -17,7 +17,7 @@ clear() {
 
 if [[ ${#} == 1 ]]; then
     if [[ ${1} == "clear" ]]; then
-        find "${PWD}" -name "*.log" -exec rm -f {} \;
+        find "${PWD}" -name "*.log" -exec rm -f {} \; && find "${PWD}" -name "*.db" -exec rm -f {} \;
         exit ${?}
     fi
     clear "${1}"

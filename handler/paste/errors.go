@@ -3,14 +3,13 @@ package paste
 import "errors"
 
 var (
-    ErrEmptyExpireType               = errors.New("empty expire_type or expiration")
-    ErrZeroExpiration                = errors.New("zero expiration")
-    ErrExpirationGreaterThanMonth    = errors.New("expiration greater than a month")
-    ErrExpirationGreaterThanMaxCount = errors.New("expiration greater than max count")
-    ErrInvalidExpireType             = errors.New("invalid expire_type")
-    ErrEmptyContent                  = errors.New("empty content")
-    ErrEmptyLang                     = errors.New("empty lang")
-    ErrQueryDBFailed                 = errors.New("query from db failed")
-    ErrSaveFailed                    = errors.New("save failed")
-    ErrUnauthorized                  = errors.New("unauthorized")
+	ErrZeroExpireMinute               = errors.New("zero expire time")
+	ErrZeroExpireCount                = errors.New("zero expire count")
+	ErrExpireMinuteGreaterThanMonth   = errors.New("expire minute greater than a month")
+	ErrExpireCountGreaterThanMaxCount = errors.New("expire count greater than max count")
+	ErrEmptyContent                   = errors.New("empty content")
+	ErrEmptyLang                      = errors.New("empty lang")
+	ErrQueryDBFailed                  = errors.New("query from db failed")
+	ErrSaveFailed                     = errors.New("save failed")
+	ErrUnauthorized                   = errors.New("unauthorized")
 )
