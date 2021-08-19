@@ -49,3 +49,24 @@ func init() {
 		DB = DB.Debug()
 	}
 }
+
+func CreateTable(object interface{}) {
+	if !DB.HasTable(object) {
+		var err error = nil
+		tableName := zap.String("table_name", DB.NewScope(object).TableName())
+		logging.Warn("Table not found, start creating", tableName)
+
+		if config.Config.Database.Type != "mysql" {
+			err = DB.CreateTable(object).Error
+		} else {
+			err = DB.Set(
+				"gorm:table_options",
+				"ENGINE=Innodb DEFAULT CHARSET=utf8mb4",
+			).CreateTable(object).Error
+		}
+
+		if err != nil {
+			logging.Panic("Create table failed", tableName, zap.String("err", err.Error()))
+		}
+	}
+}

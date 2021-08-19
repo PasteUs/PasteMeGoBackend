@@ -51,7 +51,7 @@ func validator(body requestBody) error {
 }
 
 func authenticator(body requestBody) error {
-	if body.Namespace == "nobody" {
+	if body.Username == "nobody" {
 		if !body.SelfDestruct {
 			return ErrUnauthorized
 		}
@@ -66,12 +66,12 @@ func authenticator(body requestBody) error {
 }
 
 func Create(context *gin.Context) {
-	namespace := context.GetString(session.IdentityKey)
+	username := context.GetString(session.IdentityKey)
 
 	body := requestBody{
 		AbstractPaste: &model.AbstractPaste{
 			ClientIP:  context.ClientIP(),
-			Namespace: namespace,
+			Username: username,
 		},
 	}
 
@@ -110,7 +110,6 @@ func Create(context *gin.Context) {
 
 	if body.SelfDestruct {
 		paste = &model.Temporary{
-			Key:           model.Generator(),
 			AbstractPaste: body.AbstractPaste,
 			ExpireType:    body.ExpireType,
 			Expiration:    body.Expiration,
@@ -123,7 +122,7 @@ func Create(context *gin.Context) {
 		logging.Warn("save failed", context, zap.String("err", err.Error()))
 		context.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusInternalServerError,
-			"message": ErrSaveFailed,
+			"message": ErrSaveFailed.Error(),
 		})
 		return
 	}
@@ -131,20 +130,15 @@ func Create(context *gin.Context) {
 	context.JSON(http.StatusCreated, gin.H{
 		"status":    http.StatusCreated,
 		"key":       paste.GetKey(),
-		"namespace": paste.GetNamespace(),
 	})
 }
 
 func Get(context *gin.Context) {
-	namespace, key := context.Param("namespace"), context.Param("key")
+	key := context.Param("key")
 
-	var (
-		table string
-		err   error
-		paste model.IPaste
-	)
+	var paste model.IPaste
 
-	if table, err = util.ValidChecker(key); err != nil {
+	if err := util.KeyValidator(key); err != nil {
 		context.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusBadRequest,
 			"message": err.Error(),
@@ -152,15 +146,15 @@ func Get(context *gin.Context) {
 		return
 	}
 
-	abstractPaste := model.AbstractPaste{Namespace: namespace}
+	abstractPaste := model.AbstractPaste{Key: key}
 
-	if table == "temporary" {
-		paste = &model.Temporary{Key: key, AbstractPaste: &abstractPaste}
+	if []rune(key)[0] == '0' {
+		paste = &model.Temporary{AbstractPaste: &abstractPaste}
 	} else {
-		paste = &model.Permanent{Key: util.String2uint(key), AbstractPaste: &abstractPaste}
+		paste = &model.Permanent{AbstractPaste: &abstractPaste}
 	}
 
-	if err = paste.Get(context.DefaultQuery("password", "")); err != nil {
+	if err := paste.Get(context.DefaultQuery("password", "")); err != nil {
 		var (
 			status  int
 			message string

@@ -23,6 +23,18 @@ func Parse(token string) (string, string) {
 	}
 }
 
+func KeyValidator(key string) error {
+	if len(key) != 8 {
+		return ErrInvalidKeyLength // key's length should at least 3 and at most 8
+	}
+	if flag, err := regexp.MatchString("^[0-9a-z]{8}$", key); err != nil {
+		return err
+	} else if !flag {
+		return ErrInvalidKeyFormat
+	}
+	return nil
+}
+
 func ValidChecker(key string) (string, error) {
 	if len(key) > 8 || len(key) < 3 {
 		return "", ErrInvalidKeyLength // key's length should at least 3 and at most 8

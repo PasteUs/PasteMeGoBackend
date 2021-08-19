@@ -2,7 +2,7 @@ package handler
 
 import (
 	"fmt"
-	paste2 "github.com/PasteUs/PasteMeGoBackend/model/paste"
+	dao "github.com/PasteUs/PasteMeGoBackend/model/paste"
 	"github.com/PasteUs/PasteMeGoBackend/util"
 	"github.com/PasteUs/PasteMeGoBackend/v2/model"
 	"github.com/gin-gonic/gin"
@@ -114,7 +114,7 @@ func TemporaryCreator(requests *gin.Context) {
 func ReadOnceCreator(requests *gin.Context) {
 	IP := requests.ClientIP()
 	paste := model.Temporary{
-		Key: paste2.Generator(),
+		Key: dao.Generator(8, false, &model.Temporary{}),
 		AbstractPaste: &model.AbstractPaste{
 			ClientIP: IP,
 		},

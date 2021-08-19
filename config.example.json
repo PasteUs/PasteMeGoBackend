@@ -3,6 +3,7 @@
   "address": "0.0.0.0",
   "admin_url": "",
   "port": 8000,
+  "secret": "!!! CHANGE THIS !!!",
   "database": {
     "type": "mysql",
     "username": "username",

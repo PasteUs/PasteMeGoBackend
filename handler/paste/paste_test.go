@@ -68,7 +68,7 @@ func testHandler(
 		context.Request.URL.RawQuery = strings.Join(rawQueryList, "&")
 	} else {
 		mockJSONRequest(context, requestBody, method)
-		context.Set(session.IdentityKey, ginParams["namespace"])
+		context.Set(session.IdentityKey, ginParams["username"])
 	}
 	handler(context)
 	if method == "GET" && acceptType != "json" {
@@ -97,15 +97,16 @@ type Expect struct {
 }
 
 type Response struct {
-	Message   string `json:"message"`
-	Key       string `json:"key"`
-	Content   string `json:"content"`
-	Lang      string `json:"lang"`
-	Namespace string `json:"namespace"`
-	Status    uint   `json:"status"`
+	Message  string `json:"message"`
+	Key      string `json:"key"`
+	Content  string `json:"content"`
+	Lang     string `json:"lang"`
+	Username string `json:"username"`
+	Status   uint   `json:"status"`
 }
 
 type testCase struct {
+	name     string
 	input    Input
 	expect   Expect
 	response *Response
@@ -123,14 +124,16 @@ func creatTestCaseGenerator() map[string]testCase {
 		for _, password := range []string{"", "_with_password"} {
 			s := strings.Split(pasteType, "_")
 			expireType := s[len(s)-1]
-			namespace := "nobody"
+			username := "nobody"
 			if pasteType == "permanent" {
-				namespace = "unittest"
+				username = "unittest"
 			}
-			testCaseMap[pasteType+password] = testCase{
+			name := pasteType + password
+			testCaseMap[name] = testCase{
+				name,
 				Input{
 					map[string]string{
-						"namespace": namespace,
+						"username": username,
 					},
 					map[string]interface{}{
 						"content":       "print('Hello World!')",
@@ -151,7 +154,7 @@ func creatTestCaseGenerator() map[string]testCase {
 	for _, name := range []string{
 		"bind_failed", "empty_lang", "empty_content",
 		"zero_expiration", "empty_expire_type", "other_expire_type",
-		"month_expiration", "big_expiration",// "db_locked",
+		"month_expiration", "big_expiration", // "db_locked",
 	} {
 		var (
 			expectedStatus uint        = http.StatusBadRequest
@@ -194,8 +197,9 @@ func creatTestCaseGenerator() map[string]testCase {
 		}
 
 		testCaseMap[name] = testCase{
+			name,
 			Input{map[string]string{
-				"namespace": "nobody",
+				"username": "nobody",
 			},
 				map[string]interface{}{
 					"content":       content,
@@ -227,9 +231,6 @@ func TestCreate(t *testing.T) {
 			if c.response.Status != c.expect.status {
 				t.Errorf("check status failed | expected = %d, actual = %d, message = %s",
 					c.expect.status, c.response.Status, c.response.Message)
-			} else if c.expect.status == http.StatusCreated && c.response.Namespace != c.input.ginParams["namespace"] {
-				t.Errorf("check namespace failed | expected = %s, actual = %s, message = %s",
-					c.input.ginParams["namespace"], c.response.Namespace, c.response.Message)
 			} else if c.expect.status != http.StatusCreated && c.response.Message != c.expect.message {
 				t.Errorf("check error message failed | expected = %s, actual = %s",
 					c.expect.message, c.response.Message)
@@ -262,10 +263,11 @@ func getTestCaseGenerator() map[string]testCase {
 			}
 
 			testCaseMap[name] = testCase{
+				name,
 				Input{
 					map[string]string{
-						"namespace": createTestCaseDict[name].input.ginParams["namespace"],
-						"key":       createTestCaseDict[name].response.Key,
+						"username": createTestCaseDict[name].input.ginParams["username"],
+						"key":      createTestCaseDict[name].response.Key,
 					},
 					map[string]interface{}{
 						"password": password,
@@ -287,15 +289,15 @@ func getTestCaseGenerator() map[string]testCase {
 
 	for _, name := range []string{
 		"not_found", "invalid_key_length",
-		"invalid_key_format", "raw_content",// "db_locked",
+		"invalid_key_format", "raw_content", // "db_locked",
 	} {
 		var (
-			key     string
-			status  uint
-			message string
-			header  = map[string]string{"Accept": "application/json"}
-			namespace = "nobody"
-			content string
+			key      string
+			status   uint
+			message  string
+			header   = map[string]string{"Accept": "application/json"}
+			username = "nobody"
+			content  string
 		)
 
 		switch name {
@@ -314,7 +316,7 @@ func getTestCaseGenerator() map[string]testCase {
 		case "raw_content":
 			key = createTestCaseDict["permanent"].response.Key
 			content = createTestCaseDict["permanent"].input.requestBody["content"].(string)
-			namespace = createTestCaseDict["permanent"].input.ginParams["namespace"]
+			username = createTestCaseDict["permanent"].input.ginParams["username"]
 			status = http.StatusOK
 			header = map[string]string{}
 		case "db_locked":
@@ -324,10 +326,11 @@ func getTestCaseGenerator() map[string]testCase {
 		}
 
 		testCaseMap[name] = testCase{
+			name,
 			Input{
 				map[string]string{
-					"namespace": namespace,
-					"key":       key,
+					"username": username,
+					"key":      key,
 				},
 				map[string]interface{}{
 					"password": "",

@@ -39,7 +39,7 @@ Accept: application/json
 POST {{host}}/api/v3/paste
 Content-Type: application/json
 Accept: application/json
-Cookie: token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjgwOTkwOTQsIm9yaWdfaWF0IjoxNjI4MDk1NDk0LCJ1c2VybmFtZSI6InRlc3QifQ.8ScSPU3c6QDgN1WYREpxFrH6I-vPEe7Vk4LLMZ6JS2g
+Cookie: token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjkxMzY2MjksIm9yaWdfaWF0IjoxNjI5MTMzMDI5LCJ1c2VybmFtZSI6InRlc3QifQ.oHwU1mReJGiC8UCffaka0eL6JBRmLRe5FR_ksLAxxwk
 
 {
   "lang": "python",
@@ -47,7 +47,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjgwOTkwOTQsIm9ya
 }
 
 ### Greate self destruct paste
-POST {{host}}/api/v3/paste
+POST {{host}}/api/v3/paste/
 Content-Type: application/json
 Accept: application/json
 
@@ -94,4 +94,7 @@ GET {{host}}/api/v3/session
 //{
 //  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjgwOTY5NDgsIm9yaWdfaWF0IjoxNjI4MDkzMzQ4LCJ1c2VybmFtZSI6ImFkbWluIn0.AxtZhWiSBrxPeR4ZQWgyjU6AwxlJs8DJ9PREOGiqm5c"
 //}
+
+### Get temporary
+GET {{host}}/api/v3/paste/gxm08pex
 
