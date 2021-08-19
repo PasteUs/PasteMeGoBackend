@@ -97,15 +97,16 @@ type Expect struct {
 }
 
 type Response struct {
-	Message   string `json:"message"`
-	Key       string `json:"key"`
-	Content   string `json:"content"`
-	Lang      string `json:"lang"`
+	Message  string `json:"message"`
+	Key      string `json:"key"`
+	Content  string `json:"content"`
+	Lang     string `json:"lang"`
 	Username string `json:"username"`
-	Status    uint   `json:"status"`
+	Status   uint   `json:"status"`
 }
 
 type testCase struct {
+	name     string
 	input    Input
 	expect   Expect
 	response *Response
@@ -127,7 +128,9 @@ func creatTestCaseGenerator() map[string]testCase {
 			if pasteType == "permanent" {
 				username = "unittest"
 			}
-			testCaseMap[pasteType+password] = testCase{
+			name := pasteType + password
+			testCaseMap[name] = testCase{
+				name,
 				Input{
 					map[string]string{
 						"username": username,
@@ -151,7 +154,7 @@ func creatTestCaseGenerator() map[string]testCase {
 	for _, name := range []string{
 		"bind_failed", "empty_lang", "empty_content",
 		"zero_expiration", "empty_expire_type", "other_expire_type",
-		"month_expiration", "big_expiration",// "db_locked",
+		"month_expiration", "big_expiration", // "db_locked",
 	} {
 		var (
 			expectedStatus uint        = http.StatusBadRequest
@@ -194,6 +197,7 @@ func creatTestCaseGenerator() map[string]testCase {
 		}
 
 		testCaseMap[name] = testCase{
+			name,
 			Input{map[string]string{
 				"username": "nobody",
 			},
@@ -259,10 +263,11 @@ func getTestCaseGenerator() map[string]testCase {
 			}
 
 			testCaseMap[name] = testCase{
+				name,
 				Input{
 					map[string]string{
 						"username": createTestCaseDict[name].input.ginParams["username"],
-						"key":       createTestCaseDict[name].response.Key,
+						"key":      createTestCaseDict[name].response.Key,
 					},
 					map[string]interface{}{
 						"password": password,
@@ -284,15 +289,15 @@ func getTestCaseGenerator() map[string]testCase {
 
 	for _, name := range []string{
 		"not_found", "invalid_key_length",
-		"invalid_key_format", "raw_content",// "db_locked",
+		"invalid_key_format", "raw_content", // "db_locked",
 	} {
 		var (
-			key     string
-			status  uint
-			message string
-			header  = map[string]string{"Accept": "application/json"}
+			key      string
+			status   uint
+			message  string
+			header   = map[string]string{"Accept": "application/json"}
 			username = "nobody"
-			content string
+			content  string
 		)
 
 		switch name {
@@ -321,10 +326,11 @@ func getTestCaseGenerator() map[string]testCase {
 		}
 
 		testCaseMap[name] = testCase{
+			name,
 			Input{
 				map[string]string{
 					"username": username,
-					"key":       key,
+					"key":      key,
 				},
 				map[string]interface{}{
 					"password": "",

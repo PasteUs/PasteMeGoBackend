@@ -15,26 +15,6 @@ const (
 
 func init() {
 	dao.CreateTable(&Temporary{})
-	/*
-	if !dao.DB.HasTable(&Temporary{}) {
-		var err error = nil
-		tableName := zap.String("table_name", Temporary{}.TableName())
-		logging.Warn("Table not found, start creating", tableName)
-
-		if config.Config.Database.Type != "mysql" {
-			err = dao.DB.CreateTable(&Temporary{}).Error
-		} else {
-			err = dao.DB.Set(
-				"gorm:table_options",
-				"ENGINE=Innodb DEFAULT CHARSET=utf8mb4",
-			).CreateTable(&Temporary{}).Error
-		}
-
-		if err != nil {
-			logging.Panic("Create table failed", tableName, zap.String("err", err.Error()))
-		}
-	}
-	*/
 }
 
 // Temporary 临时
@@ -50,6 +30,7 @@ func (Temporary) TableName() string {
 
 // Save 成员函数，保存
 func (paste *Temporary) Save() error {
+	paste.Key = Generator(8, true, &paste)
 	return dao.DB.Create(&paste).Error
 }
 
@@ -93,8 +74,8 @@ func (paste *Temporary) Get(password string) error {
 	return err
 }
 
-func Exist(key string) bool {
+func exist(key string, model interface{}) bool {
 	count := uint8(0)
-	dao.DB.Model(&Temporary{}).Where("`key` = ?", key).Count(&count)
+	dao.DB.Model(model).Where("`key` = ?", key).Count(&count)
 	return count > 0
 }

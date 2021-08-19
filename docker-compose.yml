@@ -7,7 +7,7 @@ services:
     depends_on:
       - pasteme-mysql
     healthcheck:
-      test: ["CMD", "wget", "localhost:8000/?method=beat", "--output=/dev/null"]
+      test: ["CMD", "wget", "localhost:8000/api/?method=beat", "--output=/dev/null"]
       interval: 30s
       timeout: 3s
       retries: 3

@@ -43,6 +43,7 @@ func (Permanent) TableName() string {
 
 // Save 成员函数，创建
 func (paste *Permanent) Save() error {
+	paste.Key = Generator(8, false, &paste)
 	return dao.DB.Create(&paste).Error
 }
 

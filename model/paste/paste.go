@@ -8,6 +8,7 @@ import (
 type IPaste interface {
 	Save() error
 	Get(string) error
+	TableName() string
 	Delete() error
 	GetKey() string
 	GetContent() string

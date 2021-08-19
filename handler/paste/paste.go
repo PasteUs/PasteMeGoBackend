@@ -106,8 +106,6 @@ func Create(context *gin.Context) {
 		body.AbstractPaste.Password = util.String2md5(body.AbstractPaste.Password)
 	}
 
-	body.AbstractPaste.Key = model.Generator()
-
 	var paste model.IPaste
 
 	if body.SelfDestruct {
@@ -138,13 +136,9 @@ func Create(context *gin.Context) {
 func Get(context *gin.Context) {
 	key := context.Param("key")
 
-	var (
-		table string
-		err   error
-		paste model.IPaste
-	)
+	var paste model.IPaste
 
-	if table, err = util.ValidChecker(key); err != nil {
+	if err := util.KeyValidator(key); err != nil {
 		context.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusBadRequest,
 			"message": err.Error(),
@@ -154,13 +148,13 @@ func Get(context *gin.Context) {
 
 	abstractPaste := model.AbstractPaste{Key: key}
 
-	if table == "temporary" {
+	if []rune(key)[0] == '0' {
 		paste = &model.Temporary{AbstractPaste: &abstractPaste}
 	} else {
 		paste = &model.Permanent{AbstractPaste: &abstractPaste}
 	}
 
-	if err = paste.Get(context.DefaultQuery("password", "")); err != nil {
+	if err := paste.Get(context.DefaultQuery("password", "")); err != nil {
 		var (
 			status  int
 			message string
