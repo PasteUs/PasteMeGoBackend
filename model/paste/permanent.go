@@ -7,26 +7,6 @@ import (
 
 func init() {
 	dao.CreateTable(&Permanent{})
-	/*
-	if !dao.DB.HasTable(&Permanent{}) {
-		var err error = nil
-		tableName := zap.String("table_name", Permanent{}.TableName())
-		logging.Warn("Table not found, start creating", tableName)
-
-		if config.Config.Database.Type != "mysql" {
-			err = dao.DB.CreateTable(&Permanent{}).Error
-			dao.DB.Exec(fmt.Sprintf("INSERT INTO `sqlite_sequence` (`name`, `seq`) VALUES ('%s', 99)", Permanent{}.TableName()))
-		} else {
-			err = dao.DB.Set(
-				"gorm:table_options",
-				"ENGINE=Innodb DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=100",
-			).CreateTable(&Permanent{}).Error
-		}
-		if err != nil {
-			logging.Panic("Create table failed", tableName, zap.String("err", err.Error()))
-		}
-	}
-	 */
 }
 
 // Permanent 永久

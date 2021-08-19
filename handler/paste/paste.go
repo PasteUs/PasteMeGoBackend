@@ -15,8 +15,8 @@ import (
 type requestBody struct {
 	*model.AbstractPaste
 	SelfDestruct bool   `json:"self_destruct"`
-	ExpireType   string `json:"expire_type"`
-	Expiration   uint64 `json:"expiration"`
+	ExpireMinute   uint64 `json:"expire_minute"`
+	ExpireCount  uint64 `json:"expire_count"`
 }
 
 func validator(body requestBody) error {
@@ -28,37 +28,32 @@ func validator(body requestBody) error {
 	}
 
 	if body.SelfDestruct {
-		if body.ExpireType == "" {
-			return ErrEmptyExpireType
+		if body.ExpireMinute <= 0 {
+			return ErrZeroExpireMinute
 		}
-		if body.Expiration <= 0 {
-			return ErrZeroExpiration
+		if body.ExpireCount <= 0 {
+			return ErrZeroExpireCount
 		}
 
-		if body.ExpireType == model.EnumTime {
-			if body.Expiration > model.OneMonth {
-				return ErrExpirationGreaterThanMonth
-			}
-		} else if body.ExpireType == model.EnumCount {
-			if body.Expiration > model.MaxCount {
-				return ErrExpirationGreaterThanMaxCount
-			}
-		} else {
-			return ErrInvalidExpireType
+		if body.ExpireMinute > model.OneMonth {
+			return ErrExpireMinuteGreaterThanMonth
+		}
+		if body.ExpireCount > model.MaxCount {
+			return ErrExpireCountGreaterThanMaxCount
 		}
 	}
 	return nil
 }
 
 func authenticator(body requestBody) error {
-	if body.Username == "nobody" {
+	if body.Username == session.Nobody {
 		if !body.SelfDestruct {
 			return ErrUnauthorized
 		}
-		if body.ExpireType == model.EnumCount && body.Expiration > 1 {
+		if body.ExpireCount > 1 {
 			return ErrUnauthorized
 		}
-		if body.ExpireType == model.EnumTime && body.Expiration > 3 {
+		if body.ExpireMinute > 5 {
 			return ErrUnauthorized
 		}
 	}
@@ -70,7 +65,7 @@ func Create(context *gin.Context) {
 
 	body := requestBody{
 		AbstractPaste: &model.AbstractPaste{
-			ClientIP:  context.ClientIP(),
+			ClientIP: context.ClientIP(),
 			Username: username,
 		},
 	}
@@ -111,8 +106,8 @@ func Create(context *gin.Context) {
 	if body.SelfDestruct {
 		paste = &model.Temporary{
 			AbstractPaste: body.AbstractPaste,
-			ExpireType:    body.ExpireType,
-			Expiration:    body.Expiration,
+			ExpireMinute:    body.ExpireMinute,
+			ExpireCount:   body.ExpireCount,
 		}
 	} else {
 		paste = &model.Permanent{AbstractPaste: body.AbstractPaste}
@@ -128,8 +123,8 @@ func Create(context *gin.Context) {
 	}
 
 	context.JSON(http.StatusCreated, gin.H{
-		"status":    http.StatusCreated,
-		"key":       paste.GetKey(),
+		"status": http.StatusCreated,
+		"key":    paste.GetKey(),
 	})
 }
 

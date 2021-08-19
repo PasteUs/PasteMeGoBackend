@@ -19,7 +19,7 @@ func (mw *JWTMiddleware) MiddlewareFunc(disableAboard bool) gin.HandlerFunc {
 
 func (mw *JWTMiddleware) unauthorized(disableAboard bool, c *gin.Context, code int, message string) {
 	if disableAboard {
-		c.Set(mw.IdentityKey, "nobody")
+		c.Set(mw.IdentityKey, Nobody)
 		c.Next()
 	} else {
 		c.Header("WWW-Authenticate", "JWT realm="+mw.Realm)

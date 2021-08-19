@@ -120,11 +120,9 @@ var (
 func creatTestCaseGenerator() map[string]testCase {
 	testCaseMap := map[string]testCase{}
 
-	for _, pasteType := range []string{"permanent", "temporary_count", "temporary_time"} {
+	for _, pasteType := range []string{"permanent", "temporary"} {
 		for _, password := range []string{"", "_with_password"} {
-			s := strings.Split(pasteType, "_")
-			expireType := s[len(s)-1]
-			username := "nobody"
+			username := session.Nobody
 			if pasteType == "permanent" {
 				username = "unittest"
 			}
@@ -140,8 +138,8 @@ func creatTestCaseGenerator() map[string]testCase {
 						"lang":          "python",
 						"password":      password,
 						"self_destruct": pasteType != "permanent",
-						"expire_type":   expireType,
-						"expiration":    1,
+						"expire_minute": 1,
+						"expire_count":  1,
 					},
 					map[string]string{},
 					"127.0.0.1:10086", "POST"},
@@ -153,13 +151,13 @@ func creatTestCaseGenerator() map[string]testCase {
 
 	for _, name := range []string{
 		"bind_failed", "empty_lang", "empty_content",
-		"zero_expiration", "empty_expire_type", "other_expire_type",
+		"zero_expire_count", "zero_expire_minute",
 		"month_expiration", "big_expiration", // "db_locked",
 	} {
 		var (
 			expectedStatus uint        = http.StatusBadRequest
-			expiration     interface{} = model.OneMonth
-			expireType                 = "time"
+			expireMinute   interface{} = model.OneMonth
+			expireCount                = 1
 			content                    = "print('Hello World!')"
 			lang                       = "python"
 			message                    = ""
@@ -173,24 +171,20 @@ func creatTestCaseGenerator() map[string]testCase {
 			content = ""
 			message = ErrEmptyContent.Error()
 		case "bind_failed":
-			expiration = "1"
+			expireMinute = "1"
 			message = "wrong param type"
-		case "zero_expiration":
-			expiration = 0
-			message = ErrZeroExpiration.Error()
-		case "empty_expire_type":
-			expireType = ""
-			message = ErrEmptyExpireType.Error()
-		case "other_expire_type":
-			expireType = "other"
-			message = ErrInvalidExpireType.Error()
+		case "zero_expire_count":
+			expireCount = 0
+			message = ErrZeroExpireCount.Error()
+		case "zero_expire_minute":
+			expireMinute = 0
+			message = ErrZeroExpireMinute.Error()
 		case "month_expiration":
-			expiration = model.OneMonth + 1
-			message = ErrExpirationGreaterThanMonth.Error()
+			expireMinute = model.OneMonth + 1
+			message = ErrExpireMinuteGreaterThanMonth.Error()
 		case "big_expiration":
-			expireType = "count"
-			expiration = model.MaxCount + 1
-			message = ErrExpirationGreaterThanMaxCount.Error()
+			expireCount = model.MaxCount + 1
+			message = ErrExpireCountGreaterThanMaxCount.Error()
 		case "db_locked":
 			expectedStatus = http.StatusInternalServerError
 			message = ErrQueryDBFailed.Error()
@@ -199,15 +193,15 @@ func creatTestCaseGenerator() map[string]testCase {
 		testCaseMap[name] = testCase{
 			name,
 			Input{map[string]string{
-				"username": "nobody",
+				"username": session.Nobody,
 			},
 				map[string]interface{}{
 					"content":       content,
 					"lang":          lang,
 					"password":      "",
 					"self_destruct": true,
-					"expire_type":   expireType,
-					"expiration":    expiration,
+					"expire_minute": expireMinute,
+					"expire_count":  expireCount,
 				},
 				map[string]string{},
 				"127.0.0.1:10086", "POST"},
@@ -242,7 +236,7 @@ func TestCreate(t *testing.T) {
 func getTestCaseGenerator() map[string]testCase {
 	testCaseMap := map[string]testCase{}
 
-	for _, pasteType := range []string{"permanent", "temporary_count", "temporary_time"} {
+	for _, pasteType := range []string{"permanent", "temporary"} {
 		passwordList := []string{"", "_with_password"}
 
 		if pasteType == "permanent" {
@@ -296,7 +290,7 @@ func getTestCaseGenerator() map[string]testCase {
 			status   uint
 			message  string
 			header   = map[string]string{"Accept": "application/json"}
-			username = "nobody"
+			username = session.Nobody
 			content  string
 		)
 

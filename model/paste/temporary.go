@@ -7,10 +7,8 @@ import (
 )
 
 const (
-	EnumTime  = "time"
-	EnumCount = "count"
-	OneMonth  = 31 * 24 * 60
-	MaxCount  = 3
+	OneMonth = 31 * 24 * 60
+	MaxCount = 3
 )
 
 func init() {
@@ -20,8 +18,8 @@ func init() {
 // Temporary 临时
 type Temporary struct {
 	*AbstractPaste        // 公有字段
-	ExpireType     string // 过期类型
-	Expiration     uint64 // 过期的数据
+	ExpireMinute   uint64 `json:"expire_minute"` // 过期时间
+	ExpireCount    uint64 `json:"expire_count"` // 过期的次数
 }
 
 func (Temporary) TableName() string {
@@ -46,29 +44,26 @@ func (paste *Temporary) Get(password string) error {
 			return e
 		}
 
-		if paste.ExpireType == EnumTime {
-			duration := time.Minute * time.Duration(paste.Expiration)
-			if time.Now().After(paste.CreatedAt.Add(duration)) {
-				if e := tx.Delete(&paste).Error; e != nil {
-					return e
-				}
-				return gorm.ErrRecordNotFound
+		duration := time.Minute * time.Duration(paste.ExpireMinute)
+		if time.Now().After(paste.CreatedAt.Add(duration)) {
+			if e := tx.Delete(&paste).Error; e != nil {
+				return e
 			}
+			return gorm.ErrRecordNotFound
 		}
 
 		if e := paste.checkPassword(password); e != nil {
 			return e
 		}
 
-		if paste.ExpireType == EnumCount {
-			if paste.Expiration <= 1 {
-				if e := tx.Delete(&paste).Error; e != nil {
-					return e
-				}
-			} else {
-				return tx.Model(&paste).Update("expiration", paste.Expiration-1).Error
+		if paste.ExpireCount <= 1 {
+			if e := tx.Delete(&paste).Error; e != nil {
+				return e
 			}
+		} else {
+			return tx.Model(&paste).Update("expire_count", paste.ExpireCount-1).Error
 		}
+
 		return nil
 	})
 	return err

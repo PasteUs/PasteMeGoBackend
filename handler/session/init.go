@@ -12,10 +12,11 @@ import (
 
 var (
 	IdentityKey    = "username"
+	Nobody         = "nobody"
 	AuthMiddleware *JWTMiddleware
 )
 
-func authenticator(c *gin.Context) (interface{}, error)  {
+func authenticator(c *gin.Context) (interface{}, error) {
 	var body user.User
 	if err := c.ShouldBind(&body); err != nil {
 		return "", jwt.ErrMissingLoginValues
@@ -39,13 +40,13 @@ func init() {
 	var err error
 	AuthMiddleware = &JWTMiddleware{
 		jwt.GinJWTMiddleware{
-			Realm:       "pasteme",
-			Key:         []byte(config.Config.Secret),
-			Timeout:     time.Hour,
-			MaxRefresh:  time.Hour,
-			IdentityKey: IdentityKey,
+			Realm:         "pasteme",
+			Key:           []byte(config.Config.Secret),
+			Timeout:       time.Hour,
+			MaxRefresh:    time.Hour,
+			IdentityKey:   IdentityKey,
 			Authenticator: authenticator,
-			PayloadFunc: payloadFunc,
+			PayloadFunc:   payloadFunc,
 			TokenLookup:   "cookie: token",
 			TokenHeadName: "PasteMe",
 		},
