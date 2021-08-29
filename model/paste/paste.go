@@ -1,6 +1,7 @@
 package paste
 
 import (
+	"github.com/PasteUs/PasteMeGoBackend/model/dao"
 	"github.com/PasteUs/PasteMeGoBackend/util"
 	"time"
 )
@@ -43,4 +44,10 @@ func (paste *AbstractPaste) checkPassword(password string) error {
 		return nil
 	}
 	return ErrWrongPassword
+}
+
+func Exist(key string, model interface{}) bool {
+	count := uint8(0)
+	dao.DB.Model(model).Where("`key` = ?", key).Count(&count)
+	return count > 0
 }

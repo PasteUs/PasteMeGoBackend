@@ -21,9 +21,9 @@ type Database struct {
 type config struct {
 	Version  string   `json:"version"`
 	Address  string   `json:"address"`
-	AdminUrl string   `json:"admin_url"` // PasteMe Admin's hostname
 	Port     uint16   `json:"port"`
 	Secret   string   `json:"secret"`
+	LogFile  string   `json:"log_file"`
 	Database Database `json:"database"`
 }
 
@@ -32,10 +32,6 @@ var Config config
 func init() {
 	load(flag.Config)
 	checkVersion(Config.Version)
-	setDefault()
-}
-
-func setDefault() {
 }
 
 func isInArray(item string, array []string) bool {
@@ -66,7 +62,7 @@ func exportConfig(filename string, c config) {
 			zap.String("config_file", filename),
 			zap.String("config_version", c.Version),
 			zap.String("address", c.Address),
-			zap.String("admin_url", c.AdminUrl),
+			zap.String("log_file", c.LogFile),
 			zap.Uint16("port", c.Port),
 		)
 

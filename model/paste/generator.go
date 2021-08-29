@@ -30,7 +30,7 @@ func generator(length int, zeroFirst bool) string {
 
 func Generator(length int, zeroFirst bool, model interface{}) string {
 	str := generator(length, zeroFirst)
-	for exist(str, model) {
+	for Exist(str, model) {
 		str = generator(length, zeroFirst)
 	}
 	return str

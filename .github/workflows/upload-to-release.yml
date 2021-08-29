@@ -42,7 +42,7 @@ jobs:
       - name: Release Version
         id: release_version
         run: |
-          echo ::set-output name=tag::$(echo "${GITHUB_REF}" | sed -e "s/refs\/tags\///g" | sed -E "s/release-v?([0-9]+)\.([0-9]+)\.([0-9]+)(-[a-zA-Z]+(\.[0-9]+)?)?/\1.\2.\3\4/g")
+          echo ::set-output name=tag::$(echo "${GITHUB_REF}" | sed -e "s/refs\/tags\///g")
 
       - name: Gzip
         run: |
@@ -72,7 +72,7 @@ jobs:
       - name: Release Version
         id: release_version
         run: |
-          echo ::set-output name=tag::$(echo "${GITHUB_REF}" | sed -e "s/refs\/tags\///g" | sed -E "s/release-v?([0-9]+)\.([0-9]+)\.([0-9]+)(-[a-zA-Z]+(\.[0-9]+)?)?/\1.\2.\3\4/g")
+          echo ::set-output name=tag::$(echo "${GITHUB_REF}" | sed -e "s/refs\/tags\///g")
 
       - name: Check out code into the Go module directory
         uses: actions/checkout@v1
