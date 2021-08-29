@@ -1,9 +1,9 @@
 {
-  "version": "3.3.0",
+  "version": "3.4.0",
   "address": "0.0.0.0",
-  "admin_url": "",
   "port": 8000,
   "secret": "!!! CHANGE THIS !!!",
+  "log_file": "pasteme.log",
   "database": {
     "type": "mysql",
     "username": "username",

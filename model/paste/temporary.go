@@ -69,8 +69,4 @@ func (paste *Temporary) Get(password string) error {
 	return err
 }
 
-func exist(key string, model interface{}) bool {
-	count := uint8(0)
-	dao.DB.Model(model).Where("`key` = ?", key).Count(&count)
-	return count > 0
-}
+
