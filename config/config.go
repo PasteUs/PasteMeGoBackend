@@ -19,7 +19,6 @@ type Database struct {
 }
 
 type config struct {
-	Version  string   `json:"version"`
 	Address  string   `json:"address"`
 	Port     uint16   `json:"port"`
 	Secret   string   `json:"secret"`
@@ -31,28 +30,6 @@ var Config config
 
 func init() {
 	load(flag.Config)
-	checkVersion(Config.Version)
-}
-
-func isInArray(item string, array []string) bool {
-	for _, each := range array {
-		if item == each {
-			return true
-		}
-	}
-	return false
-}
-
-func checkVersion(v string) {
-	if v != version {
-		if !isInArray(v, validConfigVersion) {
-			logging.Panic(
-				"invalid Config version",
-				zap.Strings("valid_config_version_list", validConfigVersion),
-				zap.String("config_version", v),
-			)
-		}
-	}
 }
 
 func exportConfig(filename string, c config) {
@@ -60,7 +37,6 @@ func exportConfig(filename string, c config) {
 		logging.Info(
 			"Config loaded",
 			zap.String("config_file", filename),
-			zap.String("config_version", c.Version),
 			zap.String("address", c.Address),
 			zap.String("log_file", c.LogFile),
 			zap.Uint16("port", c.Port),
