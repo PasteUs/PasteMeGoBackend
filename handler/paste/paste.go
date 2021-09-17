@@ -12,11 +12,22 @@ import (
 	"strings"
 )
 
+var validLang = []string{"cpp", "java", "python", "bash", "markdown", "json", "go"}
+
 type requestBody struct {
 	*model.AbstractPaste
 	SelfDestruct bool   `json:"self_destruct"`
 	ExpireMinute   uint64 `json:"expire_minute"`
 	ExpireCount  uint64 `json:"expire_count"`
+}
+
+func contains(s []string, e string) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
 }
 
 func validator(body requestBody) error {
@@ -25,6 +36,9 @@ func validator(body requestBody) error {
 	}
 	if body.Lang == "" {
 		return ErrEmptyLang // 语言类型为空，返回错误信息 "empty lang"
+	}
+	if !contains(validLang, body.Lang) {
+		return ErrInvalidLang
 	}
 
 	if body.SelfDestruct {

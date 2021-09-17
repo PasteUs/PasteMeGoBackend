@@ -152,7 +152,7 @@ func creatTestCaseGenerator() map[string]testCase {
 	for _, name := range []string{
 		"bind_failed", "empty_lang", "empty_content",
 		"zero_expire_count", "zero_expire_minute",
-		"month_expiration", "big_expiration", // "db_locked",
+		"month_expiration", "big_expiration", "invalid_lang", // "db_locked",
 	} {
 		var (
 			expectedStatus uint        = http.StatusBadRequest
@@ -188,6 +188,10 @@ func creatTestCaseGenerator() map[string]testCase {
 		case "db_locked":
 			expectedStatus = http.StatusInternalServerError
 			message = ErrQueryDBFailed.Error()
+		case "invalid_lang":
+			lang = "none"
+			expectedStatus = http.StatusBadRequest
+			message = ErrInvalidLang.Error()
 		}
 
 		testCaseMap[name] = testCase{

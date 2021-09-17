@@ -9,6 +9,7 @@ var (
 	ErrExpireCountGreaterThanMaxCount = errors.New("expire count greater than max count")
 	ErrEmptyContent                   = errors.New("empty content")
 	ErrEmptyLang                      = errors.New("empty lang")
+	ErrInvalidLang                    = errors.New("invalid lang")
 	ErrQueryDBFailed                  = errors.New("query from db failed")
 	ErrSaveFailed                     = errors.New("save failed")
 	ErrUnauthorized                   = errors.New("unauthorized")
