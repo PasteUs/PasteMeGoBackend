@@ -12,7 +12,7 @@ import (
 	"strings"
 )
 
-var validLang = []string{"cpp", "java", "python", "bash", "markdown", "json", "go"}
+var validLang = []string{"plain", "cpp", "java", "python", "bash", "markdown", "json", "go"}
 
 type requestBody struct {
 	*model.AbstractPaste
