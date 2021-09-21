@@ -143,7 +143,7 @@ func Create(context *gin.Context) {
 }
 
 func Get(context *gin.Context) {
-	key := context.Param("key")
+	key := strings.ToLower(context.Param("key"))
 
 	var paste model.IPaste
 
