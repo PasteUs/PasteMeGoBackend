@@ -2,7 +2,6 @@ package paste
 
 import (
 	"github.com/PasteUs/PasteMeGoBackend/model/dao"
-	"github.com/PasteUs/PasteMeGoBackend/util"
 	"time"
 )
 
@@ -40,7 +39,7 @@ func (paste *AbstractPaste) GetLang() string {
 }
 
 func (paste *AbstractPaste) checkPassword(password string) error {
-	if paste.Password == "" || paste.Password == util.String2md5(password) {
+	if paste.Password == password {
 		return nil
 	}
 	return ErrWrongPassword

@@ -2,10 +2,15 @@ package paste
 
 import (
 	"math/rand"
+	"time"
 )
 
+func init() {
+	rand.Seed(time.Now().UnixNano()) // 连续生成随机数，以当前纳秒数作为随机数种子
+}
+
 var (
-	charset = []rune("qwertyuiopasdfghjklzxcvbnm0123456789")
+	charset            = []rune("qwertyuiopasdfghjklzxcvbnm0123456789")
 	charsetWithoutZero = []rune("qwertyuiopasdfghjklzxcvbnm123456789")
 )
 

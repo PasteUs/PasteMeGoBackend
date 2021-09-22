@@ -4,75 +4,12 @@ import (
 	"github.com/PasteUs/PasteMeGoBackend/handler/session"
 	"github.com/PasteUs/PasteMeGoBackend/logging"
 	model "github.com/PasteUs/PasteMeGoBackend/model/paste"
-	"github.com/PasteUs/PasteMeGoBackend/util"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"go.uber.org/zap"
 	"net/http"
 	"strings"
 )
-
-var validLang = []string{"plain", "cpp", "java", "python", "bash", "markdown", "json", "go"}
-
-type requestBody struct {
-	*model.AbstractPaste
-	SelfDestruct bool   `json:"self_destruct"`
-	ExpireMinute   uint64 `json:"expire_minute"`
-	ExpireCount  uint64 `json:"expire_count"`
-}
-
-func contains(s []string, e string) bool {
-	for _, a := range s {
-		if a == e {
-			return true
-		}
-	}
-	return false
-}
-
-func validator(body requestBody) error {
-	if body.Content == "" {
-		return ErrEmptyContent // 内容为空，返回错误信息 "empty content"
-	}
-	if body.Lang == "" {
-		return ErrEmptyLang // 语言类型为空，返回错误信息 "empty lang"
-	}
-	if !contains(validLang, body.Lang) {
-		return ErrInvalidLang
-	}
-
-	if body.SelfDestruct {
-		if body.ExpireMinute <= 0 {
-			return ErrZeroExpireMinute
-		}
-		if body.ExpireCount <= 0 {
-			return ErrZeroExpireCount
-		}
-
-		if body.ExpireMinute > model.OneMonth {
-			return ErrExpireMinuteGreaterThanMonth
-		}
-		if body.ExpireCount > model.MaxCount {
-			return ErrExpireCountGreaterThanMaxCount
-		}
-	}
-	return nil
-}
-
-func authenticator(body requestBody) error {
-	if body.Username == session.Nobody {
-		if !body.SelfDestruct {
-			return ErrUnauthorized
-		}
-		if body.ExpireCount > 1 {
-			return ErrUnauthorized
-		}
-		if body.ExpireMinute > 5 {
-			return ErrUnauthorized
-		}
-	}
-	return nil
-}
 
 func Create(context *gin.Context) {
 	username := context.GetString(session.IdentityKey)
@@ -111,16 +48,12 @@ func Create(context *gin.Context) {
 		return
 	}
 
-	if body.AbstractPaste.Password != "" {
-		body.AbstractPaste.Password = util.String2md5(body.AbstractPaste.Password)
-	}
-
 	var paste model.IPaste
 
 	if body.SelfDestruct {
 		paste = &model.Temporary{
 			AbstractPaste: body.AbstractPaste,
-			ExpireMinute:    body.ExpireMinute,
+			ExpireMinute:  body.ExpireMinute,
 			ExpireCount:   body.ExpireCount,
 		}
 	} else {
@@ -147,7 +80,7 @@ func Get(context *gin.Context) {
 
 	var paste model.IPaste
 
-	if err := util.KeyValidator(key); err != nil {
+	if err := keyValidator(key); err != nil {
 		context.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusBadRequest,
 			"message": err.Error(),
