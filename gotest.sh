@@ -5,7 +5,6 @@ BASE=github.com/PasteUs/PasteMeGoBackend/
 PACKAGE_LISTS="
 handler/paste
 router
-util
 "
 
 export UNITTEST=1

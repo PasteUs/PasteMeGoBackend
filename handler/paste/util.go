@@ -38,7 +38,7 @@ func validator(body requestBody) error {
 	if !contains(validLang, body.Lang) {
 		return ErrInvalidLang
 	}
-	if body.Password != "" && !md5Pattern.MatchString(body.Password) {
+	if !md5Pattern.MatchString(body.Password) {
 		return ErrUnencryptedPassword
 	}
 

@@ -2,11 +2,11 @@ package paste
 
 import (
 	"bytes"
+	"crypto/md5"
 	"encoding/json"
 	"fmt"
 	"github.com/PasteUs/PasteMeGoBackend/handler/session"
 	model "github.com/PasteUs/PasteMeGoBackend/model/paste"
-	"github.com/PasteUs/PasteMeGoBackend/util"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"io"
@@ -117,6 +117,13 @@ var (
 	getTestCaseDict    map[string]testCase
 )
 
+func hash(text string) string {
+	if text == "" {
+		return text
+	}
+	return fmt.Sprintf("%x", md5.Sum([]byte(text)))
+}
+
 func creatTestCaseGenerator() map[string]testCase {
 	testCaseMap := map[string]testCase{}
 
@@ -136,7 +143,7 @@ func creatTestCaseGenerator() map[string]testCase {
 					map[string]interface{}{
 						"content":       "print('Hello World!')",
 						"lang":          "python",
-						"password":      password,
+						"password":      hash(password),
 						"self_destruct": pasteType != "permanent",
 						"expire_minute": 1,
 						"expire_count":  1,
@@ -268,7 +275,7 @@ func getTestCaseGenerator() map[string]testCase {
 						"key":      createTestCaseDict[name].response.Key,
 					},
 					map[string]interface{}{
-						"password": password,
+						"password": hash(password),
 					},
 					map[string]string{"Accept": "application/json"},
 					"127.0.0.1:10086", "GET",
@@ -306,11 +313,11 @@ func getTestCaseGenerator() map[string]testCase {
 		case "invalid_key_length":
 			key = "123456789"
 			status = http.StatusBadRequest
-			message = util.ErrInvalidKeyLength.Error()
+			message = ErrInvalidKeyLength.Error()
 		case "invalid_key_format":
 			key = "123__456"
 			status = http.StatusBadRequest
-			message = util.ErrInvalidKeyFormat.Error()
+			message = ErrInvalidKeyFormat.Error()
 		case "raw_content":
 			key = createTestCaseDict["permanent"].response.Key
 			content = createTestCaseDict["permanent"].input.requestBody["content"].(string)
