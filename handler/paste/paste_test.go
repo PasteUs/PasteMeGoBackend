@@ -2,7 +2,6 @@ package paste
 
 import (
 	"bytes"
-	"crypto/md5"
 	"encoding/json"
 	"fmt"
 	"github.com/PasteUs/PasteMeGoBackend/handler/session"
@@ -117,13 +116,6 @@ var (
 	getTestCaseDict    map[string]testCase
 )
 
-func hash(text string) string {
-	if text == "" {
-		return text
-	}
-	return fmt.Sprintf("%x", md5.Sum([]byte(text)))
-}
-
 func creatTestCaseGenerator() map[string]testCase {
 	testCaseMap := map[string]testCase{}
 
@@ -143,7 +135,7 @@ func creatTestCaseGenerator() map[string]testCase {
 					map[string]interface{}{
 						"content":       "print('Hello World!')",
 						"lang":          "python",
-						"password":      hash(password),
+						"password":      password,
 						"self_destruct": pasteType != "permanent",
 						"expire_minute": 1,
 						"expire_count":  1,
@@ -275,7 +267,7 @@ func getTestCaseGenerator() map[string]testCase {
 						"key":      createTestCaseDict[name].response.Key,
 					},
 					map[string]interface{}{
-						"password": hash(password),
+						"password": password,
 					},
 					map[string]string{"Accept": "application/json"},
 					"127.0.0.1:10086", "GET",

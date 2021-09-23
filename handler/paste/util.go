@@ -8,7 +8,6 @@ import (
 
 var (
 	validLang  = []string{"plain", "cpp", "java", "python", "bash", "markdown", "json", "go"}
-	md5Pattern = regexp.MustCompile("^$|^[a-f0-9]{32}$")
 	keyPattern = regexp.MustCompile("^[0-9a-z]{8}$")
 )
 
@@ -37,9 +36,6 @@ func validator(body requestBody) error {
 	}
 	if !contains(validLang, body.Lang) {
 		return ErrInvalidLang
-	}
-	if !md5Pattern.MatchString(body.Password) {
-		return ErrUnencryptedPassword
 	}
 
 	if body.SelfDestruct {

@@ -2,7 +2,6 @@ package router
 
 import (
 	"bytes"
-	"crypto/md5"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -51,10 +50,6 @@ func request(t *testing.T, method string, uri string, param map[string]interface
 	return
 }
 
-func hash(text string) string {
-	return fmt.Sprintf("%x", md5.Sum([]byte(text)))
-}
-
 type testCase struct {
 	name     string
 	method   string
@@ -84,9 +79,9 @@ func makeCreateTestCase() (result map[string]*testCase) {
 			result[name] = &testCase{
 				name, method, "/api/v3/paste/",
 				map[string]interface{}{
-					"lang":    "plain",
-					"content": "Hello World!",
-					"password": hash(password),
+					"lang":     "plain",
+					"content":  "Hello World!",
+					"password": password,
 				},
 				map[string]interface{}{},
 				map[string]interface{}{
@@ -115,7 +110,7 @@ func makeGetTestCase(createCaseList map[string]*testCase) (result map[string]*te
 			result[name] = &testCase{
 				name, method, "/api/v3/paste/" + (createCaseList[previousName].response["key"]).(string),
 				map[string]interface{}{
-					"password": hash(password),
+					"password": password,
 				},
 				map[string]interface{}{},
 				map[string]interface{}{
