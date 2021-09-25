@@ -10,7 +10,7 @@ var (
 	ErrEmptyContent                   = errors.New("empty content")
 	ErrEmptyLang                      = errors.New("empty lang")
 	ErrInvalidLang                    = errors.New("invalid lang")
-	ErrUnencryptedPassword            = errors.New("unencrypted password ")
+	ErrWrongParamType                 = errors.New("wrong param type")
 	ErrQueryDBFailed                  = errors.New("query from db failed")
 	ErrSaveFailed                     = errors.New("save failed")
 	ErrUnauthorized                   = errors.New("unauthorized")

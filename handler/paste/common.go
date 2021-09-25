@@ -1,6 +1,7 @@
 package paste
 
 import (
+	"github.com/PasteUs/PasteMeGoBackend/handler/common"
 	"github.com/PasteUs/PasteMeGoBackend/handler/session"
 	model "github.com/PasteUs/PasteMeGoBackend/model/paste"
 	"regexp"
@@ -11,11 +12,22 @@ var (
 	keyPattern = regexp.MustCompile("^[0-9a-z]{8}$")
 )
 
-type requestBody struct {
+type CreateRequest struct {
 	*model.AbstractPaste
-	SelfDestruct bool   `json:"self_destruct"`
-	ExpireMinute uint64 `json:"expire_minute"`
-	ExpireCount  uint64 `json:"expire_count"`
+	SelfDestruct bool   `json:"self_destruct" example:"true"` // 是否自我销毁
+	ExpireMinute uint64 `json:"expire_minute" example:"5"`    // 创建若干分钟后自我销毁
+	ExpireCount  uint64 `json:"expire_count" example:"1"`     // 访问若干次后自我销毁
+}
+
+type CreateResponse struct {
+	*common.Response
+	Key string `json:"key" example:"a1b2c3d4"`
+}
+
+type GetResponse struct {
+	*common.Response
+	Lang string `json:"lang" example:"plain"`
+	Content string `json:"content" example:"Hello World!"`
 }
 
 func contains(s []string, e string) bool {
@@ -27,7 +39,7 @@ func contains(s []string, e string) bool {
 	return false
 }
 
-func validator(body requestBody) error {
+func validator(body CreateRequest) error {
 	if body.Content == "" {
 		return ErrEmptyContent // 内容为空，返回错误信息 "empty content"
 	}
@@ -56,7 +68,7 @@ func validator(body requestBody) error {
 	return nil
 }
 
-func authenticator(body requestBody) error {
+func authenticator(body CreateRequest) error {
 	if body.Username == session.Nobody {
 		if !body.SelfDestruct {
 			return ErrUnauthorized

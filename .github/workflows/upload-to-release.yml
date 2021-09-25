@@ -19,17 +19,18 @@ jobs:
     steps:
 
       - name: Set up Go ${{ matrix.go_version }}
-        uses: actions/setup-go@v1
+        uses: actions/setup-go@v2
         with:
           go-version: ${{ matrix.go_version }}
         id: go
 
       - name: Check out code into the Go module directory
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
 
       - name: Get dependencies
         run: |
           go get -v -t -d ./...
+          go get -u github.com/swaggo/swag/cmd/swag
           if [ -f Gopkg.toml ]; then
               curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
               dep ensure
@@ -38,6 +39,7 @@ jobs:
       - name: Build
         run: |
           GOARCH=amd64 GOOS=linux go build -v -o pastemed .
+          GOARCH=amd64 GOOS=linux swag init
 
       - name: Release Version
         id: release_version
@@ -51,11 +53,19 @@ jobs:
           cp config.example.json pastemed-linux-amd64
           cp -r systemd pastemed-linux-amd64
           tar -czvf pastemed-${{ steps.release_version.outputs.tag }}-linux-amd64.tar.gz pastemed-linux-amd64
+          tar -czvf pastemed-swagger-${{ steps.release_version.outputs.tag }}.tar.gz docs
 
-      - name: Upload to release
+      - name: Upload bin to release
         uses: JasonEtco/upload-to-release@master
         with:
           args: pastemed-${{ steps.release_version.outputs.tag }}-linux-amd64.tar.gz application/octet-stream
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload swagger to release
+        uses: JasonEtco/upload-to-release@master
+        with:
+          args: pastemed-swagger-${{ steps.release_version.outputs.tag }}.tar.gz application/octet-stream
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -89,12 +99,12 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Login to Aliyun Docker Registry
-        uses: docker/login-action@v1
-        with:
-          registry: registry.cn-hangzhou.aliyuncs.com
-          username: ${{ secrets.ALIYUN_DOCKER_REGISTRY_USERNAME }}
-          password: ${{ secrets.ALIYUN_DOCKER_REGISTRY_TOKEN }}
+#      - name: Login to Aliyun Docker Registry
+#        uses: docker/login-action@v1
+#        with:
+#          registry: registry.cn-hangzhou.aliyuncs.com
+#          username: ${{ secrets.ALIYUN_DOCKER_REGISTRY_USERNAME }}
+#          password: ${{ secrets.ALIYUN_DOCKER_REGISTRY_TOKEN }}
 
       - name: Build and push
         id: docker_build
@@ -111,8 +121,8 @@ jobs:
           tags: |
             pasteme/go-backend:latest
             pasteme/go-backend:${{ steps.release_version.outputs.tag }}
-            registry.cn-hangzhou.aliyuncs.com/pasteus/pasteme-go-backend:latest
-            registry.cn-hangzhou.aliyuncs.com/pasteus/pasteme-go-backend:${{ steps.release_version.outputs.tag }}
+#            registry.cn-hangzhou.aliyuncs.com/pasteus/pasteme-go-backend:latest
+#            registry.cn-hangzhou.aliyuncs.com/pasteus/pasteme-go-backend:${{ steps.release_version.outputs.tag }}
 
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
