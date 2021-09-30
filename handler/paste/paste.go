@@ -1,9 +1,9 @@
 package paste
 
 import (
+	"github.com/PasteUs/PasteMeGoBackend/common/logging"
 	"github.com/PasteUs/PasteMeGoBackend/handler/common"
 	"github.com/PasteUs/PasteMeGoBackend/handler/session"
-	"github.com/PasteUs/PasteMeGoBackend/logging"
 	model "github.com/PasteUs/PasteMeGoBackend/model/paste"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -35,19 +35,19 @@ func Create(context *gin.Context) {
 
 	if err := context.ShouldBindJSON(&body); err != nil {
 		logging.Warn("bind body failed", context, zap.String("err", err.Error()))
-		common.Error(context, http.StatusBadRequest, ErrWrongParamType)
+		common.ErrWrongParamType.Abort(context)
 		return
 	}
 
 	if err := validator(body); err != nil {
 		logging.Info("param validate failed", zap.String("err", err.Error()))
-		common.Error(context, http.StatusBadRequest, err)
+		err.Abort(context)
 		return
 	}
 
 	if err := authenticator(body); err != nil {
 		logging.Info("unauthorized request")
-		common.Error(context, http.StatusUnauthorized, err)
+		err.Abort(context)
 		return
 	}
 
@@ -64,13 +64,13 @@ func Create(context *gin.Context) {
 	}
 
 	if err := paste.Save(); err != nil {
-		logging.Warn("save failed", context, zap.String("err", err.Error()))
-		common.Error(context, http.StatusInternalServerError, err)
+		logging.Error("save failed", context, zap.String("err", err.Error()))
+		common.ErrSaveFailed.Abort(context)
 		return
 	}
 
-	context.JSON(http.StatusCreated, CreateResponse{
-		Response: &common.Response{Status: http.StatusCreated},
+	common.JSON(context, CreateResponse{
+		Response: &common.Response{Code: http.StatusCreated},
 		Key:      paste.GetKey(),
 	})
 }
@@ -92,7 +92,7 @@ func Get(context *gin.Context) {
 	var paste model.IPaste
 
 	if err := keyValidator(key); err != nil {
-		common.Error(context, http.StatusBadRequest, err)
+		err.Abort(context)
 		return
 	}
 
@@ -105,27 +105,27 @@ func Get(context *gin.Context) {
 	}
 
 	if err := paste.Get(context.DefaultQuery("password", "")); err != nil {
-		var status int
+		var errorResponse *common.ErrorResponse
 		switch err {
 		case gorm.ErrRecordNotFound:
-			status = http.StatusNotFound
-		case model.ErrWrongPassword:
-			status = http.StatusForbidden
+			errorResponse = common.ErrRecordNotFound
+		case common.ErrWrongPassword:
+			errorResponse = err.(*common.ErrorResponse)
 		default:
 			logging.Error("query from db failed", context, zap.String("err", err.Error()))
-			status = http.StatusInternalServerError
+			errorResponse = common.ErrQueryDBFailed
 		}
 
-		common.Error(context, status, err)
+		errorResponse.Abort(context)
 		return
 	}
 
 	if strings.Contains(context.GetHeader("Accept"), "json") {
-		context.JSON(http.StatusOK, GetResponse{
+		common.JSON(context, GetResponse{
 			Response: &common.Response{
-				Status: http.StatusOK,
+				Code: http.StatusOK,
 			},
-			Lang: paste.GetLang(),
+			Lang:    paste.GetLang(),
 			Content: paste.GetContent(),
 		})
 	} else {

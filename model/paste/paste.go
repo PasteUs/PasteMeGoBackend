@@ -3,6 +3,7 @@ package paste
 import (
 	"crypto/md5"
 	"fmt"
+	"github.com/PasteUs/PasteMeGoBackend/handler/common"
 	"github.com/PasteUs/PasteMeGoBackend/model/dao"
 	"time"
 )
@@ -47,11 +48,11 @@ func hash(text string) string {
 	return fmt.Sprintf("%x", md5.Sum([]byte(text)))
 }
 
-func (paste *AbstractPaste) checkPassword(password string) error {
+func (paste *AbstractPaste) checkPassword(password string) *common.ErrorResponse {
 	if paste.Password == hash(password) {
 		return nil
 	}
-	return ErrWrongPassword
+	return common.ErrWrongPassword
 }
 
 func Exist(key string, model interface{}) bool {

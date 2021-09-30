@@ -2,8 +2,8 @@ package config
 
 import (
 	"encoding/json"
-	"github.com/PasteUs/PasteMeGoBackend/flag"
-	"github.com/PasteUs/PasteMeGoBackend/logging"
+	"github.com/PasteUs/PasteMeGoBackend/common/flag"
+	"github.com/PasteUs/PasteMeGoBackend/common/logging"
 	"go.uber.org/zap"
 	"io/ioutil"
 	"os"

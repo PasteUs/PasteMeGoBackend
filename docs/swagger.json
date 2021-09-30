@@ -1,0 +1,238 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "PasteMe Go Backend API",
+        "title": "PasteMe API",
+        "termsOfService": "https://github.com/LucienShui/PasteMe#%E5%85%8D%E8%B4%A3%E5%A3%B0%E6%98%8E",
+        "contact": {
+            "name": "Lucien",
+            "url": "https://blog.lucien.ink",
+            "email": "lucien@lucien.ink"
+        },
+        "license": {
+            "name": "GNU General Public License v3.0",
+            "url": "https://github.com/PasteUs/PasteMeGoBackend/blob/main/LICENSE"
+        },
+        "version": "3.4.1"
+    },
+    "basePath": "/api/v3",
+    "paths": {
+        "/": {
+            "get": {
+                "description": "心跳检测",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Common"
+                ],
+                "summary": "心跳检测",
+                "parameters": [
+                    {
+                        "enum": [
+                            "\"beat\""
+                        ],
+                        "type": "string",
+                        "description": "方法",
+                        "name": "method",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/common.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/paste/": {
+            "post": {
+                "description": "只有在登陆的状态下才能创建永久的一贴",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Paste"
+                ],
+                "summary": "创建永久存储或者是自我销毁的一贴",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "登陆的 Token",
+                        "name": "Authorization",
+                        "in": "header"
+                    },
+                    {
+                        "description": "请求数据",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/paste.CreateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/paste.CreateResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/common.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/paste/{key}": {
+            "get": {
+                "description": "如果不指定 Accept: application/json 的话，默认会返回 text/plain 格式的 content",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Paste"
+                ],
+                "summary": "读取一贴",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "\"text/plain\"",
+                        "description": "响应格式",
+                        "name": "Accept",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "description": "索引",
+                        "name": "key",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/paste.GetResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/common.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "common.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "example": 200
+                },
+                "message": {
+                    "type": "string",
+                    "example": "ok"
+                }
+            }
+        },
+        "common.Response": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "example": 200
+                }
+            }
+        },
+        "paste.CreateRequest": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "description": "内容，最大长度为 16777215(2^24-1) 个字符",
+                    "type": "string",
+                    "example": "Hello World!"
+                },
+                "expire_count": {
+                    "description": "访问若干次后自我销毁",
+                    "type": "integer",
+                    "example": 1
+                },
+                "expire_minute": {
+                    "description": "创建若干分钟后自我销毁",
+                    "type": "integer",
+                    "example": 5
+                },
+                "lang": {
+                    "description": "语言类型",
+                    "type": "string",
+                    "example": "plain"
+                },
+                "password": {
+                    "description": "密码",
+                    "type": "string"
+                },
+                "self_destruct": {
+                    "description": "是否自我销毁",
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
+        "paste.CreateResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "example": 200
+                },
+                "key": {
+                    "type": "string",
+                    "example": "a1b2c3d4"
+                }
+            }
+        },
+        "paste.GetResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "example": 200
+                },
+                "content": {
+                    "type": "string",
+                    "example": "Hello World!"
+                },
+                "lang": {
+                    "type": "string",
+                    "example": "plain"
+                }
+            }
+        }
+    }
+}

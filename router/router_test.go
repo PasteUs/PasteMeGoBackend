@@ -85,7 +85,7 @@ func makeCreateTestCase() (result map[string]*testCase) {
 				},
 				map[string]interface{}{},
 				map[string]interface{}{
-					"status": status,
+					"code": status,
 				},
 			}
 
@@ -114,7 +114,7 @@ func makeGetTestCase(createCaseList map[string]*testCase) (result map[string]*te
 				},
 				map[string]interface{}{},
 				map[string]interface{}{
-					"status":  200,
+					"code":  200,
 					"lang":    "plain",
 					"content": "Hello World!",
 				},

@@ -26,7 +26,7 @@ type CreateResponse struct {
 
 type GetResponse struct {
 	*common.Response
-	Lang string `json:"lang" example:"plain"`
+	Lang    string `json:"lang" example:"plain"`
 	Content string `json:"content" example:"Hello World!"`
 }
 
@@ -39,56 +39,56 @@ func contains(s []string, e string) bool {
 	return false
 }
 
-func validator(body CreateRequest) error {
+func validator(body CreateRequest) *common.ErrorResponse {
 	if body.Content == "" {
-		return ErrEmptyContent // 内容为空，返回错误信息 "empty content"
+		return common.ErrEmptyContent // 内容为空，返回错误信息 "empty content"
 	}
 	if body.Lang == "" {
-		return ErrEmptyLang // 语言类型为空，返回错误信息 "empty lang"
+		return common.ErrEmptyLang // 语言类型为空，返回错误信息 "empty lang"
 	}
 	if !contains(validLang, body.Lang) {
-		return ErrInvalidLang
+		return common.ErrInvalidLang
 	}
 
 	if body.SelfDestruct {
 		if body.ExpireMinute <= 0 {
-			return ErrZeroExpireMinute
+			return common.ErrZeroExpireMinute
 		}
 		if body.ExpireCount <= 0 {
-			return ErrZeroExpireCount
+			return common.ErrZeroExpireCount
 		}
 
 		if body.ExpireMinute > model.OneMonth {
-			return ErrExpireMinuteGreaterThanMonth
+			return common.ErrExpireMinuteGreaterThanMonth
 		}
 		if body.ExpireCount > model.MaxCount {
-			return ErrExpireCountGreaterThanMaxCount
+			return common.ErrExpireCountGreaterThanMaxCount
 		}
 	}
 	return nil
 }
 
-func authenticator(body CreateRequest) error {
+func authenticator(body CreateRequest) *common.ErrorResponse {
 	if body.Username == session.Nobody {
 		if !body.SelfDestruct {
-			return ErrUnauthorized
+			return common.ErrUnauthorized
 		}
 		if body.ExpireCount > 1 {
-			return ErrUnauthorized
+			return common.ErrUnauthorized
 		}
 		if body.ExpireMinute > 5 {
-			return ErrUnauthorized
+			return common.ErrUnauthorized
 		}
 	}
 	return nil
 }
 
-func keyValidator(key string) error {
+func keyValidator(key string) *common.ErrorResponse {
 	if len(key) != 8 {
-		return ErrInvalidKeyLength // key's length should at least 3 and at most 8
+		return common.ErrInvalidKeyLength // key's length should at least 3 and at most 8
 	}
 	if flag := keyPattern.MatchString(key); !flag {
-		return ErrInvalidKeyFormat
+		return common.ErrInvalidKeyFormat
 	}
 	return nil
 }
