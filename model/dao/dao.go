@@ -2,9 +2,9 @@ package dao
 
 import (
 	"fmt"
-	"github.com/PasteUs/PasteMeGoBackend/config"
-	"github.com/PasteUs/PasteMeGoBackend/flag"
-	"github.com/PasteUs/PasteMeGoBackend/logging"
+	"github.com/PasteUs/PasteMeGoBackend/common/config"
+	"github.com/PasteUs/PasteMeGoBackend/common/flag"
+	"github.com/PasteUs/PasteMeGoBackend/common/logging"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
 	_ "github.com/mattn/go-sqlite3"

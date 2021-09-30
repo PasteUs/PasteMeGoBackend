@@ -1,8 +1,8 @@
 package session
 
 import (
-	"github.com/PasteUs/PasteMeGoBackend/config"
-	"github.com/PasteUs/PasteMeGoBackend/logging"
+	"github.com/PasteUs/PasteMeGoBackend/common/config"
+	"github.com/PasteUs/PasteMeGoBackend/common/logging"
 	"github.com/PasteUs/PasteMeGoBackend/model/user"
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"

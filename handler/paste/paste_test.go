@@ -4,10 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/PasteUs/PasteMeGoBackend/handler/common"
 	"github.com/PasteUs/PasteMeGoBackend/handler/session"
 	model "github.com/PasteUs/PasteMeGoBackend/model/paste"
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -73,7 +73,7 @@ func testHandler(
 	if method == "GET" && acceptType != "json" {
 		p := response.(**Response)
 		(*p).Content = recorder.Body.String()
-		(*p).Status = http.StatusOK
+		(*p).Code = http.StatusOK
 		return nil
 	}
 	return json.Unmarshal(recorder.Body.Bytes(), &response)
@@ -89,7 +89,7 @@ type Input struct {
 
 type Expect struct {
 	ip      string
-	status  uint
+	status  int
 	message string
 	content string
 	lang    string
@@ -101,7 +101,7 @@ type Response struct {
 	Content  string `json:"content"`
 	Lang     string `json:"lang"`
 	Username string `json:"username"`
-	Status   uint   `json:"status"`
+	Code     int    `json:"code"`
 }
 
 type testCase struct {
@@ -154,7 +154,7 @@ func creatTestCaseGenerator() map[string]testCase {
 		"month_expiration", "big_expiration", "invalid_lang", // "db_locked",
 	} {
 		var (
-			expectedStatus uint        = http.StatusBadRequest
+			expectedStatus             = -1
 			expireMinute   interface{} = model.OneMonth
 			expireCount                = 1
 			content                    = "print('Hello World!')"
@@ -165,32 +165,39 @@ func creatTestCaseGenerator() map[string]testCase {
 		switch name {
 		case "empty_lang":
 			lang = ""
-			message = ErrEmptyLang.Error()
+			expectedStatus = common.ErrEmptyLang.Code
+			message = common.ErrEmptyLang.Error()
 		case "empty_content":
 			content = ""
-			message = ErrEmptyContent.Error()
+			expectedStatus = common.ErrEmptyContent.Code
+			message = common.ErrEmptyContent.Error()
 		case "bind_failed":
 			expireMinute = "1"
-			message = "wrong param type"
+			expectedStatus = common.ErrWrongParamType.Code
+			message = common.ErrWrongParamType.Error()
 		case "zero_expire_count":
 			expireCount = 0
-			message = ErrZeroExpireCount.Error()
+			expectedStatus = common.ErrZeroExpireCount.Code
+			message = common.ErrZeroExpireCount.Error()
 		case "zero_expire_minute":
 			expireMinute = 0
-			message = ErrZeroExpireMinute.Error()
+			expectedStatus = common.ErrZeroExpireMinute.Code
+			message = common.ErrZeroExpireMinute.Error()
 		case "month_expiration":
 			expireMinute = model.OneMonth + 1
-			message = ErrExpireMinuteGreaterThanMonth.Error()
+			expectedStatus = common.ErrExpireMinuteGreaterThanMonth.Code
+			message = common.ErrExpireMinuteGreaterThanMonth.Error()
 		case "big_expiration":
 			expireCount = model.MaxCount + 1
-			message = ErrExpireCountGreaterThanMaxCount.Error()
+			expectedStatus = common.ErrExpireCountGreaterThanMaxCount.Code
+			message = common.ErrExpireCountGreaterThanMaxCount.Error()
 		case "db_locked":
-			expectedStatus = http.StatusInternalServerError
-			message = ErrQueryDBFailed.Error()
+			expectedStatus = common.ErrQueryDBFailed.Code
+			message = common.ErrQueryDBFailed.Error()
 		case "invalid_lang":
 			lang = "none"
-			expectedStatus = http.StatusBadRequest
-			message = ErrInvalidLang.Error()
+			expectedStatus = common.ErrInvalidLang.Code
+			message = common.ErrInvalidLang.Error()
 		}
 
 		testCaseMap[name] = testCase{
@@ -225,9 +232,9 @@ func TestCreate(t *testing.T) {
 				t.Error(err.Error())
 			}
 
-			if c.response.Status != c.expect.status {
+			if c.response.Code != c.expect.status {
 				t.Errorf("check status failed | expected = %d, actual = %d, message = %s",
-					c.expect.status, c.response.Status, c.response.Message)
+					c.expect.status, c.response.Code, c.response.Message)
 			} else if c.expect.status != http.StatusCreated && c.response.Message != c.expect.message {
 				t.Errorf("check error message failed | expected = %s, actual = %s",
 					c.expect.message, c.response.Message)
@@ -248,14 +255,14 @@ func getTestCaseGenerator() map[string]testCase {
 
 		for _, password := range passwordList {
 			var (
-				name         = pasteType + password
-				status  uint = http.StatusOK
-				message      = ""
+				name        = pasteType + password
+				status  int = http.StatusOK
+				message     = ""
 			)
 
 			if password == "_wrong_password" {
-				status = http.StatusForbidden
-				message = model.ErrWrongPassword.Error()
+				status = common.ErrWrongPassword.Code
+				message = common.ErrWrongPassword.Error()
 				createTestCaseDict[name] = createTestCaseDict[pasteType+"_with_password"]
 			}
 
@@ -290,7 +297,7 @@ func getTestCaseGenerator() map[string]testCase {
 	} {
 		var (
 			key      string
-			status   uint
+			status   int
 			message  string
 			header   = map[string]string{"Accept": "application/json"}
 			username = session.Nobody
@@ -300,16 +307,16 @@ func getTestCaseGenerator() map[string]testCase {
 		switch name {
 		case "not_found":
 			key = "12345678"
-			status = http.StatusNotFound
-			message = gorm.ErrRecordNotFound.Error()
+			status = common.ErrRecordNotFound.Code
+			message = common.ErrRecordNotFound.Error()
 		case "invalid_key_length":
 			key = "123456789"
-			status = http.StatusBadRequest
-			message = ErrInvalidKeyLength.Error()
+			status = common.ErrInvalidKeyLength.Code
+			message = common.ErrInvalidKeyLength.Error()
 		case "invalid_key_format":
 			key = "123__456"
-			status = http.StatusBadRequest
-			message = ErrInvalidKeyFormat.Error()
+			status = common.ErrInvalidKeyFormat.Code
+			message = common.ErrInvalidKeyFormat.Error()
 		case "raw_content":
 			key = createTestCaseDict["permanent"].response.Key
 			content = createTestCaseDict["permanent"].input.requestBody["content"].(string)
@@ -318,8 +325,8 @@ func getTestCaseGenerator() map[string]testCase {
 			header = map[string]string{}
 		case "db_locked":
 			key = createTestCaseDict["permanent"].response.Key
-			status = http.StatusInternalServerError
-			message = ErrQueryDBFailed.Error()
+			status = common.ErrQueryDBFailed.Code
+			message = common.ErrQueryDBFailed.Error()
 		}
 
 		testCaseMap[name] = testCase{
@@ -360,9 +367,9 @@ func TestGet(t *testing.T) {
 				t.Error(err.Error())
 			}
 
-			if c.response.Status != c.expect.status {
+			if c.response.Code != c.expect.status {
 				t.Errorf("check status failed | expected = %d, actual = %d, message = %s",
-					c.expect.status, c.response.Status, c.response.Message)
+					c.expect.status, c.response.Code, c.response.Message)
 			} else if c.expect.status == http.StatusOK {
 				if c.expect.lang != c.response.Lang {
 					t.Errorf("check lang failed | expected = %s, actual = %s, message = %s",

@@ -1,0 +1,163 @@
+basePath: /api/v3
+definitions:
+  common.ErrorResponse:
+    properties:
+      code:
+        example: 200
+        type: integer
+      message:
+        example: ok
+        type: string
+    type: object
+  common.Response:
+    properties:
+      code:
+        example: 200
+        type: integer
+    type: object
+  paste.CreateRequest:
+    properties:
+      content:
+        description: 内容，最大长度为 16777215(2^24-1) 个字符
+        example: Hello World!
+        type: string
+      expire_count:
+        description: 访问若干次后自我销毁
+        example: 1
+        type: integer
+      expire_minute:
+        description: 创建若干分钟后自我销毁
+        example: 5
+        type: integer
+      lang:
+        description: 语言类型
+        example: plain
+        type: string
+      password:
+        description: 密码
+        type: string
+      self_destruct:
+        description: 是否自我销毁
+        example: true
+        type: boolean
+    type: object
+  paste.CreateResponse:
+    properties:
+      code:
+        example: 200
+        type: integer
+      key:
+        example: a1b2c3d4
+        type: string
+    type: object
+  paste.GetResponse:
+    properties:
+      code:
+        example: 200
+        type: integer
+      content:
+        example: Hello World!
+        type: string
+      lang:
+        example: plain
+        type: string
+    type: object
+info:
+  contact:
+    email: lucien@lucien.ink
+    name: Lucien
+    url: https://blog.lucien.ink
+  description: PasteMe Go Backend API
+  license:
+    name: GNU General Public License v3.0
+    url: https://github.com/PasteUs/PasteMeGoBackend/blob/main/LICENSE
+  termsOfService: https://github.com/LucienShui/PasteMe#%E5%85%8D%E8%B4%A3%E5%A3%B0%E6%98%8E
+  title: PasteMe API
+  version: 3.4.1
+paths:
+  /:
+    get:
+      description: 心跳检测
+      parameters:
+      - description: 方法
+        enum:
+        - '"beat"'
+        in: query
+        name: method
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+      summary: 心跳检测
+      tags:
+      - Common
+  /paste/:
+    post:
+      consumes:
+      - application/json
+      description: 只有在登陆的状态下才能创建永久的一贴
+      parameters:
+      - description: 登陆的 Token
+        in: header
+        name: Authorization
+        type: string
+      - description: 请求数据
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/paste.CreateRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/paste.CreateResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+      summary: 创建永久存储或者是自我销毁的一贴
+      tags:
+      - Paste
+  /paste/{key}:
+    get:
+      consumes:
+      - application/json
+      description: '如果不指定 Accept: application/json 的话，默认会返回 text/plain 格式的 content'
+      parameters:
+      - default: '"text/plain"'
+        description: 响应格式
+        in: header
+        name: Accept
+        type: string
+      - description: 索引
+        in: path
+        name: key
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/paste.GetResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+      summary: 读取一贴
+      tags:
+      - Paste
+swagger: "2.0"

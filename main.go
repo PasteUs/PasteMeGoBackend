@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/PasteUs/PasteMeGoBackend/config"
+	"github.com/PasteUs/PasteMeGoBackend/common/config"
 	"github.com/PasteUs/PasteMeGoBackend/router"
 )
 

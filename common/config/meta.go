@@ -1,11 +1,11 @@
 package config
 
 import (
-	"github.com/PasteUs/PasteMeGoBackend/logging"
+	"github.com/PasteUs/PasteMeGoBackend/common/logging"
 	"go.uber.org/zap"
 )
 
-var version = "3.4.1"
+var version = "3.5.0"
 var validConfigVersion = []string{"3.3.0", ""}
 
 func init() {

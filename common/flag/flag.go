@@ -2,7 +2,7 @@ package flag
 
 import (
 	"flag"
-	"github.com/PasteUs/PasteMeGoBackend/logging"
+	"github.com/PasteUs/PasteMeGoBackend/common/logging"
 	"go.uber.org/zap"
 	"os"
 	"strings"

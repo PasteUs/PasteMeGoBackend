@@ -5,12 +5,27 @@ import (
 	"net/http"
 )
 
+type IResponse interface {
+	GetHttpStatusCode() int
+}
+
 type Response struct {
-	Status int `json:"status" example:"200"`
+	Code int `json:"code" example:"200"`
+}
+
+func (response *Response) GetHttpStatusCode() int {
+	if response.Code > 1000 {
+		return response.Code / 100
+	}
+	return response.Code
+}
+
+func JSON(context *gin.Context, response IResponse) {
+	context.JSON(response.GetHttpStatusCode(), response)
 }
 
 func NotFoundHandler(context *gin.Context) {
-	Error(context, http.StatusNotFound, ErrNoRouterFounded)
+	ErrNoRouterFounded.Abort(context)
 }
 
 // Beat godoc
@@ -25,7 +40,7 @@ func NotFoundHandler(context *gin.Context) {
 func Beat(context *gin.Context) {
 	method := context.DefaultQuery("method", "none")
 	if method == "beat" {
-		context.JSON(http.StatusOK, Response{http.StatusOK})
+		JSON(context, &Response{Code: http.StatusOK})
 	} else {
 		NotFoundHandler(context)
 	}

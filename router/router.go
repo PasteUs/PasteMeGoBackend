@@ -2,11 +2,11 @@ package router
 
 import (
 	"fmt"
-	"github.com/PasteUs/PasteMeGoBackend/flag"
+	"github.com/PasteUs/PasteMeGoBackend/common/flag"
+	"github.com/PasteUs/PasteMeGoBackend/common/logging"
 	"github.com/PasteUs/PasteMeGoBackend/handler/common"
 	"github.com/PasteUs/PasteMeGoBackend/handler/paste"
 	"github.com/PasteUs/PasteMeGoBackend/handler/session"
-	"github.com/PasteUs/PasteMeGoBackend/logging"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -18,6 +18,7 @@ func init() {
 		gin.SetMode(gin.ReleaseMode)
 	}
 	router = gin.Default()
+	// router.Use(common.ErrorHandler())
 
 	api := router.Group("/api")
 	{
