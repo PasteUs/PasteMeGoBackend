@@ -6,8 +6,8 @@ import (
 	"github.com/PasteUs/PasteMeGoBackend/handler/token"
 	model "github.com/PasteUs/PasteMeGoBackend/model/paste"
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 	"net/http"
 	"strings"
 )

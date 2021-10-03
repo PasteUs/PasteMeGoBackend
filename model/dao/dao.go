@@ -5,11 +5,14 @@ import (
 	"github.com/PasteUs/PasteMeGoBackend/common/config"
 	"github.com/PasteUs/PasteMeGoBackend/common/flag"
 	"github.com/PasteUs/PasteMeGoBackend/common/logging"
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/jinzhu/gorm"
-	_ "github.com/mattn/go-sqlite3"
 	"go.uber.org/zap"
+	"gorm.io/driver/mysql"
+	_ "gorm.io/driver/mysql"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
+	"gorm.io/gorm/schema"
 	"os"
+	"reflect"
 )
 
 func format(
@@ -19,7 +22,7 @@ func format(
 	server string,
 	port uint16,
 	database string) string {
-	return fmt.Sprintf("%s:%s@%s(%s:%d)/%s?parseTime=True&loc=Local",
+	return fmt.Sprintf("%s:%s@%s(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 		username, password, network, server, port, database)
 }
 
@@ -30,18 +33,25 @@ func formatWithConfig(database config.Database) string {
 var DB *gorm.DB
 
 func init() {
-	var err error
+	var (
+		err        error
+		gormConfig = &gorm.Config{
+			NamingStrategy: schema.NamingStrategy{
+				SingularTable: true,
+			},
+		}
+	)
 	if config.Config.Database.Type != "mysql" {
 		sqlitePath := flag.DataDir + "pasteme.db"
 		pwd, _ := os.Getwd()
 		logging.Info("using sqlite", zap.String("database_type", config.Config.Database.Type), zap.String("work_dir", pwd))
-		if DB, err = gorm.Open("sqlite3", sqlitePath); err != nil {
+		if DB, err = gorm.Open(sqlite.Open(sqlitePath), gormConfig); err != nil {
 			logging.Panic("sqlite connect failed", zap.String("sqlite_path", sqlitePath), zap.String("err", err.Error()))
 			return
 		}
 		logging.Info("sqlite connect success", zap.String("sqlite_path", sqlitePath))
 	} else {
-		if DB, err = gorm.Open("mysql", formatWithConfig(config.Config.Database)); err != nil {
+		if DB, err = gorm.Open(mysql.Open(formatWithConfig(config.Config.Database))); err != nil {
 			logging.Panic("connect to mysql failed", zap.String("err", err.Error()))
 			return
 		}
@@ -51,26 +61,29 @@ func init() {
 		logging.Warn("running in debug mode, database execute will be displayed")
 		DB = DB.Debug()
 	}
+}
 
-	DB.SingularTable(true)
+func getTableName(object interface{}) string {
+	var typeName string
+	if t := reflect.TypeOf(object); t.Kind() == reflect.Ptr {
+		typeName = t.Elem().Name()
+	} else {
+		typeName = t.Name()
+	}
+	return DB.NamingStrategy.TableName(typeName)
 }
 
 func CreateTable(object interface{}) {
-	if !DB.HasTable(object) {
-		var err error = nil
-		tableName := zap.String("table_name", DB.NewScope(object).TableName())
+	db := DB
+	if config.Config.Database.Type == "mysql" {
+		db = db.Set("gorm:table_options", "ENGINE=Innodb DEFAULT CHARSET=utf8mb4")
+	}
+	migrator := db.Migrator()
+	if !migrator.HasTable(object) {
+		tableName := zap.String("table_name", getTableName(object))
 		logging.Warn("Table not found, start creating", tableName)
 
-		if config.Config.Database.Type != "mysql" {
-			err = DB.CreateTable(object).Error
-		} else {
-			err = DB.Set(
-				"gorm:table_options",
-				"ENGINE=Innodb DEFAULT CHARSET=utf8mb4",
-			).CreateTable(object).Error
-		}
-
-		if err != nil {
+		if err := migrator.CreateTable(object); err != nil {
 			logging.Panic("Create table failed", tableName, zap.String("err", err.Error()))
 		}
 	}

@@ -2,7 +2,7 @@ package paste
 
 import (
 	"github.com/PasteUs/PasteMeGoBackend/model/dao"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 	"time"
 )
 
@@ -37,7 +37,7 @@ func (paste *Temporary) Delete() error {
 // Get 成员函数，查看
 func (paste *Temporary) Get(password string) error {
 	err := dao.DB.Transaction(func(tx *gorm.DB) error {
-		if e := tx.Find(&paste).Error; e != nil {
+		if e := tx.Take(&paste).Error; e != nil {
 			return e
 		}
 

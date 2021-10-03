@@ -7,7 +7,7 @@ func init() {
 }
 
 type User struct {
-	Username string `json:"username" gorm:"type:varchar(32);primary_key"`
+	Username string `json:"username" gorm:"type:varchar(32);primaryKey"`
 	Password string `json:"password" gorm:"type:varchar(32)"`
 	Email    string `json:"email" gorm:"type:varchar(128)"`
 }
