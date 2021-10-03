@@ -1,4 +1,4 @@
-package session
+package token
 
 import (
 	"github.com/PasteUs/PasteMeGoBackend/common/config"
@@ -39,7 +39,7 @@ func payloadFunc(data interface{}) jwt.MapClaims {
 func init() {
 	var err error
 	AuthMiddleware = &JWTMiddleware{
-		jwt.GinJWTMiddleware{
+		&jwt.GinJWTMiddleware{
 			Realm:         "pasteme",
 			Key:           []byte(config.Config.Secret),
 			Timeout:       time.Hour,

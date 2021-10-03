@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/PasteUs/PasteMeGoBackend/handler/common"
-	"github.com/PasteUs/PasteMeGoBackend/handler/session"
+	"github.com/PasteUs/PasteMeGoBackend/handler/token"
 	model "github.com/PasteUs/PasteMeGoBackend/model/paste"
 	"github.com/gin-gonic/gin"
 	"io"
@@ -67,7 +67,7 @@ func testHandler(
 		context.Request.URL.RawQuery = strings.Join(rawQueryList, "&")
 	} else {
 		mockJSONRequest(context, requestBody, method)
-		context.Set(session.IdentityKey, ginParams["username"])
+		context.Set(token.IdentityKey, ginParams["username"])
 	}
 	handler(context)
 	if method == "GET" && acceptType != "json" {
@@ -121,7 +121,7 @@ func creatTestCaseGenerator() map[string]testCase {
 
 	for _, pasteType := range []string{"permanent", "temporary"} {
 		for _, password := range []string{"", "_with_password"} {
-			username := session.Nobody
+			username := token.Nobody
 			if pasteType == "permanent" {
 				username = "unittest"
 			}
@@ -203,7 +203,7 @@ func creatTestCaseGenerator() map[string]testCase {
 		testCaseMap[name] = testCase{
 			name,
 			Input{map[string]string{
-				"username": session.Nobody,
+				"username": token.Nobody,
 			},
 				map[string]interface{}{
 					"content":       content,
@@ -300,7 +300,7 @@ func getTestCaseGenerator() map[string]testCase {
 			status   int
 			message  string
 			header   = map[string]string{"Accept": "application/json"}
-			username = session.Nobody
+			username = token.Nobody
 			content  string
 		)
 

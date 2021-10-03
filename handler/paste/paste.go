@@ -3,7 +3,7 @@ package paste
 import (
 	"github.com/PasteUs/PasteMeGoBackend/common/logging"
 	"github.com/PasteUs/PasteMeGoBackend/handler/common"
-	"github.com/PasteUs/PasteMeGoBackend/handler/session"
+	"github.com/PasteUs/PasteMeGoBackend/handler/token"
 	model "github.com/PasteUs/PasteMeGoBackend/model/paste"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -24,7 +24,7 @@ import (
 // @Failure default {object} common.ErrorResponse
 // @Router /paste/ [post]
 func Create(context *gin.Context) {
-	username := context.GetString(session.IdentityKey)
+	username := context.GetString(token.IdentityKey)
 
 	body := CreateRequest{
 		AbstractPaste: &model.AbstractPaste{

@@ -51,6 +51,8 @@ func init() {
 		logging.Warn("running in debug mode, database execute will be displayed")
 		DB = DB.Debug()
 	}
+
+	DB.SingularTable(true)
 }
 
 func CreateTable(object interface{}) {
