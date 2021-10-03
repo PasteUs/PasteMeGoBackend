@@ -11,6 +11,8 @@ const (
 	MaxCount = 3
 )
 
+var nilTime = time.Time{}
+
 func init() {
 	dao.CreateTable(&Temporary{})
 }
@@ -36,7 +38,7 @@ func (paste *Temporary) Delete() error {
 
 // Get 成员函数，查看
 func (paste *Temporary) Get(password string) error {
-	err := dao.DB.Transaction(func(tx *gorm.DB) error {
+	if err := dao.DB.Transaction(func(tx *gorm.DB) error {
 		if e := tx.Take(&paste).Error; e != nil {
 			return e
 		}
@@ -46,7 +48,8 @@ func (paste *Temporary) Get(password string) error {
 			if e := tx.Delete(&paste).Error; e != nil {
 				return e
 			}
-			return gorm.ErrRecordNotFound
+			paste.CreatedAt = nilTime // 通过此字段标记为非法，transaction 生效后再 return error
+			return nil
 		}
 
 		if e := paste.checkPassword(password); e != nil {
@@ -62,8 +65,10 @@ func (paste *Temporary) Get(password string) error {
 		}
 
 		return nil
-	})
-	return err
+	}); err != nil {
+		return err
+	} else if paste.CreatedAt.IsZero() {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
 }
-
-
