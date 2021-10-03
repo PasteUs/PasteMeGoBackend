@@ -1,4 +1,4 @@
-package session
+package token
 
 import (
 	jwt "github.com/appleboy/gin-jwt/v2"
@@ -7,7 +7,7 @@ import (
 )
 
 type JWTMiddleware struct {
-	jwt.GinJWTMiddleware
+	*jwt.GinJWTMiddleware
 }
 
 // MiddlewareFunc makes GinJWTMiddleware implement the Middleware interface.

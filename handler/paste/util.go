@@ -2,7 +2,7 @@ package paste
 
 import (
 	"github.com/PasteUs/PasteMeGoBackend/handler/common"
-	"github.com/PasteUs/PasteMeGoBackend/handler/session"
+	"github.com/PasteUs/PasteMeGoBackend/handler/token"
 	model "github.com/PasteUs/PasteMeGoBackend/model/paste"
 	"regexp"
 )
@@ -69,7 +69,7 @@ func validator(body CreateRequest) *common.ErrorResponse {
 }
 
 func authenticator(body CreateRequest) *common.ErrorResponse {
-	if body.Username == session.Nobody {
+	if body.Username == token.Nobody {
 		if !body.SelfDestruct {
 			return common.ErrUnauthorized
 		}

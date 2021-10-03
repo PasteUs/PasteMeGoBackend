@@ -6,7 +6,7 @@ import (
 	"github.com/PasteUs/PasteMeGoBackend/common/logging"
 	"github.com/PasteUs/PasteMeGoBackend/handler/common"
 	"github.com/PasteUs/PasteMeGoBackend/handler/paste"
-	"github.com/PasteUs/PasteMeGoBackend/handler/session"
+	"github.com/PasteUs/PasteMeGoBackend/handler/token"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -18,7 +18,6 @@ func init() {
 		gin.SetMode(gin.ReleaseMode)
 	}
 	router = gin.Default()
-	// router.Use(common.ErrorHandler())
 
 	api := router.Group("/api")
 	{
@@ -26,11 +25,11 @@ func init() {
 		{
 			v3.GET("/", common.Beat)
 
-			s := v3.Group("/session")
+			s := v3.Group("/token")
 			{
-				s.POST("", session.AuthMiddleware.LoginHandler)    // 创建 Session（登陆）
-				s.DELETE("", session.AuthMiddleware.LogoutHandler) // 销毁 Session（登出）
-				s.GET("", session.AuthMiddleware.RefreshHandler)   // 刷新 Session
+				s.POST("", token.AuthMiddleware.LoginHandler)    // 创建 Session（登陆）
+				s.DELETE("", token.AuthMiddleware.LogoutHandler) // 销毁 Session（登出）
+				s.GET("", token.AuthMiddleware.RefreshHandler)   // 刷新 Session
 			}
 
 			u := v3.Group("/user")
@@ -42,7 +41,7 @@ func init() {
 
 			p := v3.Group("/paste")
 			{
-				p.POST("/", session.AuthMiddleware.MiddlewareFunc(true),
+				p.POST("/", token.AuthMiddleware.MiddlewareFunc(true),
 					paste.Create)         // 创建一个 Paste
 				p.GET("/:key", paste.Get) // 读取 Paste
 			}

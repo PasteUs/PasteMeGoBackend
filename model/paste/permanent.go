@@ -17,10 +17,6 @@ type Permanent struct {
 	DeletedAt *time.Time
 }
 
-func (Permanent) TableName() string {
-	return "permanent"
-}
-
 // Save 成员函数，创建
 func (paste *Permanent) Save() error {
 	paste.Key = Generator(8, false, &paste)

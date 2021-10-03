@@ -22,10 +22,6 @@ type Temporary struct {
 	ExpireCount    uint64 `json:"expire_count"` // 过期的次数
 }
 
-func (Temporary) TableName() string {
-	return "temporary"
-}
-
 // Save 成员函数，保存
 func (paste *Temporary) Save() error {
 	paste.Key = Generator(8, true, &paste)
