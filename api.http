@@ -1,41 +1,8 @@
-### Get nothing
-GET {{host}}/api/v2/?method=beat
-Accept: application/json
-
-### Get example
-GET {{host}}/api/v2/example
-Accept: application/json
-Accept: text/plain
-
-### Create custom read once paste
-PUT {{host}}/api/v2/example
-Content-Type: application/json
-Accept: application/json
-
-{
-  "lang": "plain",
-  "content": "Hello World!"
-}
-
-### Create permanent
-POST {{host}}/api/v2
-Content-Type: application/json
-Accept: application/json
-
-{
-  "lang": "plain",
-  "content": "Hello World!"
-}
-
-### Get example
-GET {{host}}/api/v2/100?json
-Accept: application/json
-
-### Get nothing
+### Beat
 GET {{host}}/api/v3/?method=beat
 Accept: application/json
 
-### Greate paste
+### Greate permanent paste
 POST {{host}}/api/v3/paste
 Content-Type: application/json
 Accept: application/json
@@ -55,8 +22,8 @@ Accept: application/json
   "lang": "python",
   "content": "print('Hello World!')",
   "self_destruct": true,
-  "expire_type": "count",
-  "expiration": 1
+  "expire_count": 1,
+  "expire_minute": 1
 }
 
 ### Get paste
