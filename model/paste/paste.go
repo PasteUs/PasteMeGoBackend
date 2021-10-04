@@ -18,14 +18,13 @@ type IPaste interface {
 }
 
 type AbstractPaste struct {
-	IPaste    `swaggerignore:"true"`
-	Key       string    `json:"key" swaggerignore:"true" gorm:"type:varchar(16);primary_key"` // 主键:索引
-	Lang      string    `json:"lang" example:"plain" gorm:"type:varchar(16)"`                 // 语言类型
-	Content   string    `json:"content" example:"Hello World!" gorm:"type:mediumtext"`        // 内容，最大长度为 16777215(2^24-1) 个字符
-	Password  string    `json:"password" example:"" gorm:"type:varchar(32)"`                  // 密码
-	ClientIP  string    `json:"client_ip" swaggerignore:"true" gorm:"type:varchar(64)"`       // 用户 IP
-	Username  string    `json:"username" swaggerignore:"true" gorm:"type:varchar(16)"`        // 用户名
-	CreatedAt time.Time `swaggerignore:"true"`                                                // 存储记录的创建时间
+	Key       string    `json:"key" swaggerignore:"true" gorm:"type:varchar(16);primaryKey"` // 主键:索引
+	Lang      string    `json:"lang" example:"plain" gorm:"type:varchar(16)"`                // 语言类型
+	Content   string    `json:"content" example:"Hello World!" gorm:"type:mediumtext"`       // 内容，最大长度为 16777215(2^24-1) 个字符
+	Password  string    `json:"password" example:"" gorm:"type:varchar(32)"`                 // 密码
+	ClientIP  string    `json:"client_ip" swaggerignore:"true" gorm:"type:varchar(64)"`      // 用户 IP
+	Username  string    `json:"username" swaggerignore:"true" gorm:"type:varchar(16)"`       // 用户名
+	CreatedAt time.Time `swaggerignore:"true"`                                               // 存储记录的创建时间
 }
 
 func (paste *AbstractPaste) GetKey() string {
@@ -55,7 +54,7 @@ func (paste *AbstractPaste) checkPassword(password string) *common.ErrorResponse
 }
 
 func Exist(key string, model interface{}) bool {
-	count := uint8(0)
+	count := int64(0)
 	dao.DB.Model(model).Where("`key` = ?", key).Count(&count)
 	return count > 0
 }
