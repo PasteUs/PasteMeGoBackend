@@ -34,13 +34,13 @@ func Create(context *gin.Context) {
 	}
 
 	if err := context.ShouldBindJSON(&body); err != nil {
-		logging.Warn("bind body failed", context, zap.String("err", err.Error()))
+		logging.Warn("bind body failed", context, zap.Error(err))
 		common.ErrWrongParamType.Abort(context)
 		return
 	}
 
 	if err := validator(body); err != nil {
-		logging.Info("param validate failed", zap.String("err", err.Error()))
+		logging.Info("param validate failed", zap.Error(err))
 		err.Abort(context)
 		return
 	}
@@ -64,7 +64,7 @@ func Create(context *gin.Context) {
 	}
 
 	if err := paste.Save(); err != nil {
-		logging.Error("save failed", context, zap.String("err", err.Error()))
+		logging.Error("save failed", context, zap.Error(err))
 		common.ErrSaveFailed.Abort(context)
 		return
 	}
@@ -112,7 +112,7 @@ func Get(context *gin.Context) {
 		case common.ErrWrongPassword:
 			errorResponse = err.(*common.ErrorResponse)
 		default:
-			logging.Error("query from db failed", context, zap.String("err", err.Error()))
+			logging.Error("query from db failed", context, zap.Error(err))
 			errorResponse = common.ErrQueryDBFailed
 		}
 

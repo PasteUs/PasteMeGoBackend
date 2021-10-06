@@ -45,13 +45,13 @@ func init() {
 		pwd, _ := os.Getwd()
 		logging.Info("using sqlite", zap.String("database_type", config.Config.Database.Type), zap.String("work_dir", pwd))
 		if DB, err = gorm.Open(sqlite.Open(sqlitePath), gormConfig); err != nil {
-			logging.Panic("sqlite connect failed", zap.String("sqlite_path", sqlitePath), zap.String("err", err.Error()))
+			logging.Panic("sqlite connect failed", zap.String("sqlite_path", sqlitePath), zap.Error(err))
 			return
 		}
 		logging.Info("sqlite connect success", zap.String("sqlite_path", sqlitePath))
 	} else {
 		if DB, err = gorm.Open(mysql.Open(formatWithConfig(config.Config.Database))); err != nil {
-			logging.Panic("connect to mysql failed", zap.String("err", err.Error()))
+			logging.Panic("connect to mysql failed", zap.Error(err))
 			return
 		}
 		logging.Info("mysql connected")
@@ -83,7 +83,7 @@ func CreateTable(object interface{}) {
 		logging.Warn("Table not found, start creating", tableName)
 
 		if err := migrator.CreateTable(object); err != nil {
-			logging.Panic("Create table failed", tableName, zap.String("err", err.Error()))
+			logging.Panic("Create table failed", tableName, zap.Error(err))
 		}
 	}
 }

@@ -53,6 +53,6 @@ func init() {
 
 func Run(address string, port uint16) {
 	if err := router.Run(fmt.Sprintf("%s:%d", address, port)); err != nil {
-		logging.Panic("Run server failed", zap.String("err", err.Error()))
+		logging.Panic("Run server failed", zap.Error(err))
 	}
 }

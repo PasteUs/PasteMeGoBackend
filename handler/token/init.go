@@ -53,6 +53,6 @@ func init() {
 	}
 
 	if err = AuthMiddleware.MiddlewareInit(); err != nil {
-		logging.Panic("jwt middleware init failed", zap.String("err", err.Error()))
+		logging.Panic("jwt middleware init failed", zap.Error(err))
 	}
 }
