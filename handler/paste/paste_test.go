@@ -137,7 +137,7 @@ func creatTestCaseGenerator() map[string]testCase {
 						"lang":          "python",
 						"password":      password,
 						"self_destruct": pasteType != "permanent",
-						"expire_minute": 1,
+						"expire_second": 1,
 						"expire_count":  1,
 					},
 					map[string]string{},
@@ -150,12 +150,12 @@ func creatTestCaseGenerator() map[string]testCase {
 
 	for _, name := range []string{
 		"bind_failed", "empty_lang", "empty_content",
-		"zero_expire_count", "zero_expire_minute",
+		"zero_expire_count", "zero_expire_second",
 		"month_expiration", "big_expiration", "invalid_lang", // "db_locked",
 	} {
 		var (
 			expectedStatus             = -1
-			expireMinute   interface{} = model.OneMonth
+			ExpireSecond   interface{} = model.OneMonth
 			expireCount                = 1
 			content                    = "print('Hello World!')"
 			lang                       = "python"
@@ -172,21 +172,21 @@ func creatTestCaseGenerator() map[string]testCase {
 			expectedStatus = common.ErrEmptyContent.Code
 			message = common.ErrEmptyContent.Error()
 		case "bind_failed":
-			expireMinute = "1"
+			ExpireSecond = "1"
 			expectedStatus = common.ErrWrongParamType.Code
 			message = common.ErrWrongParamType.Error()
 		case "zero_expire_count":
 			expireCount = 0
 			expectedStatus = common.ErrZeroExpireCount.Code
 			message = common.ErrZeroExpireCount.Error()
-		case "zero_expire_minute":
-			expireMinute = 0
-			expectedStatus = common.ErrZeroExpireMinute.Code
-			message = common.ErrZeroExpireMinute.Error()
+		case "zero_expire_second":
+			ExpireSecond = 0
+			expectedStatus = common.ErrZeroExpireSecond.Code
+			message = common.ErrZeroExpireSecond.Error()
 		case "month_expiration":
-			expireMinute = model.OneMonth + 1
-			expectedStatus = common.ErrExpireMinuteGreaterThanMonth.Code
-			message = common.ErrExpireMinuteGreaterThanMonth.Error()
+			ExpireSecond = model.OneMonth + 1
+			expectedStatus = common.ErrExpireSecondGreaterThanMonth.Code
+			message = common.ErrExpireSecondGreaterThanMonth.Error()
 		case "big_expiration":
 			expireCount = model.MaxCount + 1
 			expectedStatus = common.ErrExpireCountGreaterThanMaxCount.Code
@@ -210,7 +210,7 @@ func creatTestCaseGenerator() map[string]testCase {
 					"lang":          lang,
 					"password":      "",
 					"self_destruct": true,
-					"expire_minute": expireMinute,
+					"expire_second": ExpireSecond,
 					"expire_count":  expireCount,
 				},
 				map[string]string{},

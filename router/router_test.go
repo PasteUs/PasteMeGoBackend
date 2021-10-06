@@ -91,7 +91,7 @@ func makeCreateTestCase() (result map[string]*testCase) {
 
 			if pasteType == "temporary" {
 				result[name].param["self_destruct"] = true
-				result[name].param["expire_minute"] = 5
+				result[name].param["expire_second"] = 5
 				result[name].param["expire_count"] = 1
 			}
 		}

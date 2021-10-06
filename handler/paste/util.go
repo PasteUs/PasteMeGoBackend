@@ -15,7 +15,7 @@ var (
 type CreateRequest struct {
 	*model.AbstractPaste
 	SelfDestruct bool   `json:"self_destruct" example:"true"` // 是否自我销毁
-	ExpireMinute uint64 `json:"expire_minute" example:"5"`    // 创建若干分钟后自我销毁
+	ExpireSecond uint64 `json:"expire_second" example:"300"`    // 创建若干秒后自我销毁
 	ExpireCount  uint64 `json:"expire_count" example:"1"`     // 访问若干次后自我销毁
 }
 
@@ -51,15 +51,15 @@ func validator(body CreateRequest) *common.ErrorResponse {
 	}
 
 	if body.SelfDestruct {
-		if body.ExpireMinute <= 0 {
-			return common.ErrZeroExpireMinute
+		if body.ExpireSecond <= 0 {
+			return common.ErrZeroExpireSecond
 		}
 		if body.ExpireCount <= 0 {
 			return common.ErrZeroExpireCount
 		}
 
-		if body.ExpireMinute > model.OneMonth {
-			return common.ErrExpireMinuteGreaterThanMonth
+		if body.ExpireSecond > model.OneMonth {
+			return common.ErrExpireSecondGreaterThanMonth
 		}
 		if body.ExpireCount > model.MaxCount {
 			return common.ErrExpireCountGreaterThanMaxCount
@@ -76,7 +76,7 @@ func authenticator(body CreateRequest) *common.ErrorResponse {
 		if body.ExpireCount > 1 {
 			return common.ErrUnauthorized
 		}
-		if body.ExpireMinute > 5 {
+		if body.ExpireSecond > 5 {
 			return common.ErrUnauthorized
 		}
 	}

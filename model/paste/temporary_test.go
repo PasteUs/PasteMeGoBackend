@@ -22,7 +22,7 @@ func assertEqual(t *testing.T, expect interface{}, got interface{}) {
 func TestTemporaryGet(t *testing.T) {
 	paste := Temporary{AbstractPaste: &AbstractPaste{}}
 	paste.ExpireCount = 2
-	paste.ExpireMinute = 10086
+	paste.ExpireSecond = 10086
 
 	assertNil(t, paste.Save())
 	assertNil(t, paste.Get(""))
@@ -31,15 +31,17 @@ func TestTemporaryGet(t *testing.T) {
 }
 
 func TestTemporaryAutoDelete(t *testing.T) {
+	var expireSecond uint64 = 1
+
 	paste := Temporary{AbstractPaste: &AbstractPaste{}}
 	paste.ExpireCount = 10086
-	paste.ExpireMinute = 1
+	paste.ExpireSecond = expireSecond
 
 	assertNil(t, paste.Save())
 	assertNil(t, paste.Get(""))
 	key := paste.Key
 	paste.Key = "a1b2c3d4"
-	time.Sleep(time.Minute*1 + time.Second)
+	time.Sleep(time.Second * time.Duration(expireSecond + 1))
 	assertEqual(t, false, exist(key, &paste))
 	assertEqual(t, gorm.ErrRecordNotFound, (&Temporary{AbstractPaste: &AbstractPaste{Key: key}}).Get(""))
 }
@@ -53,7 +55,7 @@ func TestTemporaryConcurrentGet(t *testing.T) {
 
 	paste := Temporary{AbstractPaste: &AbstractPaste{}}
 	paste.ExpireCount = expireCount
-	paste.ExpireMinute = 1
+	paste.ExpireSecond = 300
 	assertNil(t, paste.Save())
 
 	key := paste.Key
