@@ -5,6 +5,7 @@ import (
 	"github.com/PasteUs/PasteMeGoBackend/model/dao"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 	"time"
 )
 
@@ -61,7 +62,7 @@ func (paste *Temporary) Expired() bool {
 // Get 成员函数，查看
 func (paste *Temporary) Get(password string) error {
 	if err := dao.DB.Transaction(func(tx *gorm.DB) error {
-		if e := tx.Take(&paste).Error; e != nil {
+		if e := tx.Clauses(clause.Locking{Strength: "UPDATE"}).Take(&paste).Error; e != nil {
 			return e
 		}
 
