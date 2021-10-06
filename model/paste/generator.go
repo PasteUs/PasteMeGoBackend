@@ -18,7 +18,7 @@ func getOne(cs []rune) rune {
 	return cs[rand.Intn(len(cs))]
 }
 
-func generator(length int, zeroFirst bool) string {
+func _generator(length int, zeroFirst bool) string {
 	ret := make([]rune, length)
 
 	if zeroFirst {
@@ -33,10 +33,10 @@ func generator(length int, zeroFirst bool) string {
 	return string(ret)
 }
 
-func Generator(length int, zeroFirst bool, model interface{}) string {
-	str := generator(length, zeroFirst)
-	for Exist(str, model) {
-		str = generator(length, zeroFirst)
+func generator(length int, zeroFirst bool, model interface{}) string {
+	str := _generator(length, zeroFirst)
+	for exist(str, model) {
+		str = _generator(length, zeroFirst)
 	}
 	return str
 }

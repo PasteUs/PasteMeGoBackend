@@ -7,7 +7,6 @@ import (
 	"github.com/PasteUs/PasteMeGoBackend/common/logging"
 	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
-	_ "gorm.io/driver/mysql"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"

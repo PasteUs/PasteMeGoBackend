@@ -19,7 +19,7 @@ type Permanent struct {
 
 // Save 成员函数，创建
 func (paste *Permanent) Save() error {
-	paste.Key = Generator(8, false, &paste)
+	paste.Key = generator(8, false, &paste)
 	paste.Password = hash(paste.Password)
 	return dao.DB.Create(&paste).Error
 }

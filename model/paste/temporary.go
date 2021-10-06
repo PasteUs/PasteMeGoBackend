@@ -1,7 +1,9 @@
 package paste
 
 import (
+	"github.com/PasteUs/PasteMeGoBackend/common/logging"
 	"github.com/PasteUs/PasteMeGoBackend/model/dao"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 	"time"
 )
@@ -26,14 +28,34 @@ type Temporary struct {
 
 // Save 成员函数，保存
 func (paste *Temporary) Save() error {
-	paste.Key = Generator(8, true, &paste)
+	paste.Key = generator(8, true, &paste)
 	paste.Password = hash(paste.Password)
-	return dao.DB.Create(&paste).Error
+	err := dao.DB.Create(&paste).Error
+	if err == nil {
+		key := paste.Key
+		time.AfterFunc(time.Minute*time.Duration(paste.ExpireMinute), func() {
+			if e := dao.DB.Delete(&Temporary{AbstractPaste: &AbstractPaste{Key: key}}).Error; e != nil {
+				logging.Error("delete paste failed", zap.String("key", paste.Key), zap.String("err", e.Error()))
+			}
+		})
+	}
+	return err
 }
 
 // Delete 成员函数，删除
 func (paste *Temporary) Delete() error {
 	return dao.DB.Delete(&paste).Error
+}
+
+func (paste *Temporary) Expired() bool {
+	duration := time.Minute * time.Duration(paste.ExpireMinute)
+	if time.Now().After(paste.CreatedAt.Add(duration)) {
+		return true
+	}
+	if paste.ExpireCount < 1 {
+		return true
+	}
+	return false
 }
 
 // Get 成员函数，查看
@@ -43,28 +65,22 @@ func (paste *Temporary) Get(password string) error {
 			return e
 		}
 
-		duration := time.Minute * time.Duration(paste.ExpireMinute)
-		if time.Now().After(paste.CreatedAt.Add(duration)) {
-			if e := tx.Delete(&paste).Error; e != nil {
-				return e
-			}
+		if paste.Expired() {
 			paste.CreatedAt = nilTime // 通过此字段标记为非法，transaction 生效后再 return error
-			return nil
+			return tx.Delete(&paste).Error
 		}
 
 		if e := paste.checkPassword(password); e != nil {
 			return e
 		}
 
-		if paste.ExpireCount <= 1 {
-			if e := tx.Delete(&paste).Error; e != nil {
-				return e
-			}
-		} else {
-			return tx.Model(&paste).Update("expire_count", paste.ExpireCount-1).Error
-		}
+		paste.ExpireCount -= 1
 
-		return nil
+		if paste.Expired() {
+			return tx.Delete(&paste).Error
+		} else {
+			return tx.Save(&paste).Error
+		}
 	}); err != nil {
 		return err
 	} else if paste.CreatedAt.IsZero() {

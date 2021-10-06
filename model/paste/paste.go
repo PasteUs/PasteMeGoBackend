@@ -53,7 +53,7 @@ func (paste *AbstractPaste) checkPassword(password string) *common.ErrorResponse
 	return common.ErrWrongPassword
 }
 
-func Exist(key string, model interface{}) bool {
+func exist(key string, model interface{}) bool {
 	count := int64(0)
 	dao.DB.Model(model).Where("`key` = ?", key).Count(&count)
 	return count > 0
