@@ -93,13 +93,13 @@ func load(filename string) {
 		logging.Panic(
 			"open file failed",
 			zap.String("pwd", pwd),
-			zap.String("err", err.Error()),
+			zap.Error(err),
 		)
 	}
 
 	err = json.Unmarshal(data, &Config)
 	if err != nil {
-		logging.Panic("parse Config failed", zap.String("err", err.Error()))
+		logging.Panic("parse Config failed", zap.Error(err))
 	}
 
 	exportConfig(filename, Config)
