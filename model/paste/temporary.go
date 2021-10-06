@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	OneMonth = 31 * 24 * 60
+	OneMonth = 31 * 24 * 60 * 60
 	MaxCount = 3
 )
 
@@ -23,7 +23,7 @@ func init() {
 // Temporary 临时
 type Temporary struct {
 	*AbstractPaste        // 公有字段
-	ExpireMinute   uint64 `json:"expire_minute"` // 过期时间
+	ExpireSecond   uint64 `json:"expire_second"` // 过期时间
 	ExpireCount    uint64 `json:"expire_count"` // 过期的次数
 }
 
@@ -34,7 +34,7 @@ func (paste *Temporary) Save() error {
 	err := dao.DB.Create(&paste).Error
 	if err == nil {
 		key := paste.Key
-		time.AfterFunc(time.Minute*time.Duration(paste.ExpireMinute), func() {
+		time.AfterFunc(time.Second*time.Duration(paste.ExpireSecond), func() {
 			if e := dao.DB.Delete(&Temporary{AbstractPaste: &AbstractPaste{Key: key}}).Error; e != nil {
 				logging.Error("delete paste failed", zap.String("key", paste.Key), zap.String("err", e.Error()))
 			}
@@ -49,7 +49,7 @@ func (paste *Temporary) Delete() error {
 }
 
 func (paste *Temporary) Expired() bool {
-	duration := time.Minute * time.Duration(paste.ExpireMinute)
+	duration := time.Second * time.Duration(paste.ExpireSecond)
 	if time.Now().After(paste.CreatedAt.Add(duration)) {
 		return true
 	}

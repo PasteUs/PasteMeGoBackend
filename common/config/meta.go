@@ -5,7 +5,7 @@ import (
 	"go.uber.org/zap"
 )
 
-var version = "3.5.0"
+var version = "3.5.1"
 var validConfigVersion = []string{"3.3.0", ""}
 
 func init() {

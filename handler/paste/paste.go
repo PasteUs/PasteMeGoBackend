@@ -56,7 +56,7 @@ func Create(context *gin.Context) {
 	if body.SelfDestruct {
 		paste = &model.Temporary{
 			AbstractPaste: body.AbstractPaste,
-			ExpireMinute:  body.ExpireMinute,
+			ExpireSecond:  body.ExpireSecond,
 			ExpireCount:   body.ExpireCount,
 		}
 	} else {

@@ -6,9 +6,9 @@ import (
 )
 
 var (
-	ErrZeroExpireMinute               = New(http.StatusBadRequest, 1, "zero expire time")
+	ErrZeroExpireSecond               = New(http.StatusBadRequest, 1, "zero expire time")
 	ErrZeroExpireCount                = New(http.StatusBadRequest, 2, "zero expire count")
-	ErrExpireMinuteGreaterThanMonth   = New(http.StatusBadRequest, 3, "expire minute greater than a month")
+	ErrExpireSecondGreaterThanMonth   = New(http.StatusBadRequest, 3, "expire minute greater than a month")
 	ErrExpireCountGreaterThanMaxCount = New(http.StatusBadRequest, 4, "expire count greater than max count")
 	ErrEmptyContent                   = New(http.StatusBadRequest, 5, "empty content")
 	ErrEmptyLang                      = New(http.StatusBadRequest, 6, "empty lang")
