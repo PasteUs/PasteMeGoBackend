@@ -3,6 +3,7 @@
 BASE=github.com/PasteUs/PasteMeGoBackend/
 
 PACKAGE_LISTS="
+model/paste
 handler/paste
 router
 "
@@ -33,7 +34,7 @@ for PACKAGE in ${PACKAGE_LISTS}; do
             exit 1
         fi
     else
-        if ! go test -count=1 -cover "${BASE}${PACKAGE}" -args -c "${PWD}/config.json"; then
+        if ! go test -count=1 -cover "${BASE}${PACKAGE}" -args -c "${PWD}/config.json" --debug; then
             echo "test ${PACKAGE} failed"
             exit 1
         fi
