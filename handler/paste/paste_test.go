@@ -137,7 +137,7 @@ func creatTestCaseGenerator() map[string]testCase {
 						"lang":          "python",
 						"password":      password,
 						"self_destruct": pasteType != "permanent",
-						"expire_second": 1,
+						"expire_second": 60,
 						"expire_count":  1,
 					},
 					map[string]string{},
