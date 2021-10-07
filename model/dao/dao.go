@@ -50,7 +50,7 @@ func init() {
 		}
 		logging.Info("sqlite connect success", zap.String("sqlite_path", sqlitePath))
 	} else {
-		if DB, err = gorm.Open(mysql.Open(formatWithConfig(config.Config.Database))); err != nil {
+		if DB, err = gorm.Open(mysql.Open(formatWithConfig(config.Config.Database)), gormConfig); err != nil {
 			logging.Panic("connect to mysql failed", zap.Error(err))
 			return
 		}
