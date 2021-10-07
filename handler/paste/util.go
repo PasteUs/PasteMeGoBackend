@@ -76,7 +76,7 @@ func authenticator(body CreateRequest) *common.ErrorResponse {
 		if body.ExpireCount > 1 {
 			return common.ErrUnauthorized
 		}
-		if body.ExpireSecond > 5 {
+		if body.ExpireSecond > 5 * 60 {
 			return common.ErrUnauthorized
 		}
 	}
