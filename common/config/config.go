@@ -31,28 +31,6 @@ var Config config
 
 func init() {
 	load(flag.Config)
-	checkVersion(Config.Version)
-}
-
-func isInArray(item string, array []string) bool {
-	for _, each := range array {
-		if item == each {
-			return true
-		}
-	}
-	return false
-}
-
-func checkVersion(v string) {
-	if v != version {
-		if !isInArray(v, validConfigVersion) {
-			logging.Panic(
-				"invalid Config version",
-				zap.Strings("valid_config_version_list", validConfigVersion),
-				zap.String("config_version", v),
-			)
-		}
-	}
 }
 
 func exportConfig(filename string, c config) {
