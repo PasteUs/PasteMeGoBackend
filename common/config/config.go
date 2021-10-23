@@ -2,9 +2,8 @@ package config
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/PasteUs/PasteMeGoBackend/common/flag"
-	"github.com/PasteUs/PasteMeGoBackend/common/logging"
-	"go.uber.org/zap"
 	"io/ioutil"
 	"os"
 )
@@ -19,7 +18,6 @@ type Database struct {
 }
 
 type config struct {
-	Version  string   `json:"version"`
 	Address  string   `json:"address"`
 	Port     uint16   `json:"port"`
 	Secret   string   `json:"secret"`
@@ -33,52 +31,19 @@ func init() {
 	load(flag.Config)
 }
 
-func exportConfig(filename string, c config) {
-	if flag.Debug {
-		logging.Info(
-			"Config loaded",
-			zap.String("config_file", filename),
-			zap.String("config_version", c.Version),
-			zap.String("address", c.Address),
-			zap.String("log_file", c.LogFile),
-			zap.Uint16("port", c.Port),
-		)
-
-		if c.Database.Type == "mysql" {
-			logging.Info(
-				"database",
-				zap.String("type", c.Database.Type),
-				zap.String("username", c.Database.Username),
-				zap.String("password", c.Database.Password),
-				zap.String("server", c.Database.Server),
-				zap.Uint16("port", c.Database.Port),
-				zap.String("database", c.Database.Database),
-			)
-		} else {
-			logging.Info(
-				"database",
-				zap.String("type", c.Database.Type),
-			)
-		}
-	}
-}
-
 func load(filename string) {
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
 		pwd, _ := os.Getwd()
+		panic(fmt.Sprintf("open %s under %s failed, error = \"%s\"\n", filename, pwd, err.Error()))
+	}
 
-		logging.Panic(
-			"open file failed",
-			zap.String("pwd", pwd),
-			zap.Error(err),
-		)
+	if flag.Debug {
+		fmt.Printf("read %s done, got %s\n", filename, string(data))
 	}
 
 	err = json.Unmarshal(data, &Config)
 	if err != nil {
-		logging.Panic("parse Config failed", zap.Error(err))
+		panic(fmt.Sprintf("parse Config failed, error = \"%s\"\n", err.Error()))
 	}
-
-	exportConfig(filename, Config)
 }

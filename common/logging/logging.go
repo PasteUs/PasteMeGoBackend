@@ -1,6 +1,7 @@
 package logging
 
 import (
+	"github.com/PasteUs/PasteMeGoBackend/common/config"
 	"go.uber.org/zap"
 )
 
@@ -15,11 +16,12 @@ var (
 )
 
 func init() {
-	config := zap.NewProductionConfig()
+	zapConfig := zap.NewProductionConfig()
+	if config.Config.LogFile != "" {
+		zapConfig.OutputPaths = append(zapConfig.OutputPaths, config.Config.LogFile)
+	}
 
-	config.OutputPaths = append(config.OutputPaths, "pasteme.log")
-
-	lgr, _ := config.Build(zap.AddCaller(), zap.AddCallerSkip(1))
+	lgr, _ := zapConfig.Build(zap.AddCaller(), zap.AddCallerSkip(1))
 	logger = lgr
 
 	Debug = getLogger(logger.Debug)

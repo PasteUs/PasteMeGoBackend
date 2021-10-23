@@ -4,10 +4,6 @@
   "port": 8000,
   "database": {
     "type": "sqlite3",
-    "username": "username",
-    "password": "password",
-    "server": "localhost",
-    "port": 4399,
-    "database": "pasteme"
+    "database": "pasteme.db"
   }
 }

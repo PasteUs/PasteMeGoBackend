@@ -23,7 +23,7 @@ Accept: application/json
   "content": "print('Hello World!')",
   "self_destruct": true,
   "expire_count": 1,
-  "expire_minute": 1
+  "expire_second": 1
 }
 
 ### Get paste

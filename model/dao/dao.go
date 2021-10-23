@@ -41,7 +41,7 @@ func init() {
 		}
 	)
 	if config.Config.Database.Type != "mysql" {
-		sqlitePath := flag.DataDir + "pasteme.db"
+		sqlitePath := config.Config.Database.Database
 		pwd, _ := os.Getwd()
 		logging.Info("using sqlite", zap.String("database_type", config.Config.Database.Type), zap.String("work_dir", pwd))
 		if DB, err = gorm.Open(sqlite.Open(sqlitePath), gormConfig); err != nil {
