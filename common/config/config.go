@@ -19,7 +19,6 @@ type Database struct {
 }
 
 type config struct {
-	Version  string   `json:"version"`
 	Address  string   `json:"address"`
 	Port     uint16   `json:"port"`
 	Secret   string   `json:"secret"`
@@ -38,7 +37,6 @@ func exportConfig(filename string, c config) {
 		logging.Info(
 			"Config loaded",
 			zap.String("config_file", filename),
-			zap.String("config_version", c.Version),
 			zap.String("address", c.Address),
 			zap.String("log_file", c.LogFile),
 			zap.Uint16("port", c.Port),

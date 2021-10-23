@@ -5,8 +5,7 @@ import (
 	"go.uber.org/zap"
 )
 
-var version = "3.5.1"
-var validConfigVersion = []string{"3.3.0", ""}
+var version = "3.5.2"
 
 func init() {
 	logging.Info("PasteMe Go Backend", zap.String("version", version))
