@@ -12,7 +12,7 @@ require (
 	github.com/ugorji/go v1.2.6 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.7.0 // indirect
-	go.uber.org/zap v1.19.1
+	go.uber.org/zap v1.21.0
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519 // indirect
 	golang.org/x/sys v0.0.0-20211003122950-b1ebd4e1001c // indirect
 	golang.org/x/text v0.3.7 // indirect
